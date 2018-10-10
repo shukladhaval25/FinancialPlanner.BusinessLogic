@@ -32,6 +32,17 @@ namespace FinancialPlanner.BusinessLogic.Plans
             }
             return lstPlanner;
         }
+        public Planner GetByPlannerId(int Id)
+        {
+            Planner planner = new Planner();
+
+            DataTable dtAppConfig =  DataBase.DBService.ExecuteCommand(string.Format(SELECT_ID,Id));
+            foreach (DataRow dr in dtAppConfig.Rows)
+            {
+                planner = convertToPlannerObject(dr);
+            }
+            return planner;
+        }
 
         private Planner convertToPlannerObject(DataRow dr)
         {
@@ -42,7 +53,7 @@ namespace FinancialPlanner.BusinessLogic.Plans
                 Name = dr.Field<string>("Name"),
                 StartDate = dr.Field<DateTime>("StartDate"),
                 UpdatedByUserName = dr.Field<string>("UpdatedByUserName")
-            };           
+            };
             return planner;
         }
         public void Add(Planner planner)
@@ -51,7 +62,7 @@ namespace FinancialPlanner.BusinessLogic.Plans
             {
                 DataBase.DBService.ExecuteCommand(string.Format(INSERT_QUERY,
                     planner.ClientId, planner.Name, planner.StartDate.ToString("yyyy-MM-dd"),
-                    planner.EndDate.ToString("yyyy-MM-dd"),planner.IsActive,
+                    planner.EndDate.ToString("yyyy-MM-dd"), planner.IsActive,
                     planner.CreatedOn.ToString("yyyy-MM-dd hh:mm:ss"), planner.CreatedBy,
                     planner.UpdatedOn.ToString("yyyy-MM-dd hh:mm:ss"), planner.UpdatedBy));
 
