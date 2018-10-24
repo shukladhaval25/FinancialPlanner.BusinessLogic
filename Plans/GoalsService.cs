@@ -181,6 +181,8 @@ namespace FinancialPlanner.BusinessLogic
                     addLoanForGoal(Goals);
                 else if (Goals.LoanForGoal != null && Goals.LoanForGoal.Id != 0)
                     updateLoansForGoal(Goals);
+                else
+                    DataBase.DBService.ExecuteCommandString(string.Format(DELETE_LOANFORGOAL_QUERY, Goals.Id), true);
 
                 Activity.ActivitiesService.Add(ActivityType.UpdateGoals, EntryStatus.Success,
                          Source.Server, Goals.UpdatedByUserName, clientName, Goals.MachineName);
