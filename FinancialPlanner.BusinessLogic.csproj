@@ -71,6 +71,7 @@
     <Compile Include="LifeInsurance\GeneralInsuranceService.cs" />
     <Compile Include="LifeInsurance\LifeInsuranceService.cs" />
     <Compile Include="PlanOption\CashFlowService.cs" />
+    <Compile Include="PlanOption\CurrentStatusToGoalService.cs" />
     <Compile Include="PlanOption\PlanOptionService.cs" />
     <Compile Include="Plans\ExpensesSesrvice.cs" />
     <Compile Include="Plans\GoalsService.cs" />

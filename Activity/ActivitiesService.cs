@@ -169,6 +169,10 @@ namespace FinancialPlanner.BusinessLogic.Activity
         private static readonly string UPDATE_MF_TRANSACTION ="{0} updated successfully.";
         private static readonly string DELETE_MF_TRANSACTION = "{0} deleted successfully.";
 
+        private static string ADD_CURRENTSTATUSTOGOAL="{0} fund allocation added successfully.";
+        private static string UPDATE_CURRENTSTATUSTOGOAL ="{0} fund allocation updated successfully.";
+        private static string DELETE_CURRENTSTATUSTOGOAL = "{0} fund allocation deleted successfully.";
+
         public static IList<Activities> Get()
         {
             IList<Activities> lstActivities = new List<Activities>();
@@ -397,6 +401,11 @@ namespace FinancialPlanner.BusinessLogic.Activity
                 _lstActivityDescription.Add(new KeyValuePair<ActivityType, string>(ActivityType.CreateNSC, ADD_NSC));
                 _lstActivityDescription.Add(new KeyValuePair<ActivityType, string>(ActivityType.UpdateNSC, UPDATE_NSC));
                 _lstActivityDescription.Add(new KeyValuePair<ActivityType, string>(ActivityType.DeleteNSC, DELETE_NSC));
+
+                // Current Status To Goal
+                _lstActivityDescription.Add(new KeyValuePair<ActivityType, string>(ActivityType.CreateCurrentStatusToGoal, ADD_CURRENTSTATUSTOGOAL));
+                _lstActivityDescription.Add(new KeyValuePair<ActivityType, string>(ActivityType.UpdateCurrentStatusToGoal, UPDATE_CURRENTSTATUSTOGOAL));
+                _lstActivityDescription.Add(new KeyValuePair<ActivityType, string>(ActivityType.DeleteCurrentStatusToGoal, DELETE_CURRENTSTATUSTOGOAL));
 
                 //PlannerAssumption
                 _lstActivityDescription.Add(new KeyValuePair<ActivityType, string>(ActivityType.UpdatePlannerAssumption, UPDATE_PLANNER_ASSUMPTION));
