@@ -16,6 +16,7 @@ namespace FinancialPlanner.BusinessLogic
         private const string GET_CLIENT_NAME_QUERY = "SELECT C.NAME FROM CLIENT C, PLANNER P  WHERE P.CLIENTID = C.ID AND P.ID = {0}";
         const string SELECT_ALL = "SELECT N1.*,U.USERNAME AS UPDATEDBYUSERNAME FROM Goals N1, USERS U WHERE N1.UPDATEDBY = U.ID AND N1.PID = {0}";
         const string SELECT_BYID = "SELECT N1.*,U.USERNAME AS UPDATEDBYUSERNAME FROM Goals N1, USERS U WHERE N1.UPDATEDBY = U.ID AND N1.ID = {0} AND N1.PID ={1}";
+        const string SELECT_GOAL_ID = "SELECT ID FROM GOALS WHERE NAME = '{0}' and PID = {1} AND AMOUNT = {2}";
 
         const string SELECT_LOANGFORGOAL_BYID = "SELECT N1.*,U.USERNAME AS UPDATEDBYUSERNAME FROM LOANFORGOALS N1, USERS U WHERE N1.UPDATEDBY = U.ID AND N1.GOALID ={0}";
 
@@ -151,6 +152,10 @@ namespace FinancialPlanner.BusinessLogic
 
         private static void addLoanForGoal(Goals Goals)
         {
+            int goalId;
+            int.TryParse(DataBase.DBService.ExecuteCommandScalar(string.Format(SELECT_GOAL_ID, Goals.Name, Goals.Pid, Goals.Amount)), out goalId);
+
+            Goals.LoanForGoal.GoalId = goalId;
             DataBase.DBService.ExecuteCommandString(string.Format(INSERT_GOALLOAN_QUERY,
                                   Goals.LoanForGoal.GoalId, Goals.LoanForGoal.LoanAmount,
                                   Goals.LoanForGoal.EMI, Goals.LoanForGoal.ROI,
