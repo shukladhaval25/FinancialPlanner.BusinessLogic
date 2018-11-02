@@ -173,6 +173,10 @@ namespace FinancialPlanner.BusinessLogic.Activity
         private static string UPDATE_CURRENTSTATUSTOGOAL ="{0} fund allocation updated successfully.";
         private static string DELETE_CURRENTSTATUSTOGOAL = "{0} fund allocation deleted successfully.";
 
+        private static readonly string ADD_BANK_ACCOUNT = "{0} Bank Account added successfully.";
+        private static readonly string UPDATE_BANK_ACCOUNT = "{0} Bank Account updated successfully.";
+        private static readonly string DELETE_BANK_ACCOUNT = "{0} Bank Account deleted successfully";
+
         public static IList<Activities> Get()
         {
             IList<Activities> lstActivities = new List<Activities>();
@@ -406,6 +410,11 @@ namespace FinancialPlanner.BusinessLogic.Activity
                 _lstActivityDescription.Add(new KeyValuePair<ActivityType, string>(ActivityType.CreateCurrentStatusToGoal, ADD_CURRENTSTATUSTOGOAL));
                 _lstActivityDescription.Add(new KeyValuePair<ActivityType, string>(ActivityType.UpdateCurrentStatusToGoal, UPDATE_CURRENTSTATUSTOGOAL));
                 _lstActivityDescription.Add(new KeyValuePair<ActivityType, string>(ActivityType.DeleteCurrentStatusToGoal, DELETE_CURRENTSTATUSTOGOAL));
+
+                // Bank Account
+                _lstActivityDescription.Add(new KeyValuePair<ActivityType, string>(ActivityType.CreateBankAccount, ADD_BANK_ACCOUNT));
+                _lstActivityDescription.Add(new KeyValuePair<ActivityType, string>(ActivityType.UpdateBankAccount, UPDATE_BANK_ACCOUNT));
+                _lstActivityDescription.Add(new KeyValuePair<ActivityType, string>(ActivityType.DeleteBankAccount, DELETE_BANK_ACCOUNT));
 
                 //PlannerAssumption
                 _lstActivityDescription.Add(new KeyValuePair<ActivityType, string>(ActivityType.UpdatePlannerAssumption, UPDATE_PLANNER_ASSUMPTION));

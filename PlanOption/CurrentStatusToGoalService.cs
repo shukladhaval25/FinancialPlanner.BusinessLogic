@@ -14,7 +14,9 @@ namespace FinancialPlanner.BusinessLogic.PlanOption
 {
     public class CurrentStatusToGoalService
     {
-        private readonly string SELECT_ID = "SELECT N1.*,U.USERNAME AS UPDATEDBYUSERNAME FROM CURRESNTSTATUSTOGOAL N1, USERS U WHERE N1.UPDATEDBY = U.ID AND N1.OID = {0}";
+        private readonly string SELECT_ID = "SELECT N1.*,U.USERNAME AS UPDATEDBYUSERNAME,G.NAME AS GOALNAME FROM CURRESNTSTATUSTOGOAL N1," +
+            " USERS U,GOALS G WHERE N1.UPDATEDBY = U.ID AND N1.OID = {0} AND " +
+            " N1.GOALID = G.ID; ";
 
         const string INSERT_CurrentStatusToGoal= "INSERT INTO CURRESNTSTATUSTOGOAL VALUES (" +
             "{0},{1},{2},{3},'{4}',{5},'{6}',{7})";
@@ -148,6 +150,7 @@ namespace FinancialPlanner.BusinessLogic.PlanOption
             currentStatusToGoal.Id = dr.Field<int>("ID");
             currentStatusToGoal.OptionId = dr.Field<int>("OId");
             currentStatusToGoal.PlannerId = dr.Field<int>("PId");
+            currentStatusToGoal.GoalName = dr.Field<string>("GoalName");
             currentStatusToGoal.FundAllocation = double.Parse(dr["FundAllocation"].ToString());
             currentStatusToGoal.GoalId = dr.Field<int>("GoalId");
             currentStatusToGoal.UpdatedBy = dr.Field<int>("UpdatedBy");
