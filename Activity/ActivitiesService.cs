@@ -176,6 +176,8 @@ namespace FinancialPlanner.BusinessLogic.Activity
         private static readonly string ADD_BANK_ACCOUNT = "{0} Bank Account added successfully.";
         private static readonly string UPDATE_BANK_ACCOUNT = "{0} Bank Account updated successfully.";
         private static readonly string DELETE_BANK_ACCOUNT = "{0} Bank Account deleted successfully";
+        private static readonly string ADD_DOCUMENT = "{0} document added successfully.";
+        private static readonly string DELETE_DOCUMENT ="{0} document deleted successfully.";
 
         public static IList<Activities> Get()
         {
@@ -415,6 +417,10 @@ namespace FinancialPlanner.BusinessLogic.Activity
                 _lstActivityDescription.Add(new KeyValuePair<ActivityType, string>(ActivityType.CreateBankAccount, ADD_BANK_ACCOUNT));
                 _lstActivityDescription.Add(new KeyValuePair<ActivityType, string>(ActivityType.UpdateBankAccount, UPDATE_BANK_ACCOUNT));
                 _lstActivityDescription.Add(new KeyValuePair<ActivityType, string>(ActivityType.DeleteBankAccount, DELETE_BANK_ACCOUNT));
+
+                //Document
+                _lstActivityDescription.Add(new KeyValuePair<ActivityType, string>(ActivityType.CreateDocument, ADD_DOCUMENT));
+                _lstActivityDescription.Add(new KeyValuePair<ActivityType, string>(ActivityType.DeleteDocument, DELETE_DOCUMENT));
 
                 //PlannerAssumption
                 _lstActivityDescription.Add(new KeyValuePair<ActivityType, string>(ActivityType.UpdatePlannerAssumption, UPDATE_PLANNER_ASSUMPTION));
