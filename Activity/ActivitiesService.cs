@@ -176,8 +176,15 @@ namespace FinancialPlanner.BusinessLogic.Activity
         private static readonly string ADD_BANK_ACCOUNT = "{0} Bank Account added successfully.";
         private static readonly string UPDATE_BANK_ACCOUNT = "{0} Bank Account updated successfully.";
         private static readonly string DELETE_BANK_ACCOUNT = "{0} Bank Account deleted successfully";
+
         private static readonly string ADD_DOCUMENT = "{0} document added successfully.";
         private static readonly string DELETE_DOCUMENT ="{0} document deleted successfully.";
+
+        private static readonly string ADD_FESTIVALS = "{0} festival added successfully";
+        private static readonly string DELETE_FESTIVALS ="{0} festival deleted successfully";
+
+        private static readonly string ADD_CRM_GROUP = "{0} CRM group added successfully";
+        private static readonly string DELETE_CRM_GROUP ="{0} CRM group deleted successfully";
 
         public static IList<Activities> Get()
         {
@@ -421,6 +428,14 @@ namespace FinancialPlanner.BusinessLogic.Activity
                 //Document
                 _lstActivityDescription.Add(new KeyValuePair<ActivityType, string>(ActivityType.CreateDocument, ADD_DOCUMENT));
                 _lstActivityDescription.Add(new KeyValuePair<ActivityType, string>(ActivityType.DeleteDocument, DELETE_DOCUMENT));
+
+                //Festivals
+                _lstActivityDescription.Add(new KeyValuePair<ActivityType, string>(ActivityType.CreateFestivals, ADD_FESTIVALS));
+                _lstActivityDescription.Add(new KeyValuePair<ActivityType, string>(ActivityType.DeleteFestivals, DELETE_FESTIVALS));
+
+                //CRM Group
+                _lstActivityDescription.Add(new KeyValuePair<ActivityType, string>(ActivityType.CreateCRMGroup, ADD_CRM_GROUP));
+                _lstActivityDescription.Add(new KeyValuePair<ActivityType, string>(ActivityType.DeleteCRMGroup, DELETE_CRM_GROUP));
 
                 //PlannerAssumption
                 _lstActivityDescription.Add(new KeyValuePair<ActivityType, string>(ActivityType.UpdatePlannerAssumption, UPDATE_PLANNER_ASSUMPTION));

@@ -1,0 +1,106 @@
+﻿using FinancialPlanner.Common;
+using FinancialPlanner.Common.Model;
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Diagnostics;
+using System.Linq;
+using System.Reflection;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace FinancialPlanner.BusinessLogic.Clients
+{
+    public class ClienCRMGroupService
+    {
+        private const string GET_CLIENT_NAME_QUERY = "SELECT NAME FROM CLIENT WHERE ID = {0}";
+        private const string SELECT_ALL = "SELECT C1.*,U.USERNAME AS UPDATEDBYUSERNAME FROM ClientCRMGroup C1, USERS U WHERE C1.UPDATEDBY = U.ID";
+        private const string SELECT_ALL_BY_CLIENT_ID = "SELECT C1.*,U.USERNAME AS UPDATEDBYUSERNAME FROM ClientCRMGroup C1, USERS U WHERE C1.UPDATEDBY = U.ID and C1.CID = {0}";
+
+        private const string INSERT_QUERY = "INSERT INTO ClientCRMGroup VALUES ({0},'{1}','{2}',{3},'{4}',{5})";
+        private const string UPDATE_QUERY = "UPDATE ClientCRMGroup SET RELIGION = '{0}', NAME ='{1}',UPDATEDON ='{6}',UPDATEDBY ={7} WHERE NAME ={1}";
+
+        private const string DELETE_BY_ID = "DELETE FROM ClientCRMGRoup WHERE CID ={0}";
+
+
+        public IList<ClientCRMGroup> Get(int clientId)
+        {
+            try
+            {
+                Logger.LogInfo("Get: Client festival process start");
+                IList<ClientCRMGroup> lstClientCRMGroup = new List<ClientCRMGroup>();
+
+                DataTable dtAppConfig =  DataBase.DBService.ExecuteCommand(string.Format(SELECT_ALL_BY_CLIENT_ID,clientId));
+                foreach (DataRow dr in dtAppConfig.Rows)
+                {
+                    ClientCRMGroup ClientCRMGroup = convertToClientCRMGroupObject(dr);
+                    lstClientCRMGroup.Add(ClientCRMGroup);
+                }
+                Logger.LogInfo("Get: Client festival process completed.");
+                return lstClientCRMGroup;
+            }
+            catch (Exception ex)
+            {
+                StackTrace st = new StackTrace ();
+                StackFrame sf = st.GetFrame (0);
+                MethodBase  currentMethodName = sf.GetMethod();
+                LogDebug(currentMethodName.Name, ex);
+                return null;
+            }
+        }
+
+        private ClientCRMGroup convertToClientCRMGroupObject(DataRow dr)
+        {
+            ClientCRMGroup ClientCRMGroup = new ClientCRMGroup ();
+            ClientCRMGroup.Id = dr.Field<int>("ID");
+            ClientCRMGroup.Cid = dr.Field<int>("CID");
+            ClientCRMGroup.Festival = dr.Field<string>("CRMGroup");
+            return ClientCRMGroup;
+        }
+
+        public void Add(IList<ClientCRMGroup> festivals)
+        {
+            try
+            {
+                string clientName = DataBase.DBService.ExecuteCommandScalar(string.Format(GET_CLIENT_NAME_QUERY,0));
+                if (festivals != null && festivals.Count > 0)
+                {
+                    DataBase.DBService.BeginTransaction();
+
+                    DataBase.DBService.ExecuteCommandString(string.Format(DELETE_BY_ID, festivals[0].Cid), true);
+
+                    foreach (ClientCRMGroup festival in festivals)
+                    {
+                        DataBase.DBService.ExecuteCommandString(string.Format(INSERT_QUERY,
+                           festival.Cid, festival.Festival,
+                           festival.CreatedOn.ToString("yyyy-MM-dd hh:mm:ss"), festival.CreatedBy,
+                           festival.UpdatedOn.ToString("yyyy-MM-dd hh:mm:ss"), festival.UpdatedBy), true);
+
+                        // Activity.ActivitiesService.Add(ActivityType.CreateFestivals, EntryStatus.Success,
+                        //          Source.Server, festival.UpdatedByUserName, festival.Festival, festival.MachineName);
+                    }
+                    DataBase.DBService.CommitTransaction();
+                }
+            }
+            catch (Exception ex)
+            {
+                DataBase.DBService.RollbackTransaction();
+                StackTrace st = new StackTrace ();
+                StackFrame sf = st.GetFrame (0);
+                MethodBase  currentMethodName = sf.GetMethod();
+                LogDebug(currentMethodName.Name, ex);
+                throw ex;
+            }
+        }
+
+        private void LogDebug(string methodName, Exception ex)
+        {
+            DebuggerLogInfo debuggerInfo = new DebuggerLogInfo();
+            debuggerInfo.ClassName = this.GetType().Name;
+            debuggerInfo.Method = methodName;
+            debuggerInfo.ExceptionInfo = ex;
+            Logger.LogDebug(debuggerInfo);
+        }
+    }
+}
+

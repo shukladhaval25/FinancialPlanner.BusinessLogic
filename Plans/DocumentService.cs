@@ -20,7 +20,7 @@ namespace FinancialPlanner.BusinessLogic.Plans
         const string SELECT_BYID = "SELECT N1.*,U.USERNAME AS UPDATEDBYUSERNAME FROM Document N1, USERS U WHERE N1.UPDATEDBY = U.ID AND N1.ID = {0} AND N1.PID ={1}";
 
         const string INSERT_QUERY = "INSERT INTO Document VALUES (" +
-            "{0},{1},'{2}','{3}','{4}',{5},'{6}',{7})";
+            "{0},{1},'{2}','{3}','{4}','{5}',{6},'{7}',{8})";
         const string UPDATE_QUERY = "UPDATE Document SET NAME = '{0}',UPDATEDON = '{1}'," +
             "UPDATEDBY={2} WHERE ID ={3}";
         const string DELET_QUERY = "DELETE FROM Document WHERE ID ={0}";
@@ -85,6 +85,7 @@ namespace FinancialPlanner.BusinessLogic.Plans
    
                 DataBase.DBService.ExecuteCommandString(string.Format(INSERT_QUERY,
                       document.Cid,document.Pid,document.Name, getPathWithoutRepository(document),
+                      document.Category,
                       document.CreatedOn.ToString("yyyy-MM-dd hh:mm:ss"), document.CreatedBy,
                       document.UpdatedOn.ToString("yyyy-MM-dd hh:mm:ss"), document.UpdatedBy), true);
 
@@ -113,14 +114,16 @@ namespace FinancialPlanner.BusinessLogic.Plans
             if (applicationPath == null)
                 return null;
 
-            System.IO.Directory.CreateDirectory(Path.Combine(applicationPath, document.Cid.ToString(), document.Pid.ToString()));
-            return Path.Combine(applicationPath, document.Cid.ToString(), document.Pid.ToString(), document.Name);
+            System.IO.Directory.CreateDirectory(
+                Path.Combine(applicationPath, document.Cid.ToString(), 
+                    document.Pid.ToString(),document.Category));
+            return Path.Combine(Path.Combine(applicationPath, document.Cid.ToString(), document.Pid.ToString(), document.Category), document.Name);
 
         }
 
         private string getPathWithoutRepository(Document document)
         {
-            string path = Path.Combine(document.Cid.ToString(), document.Pid.ToString(), document.Name);
+            string path = Path.Combine(document.Cid.ToString(), document.Pid.ToString(), document.Category, document.Name);
             return @path;
         }
 
@@ -194,6 +197,7 @@ namespace FinancialPlanner.BusinessLogic.Plans
             Document.Id = dr.Field<int>("ID");
             Document.Cid = dr.Field<int>("CID");
             Document.Pid = dr.Field<int>("PID");
+            Document.Category = dr.Field<string>("Category");
             Document.Name = dr.Field<string>("Name");
             Document.Path = dr.Field<string>("Path");
             Document.UpdatedOn = dr.Field<DateTime>("UpdatedOn");

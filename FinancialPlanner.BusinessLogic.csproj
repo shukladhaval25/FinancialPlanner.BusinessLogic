@@ -44,11 +44,15 @@
     <Compile Include="Activity\ActivitiesService.cs" />
     <Compile Include="ApplictionConfiguration\ApplicationConfiService.cs" />
     <Compile Include="Clients\BankAccountService.cs" />
+    <Compile Include="Clients\ClienCRMGroupService.cs" />
     <Compile Include="Clients\ClientContactService.cs" />
+    <Compile Include="Clients\ClientFestivalService.cs" />
     <Compile Include="Clients\ClientService.cs" />
     <Compile Include="Clients\ClientSpouseService.cs" />
+    <Compile Include="Clients\CRMGroupService.cs" />
     <Compile Include="Clients\EmploymentService.cs" />
     <Compile Include="Clients\FamilyMemberService.cs" />
+    <Compile Include="Clients\FestivalsService.cs" />
     <Compile Include="CurrentStatus\BondsService.cs" />
     <Compile Include="CurrentStatus\CurrentStatusService.cs" />
     <Compile Include="CurrentStatus\FixedDepositeService.cs" />
