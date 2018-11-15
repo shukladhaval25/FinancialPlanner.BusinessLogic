@@ -15,10 +15,12 @@ namespace FinancialPlanner.BusinessLogic.Activity
         private const string INSERT_QUERY = "INSERT INTO ACTIVITIES VALUES  " +
             "('{0}','{1}','{2}','{3}','{4}','{5}','{6}')";
         private const string SELECT_ALL = "SELECT * FROM ACTIVITIES ORDER BY ACTIVITYAT DESC";
+        private const string SELECT_ALL_BY_USERID = "SELECT * FROM ACTIVITIES WHERE USERNAME = '{0}' ORDER BY ACTIVITYAT DESC";
         private const string SELECT_MAX_ID = "SELECT MAX(ID) FROM ACTIVITIES";
 
         private const string SERVERLLOGIN ="Logged in successfully.";
         private const string LOGIN_FAIL ="Logged in fail";
+       
         private const string CLIENTLOGIN ="User logged in from the client successfully.";
         private const string LOGOUT ="Logged out successfully.";
 
@@ -185,6 +187,29 @@ namespace FinancialPlanner.BusinessLogic.Activity
 
         private static readonly string ADD_CRM_GROUP = "{0} CRM group added successfully";
         private static readonly string DELETE_CRM_GROUP ="{0} CRM group deleted successfully";
+        private static readonly string UPDATE_COMPANY ="Company {0} information updated successfully";
+
+        public static IList<Activities> Get(string userName)
+        {
+            IList<Activities> lstActivities = new List<Activities>();
+
+            DataTable dtAppConfig =  DataBase.DBService.ExecuteCommand(string.Format(SELECT_ALL_BY_USERID,userName));
+            foreach (DataRow dr in dtAppConfig.Rows)
+            {
+                Activities activities = new Activities();
+                activities.Id = dr.Field<int>("ID");
+                activities.EventDescription = dr.Field<string>("EventDescription");
+                activities.ActivityTypeValue = (ActivityType)Enum.Parse(typeof(ActivityType), dr.Field<string>("ActivityType")); //(ActivityType) int.Parse();
+                activities.HostName = dr.Field<string>("HostName");
+                activities.UserName = dr.Field<string>("UserName");
+                activities.ActivityAt = dr.Field<DateTime>("ActivityAt");
+                activities.EntryType = (EntryStatus)Enum.Parse(typeof(EntryStatus), dr.Field<string>("Status"));
+                activities.SourceType = (Source)Enum.Parse(typeof(Source), dr.Field<string>("Source"));
+
+                lstActivities.Add(activities);
+            }
+            return lstActivities;
+        }
 
         public static IList<Activities> Get()
         {
@@ -436,6 +461,9 @@ namespace FinancialPlanner.BusinessLogic.Activity
                 //CRM Group
                 _lstActivityDescription.Add(new KeyValuePair<ActivityType, string>(ActivityType.CreateCRMGroup, ADD_CRM_GROUP));
                 _lstActivityDescription.Add(new KeyValuePair<ActivityType, string>(ActivityType.DeleteCRMGroup, DELETE_CRM_GROUP));
+
+                //Company
+                _lstActivityDescription.Add(new KeyValuePair<ActivityType, string>(ActivityType.UpdateCompany, UPDATE_COMPANY));
 
                 //PlannerAssumption
                 _lstActivityDescription.Add(new KeyValuePair<ActivityType, string>(ActivityType.UpdatePlannerAssumption, UPDATE_PLANNER_ASSUMPTION));
