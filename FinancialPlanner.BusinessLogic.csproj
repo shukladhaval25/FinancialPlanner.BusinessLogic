@@ -42,6 +42,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Activity\ActivitiesService.cs" />
+    <Compile Include="ApplicationMaster\AreaService.cs" />
     <Compile Include="ApplictionConfiguration\ApplicationConfiService.cs" />
     <Compile Include="Clients\BankAccountService.cs" />
     <Compile Include="Clients\ClienCRMGroupService.cs" />

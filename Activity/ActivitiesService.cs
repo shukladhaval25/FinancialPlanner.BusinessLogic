@@ -189,6 +189,9 @@ namespace FinancialPlanner.BusinessLogic.Activity
         private static readonly string DELETE_CRM_GROUP ="{0} CRM group deleted successfully";
         private static readonly string UPDATE_COMPANY ="Company {0} information updated successfully";
 
+        private static readonly string ADD_AREA = "{0} area added successfully";
+        private static readonly string DELETE_AREA = "{0} area deleted successfully";
+
         public static IList<Activities> Get(string userName)
         {
             IList<Activities> lstActivities = new List<Activities>();
@@ -461,6 +464,10 @@ namespace FinancialPlanner.BusinessLogic.Activity
                 //CRM Group
                 _lstActivityDescription.Add(new KeyValuePair<ActivityType, string>(ActivityType.CreateCRMGroup, ADD_CRM_GROUP));
                 _lstActivityDescription.Add(new KeyValuePair<ActivityType, string>(ActivityType.DeleteCRMGroup, DELETE_CRM_GROUP));
+
+                //Area
+                _lstActivityDescription.Add(new KeyValuePair<ActivityType, string>(ActivityType.CreateArea, ADD_AREA));
+                _lstActivityDescription.Add(new KeyValuePair<ActivityType, string>(ActivityType.DeleteArea, DELETE_AREA));
 
                 //Company
                 _lstActivityDescription.Add(new KeyValuePair<ActivityType, string>(ActivityType.UpdateCompany, UPDATE_COMPANY));

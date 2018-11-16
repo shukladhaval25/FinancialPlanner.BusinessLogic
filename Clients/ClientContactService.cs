@@ -15,11 +15,11 @@ namespace FinancialPlanner.BusinessLogic.Clients
         private const string UPDATE_QUERY = "UPDATE CLIENTCONTACT SET ADD1 = '{0}',STREET ='{1}'," +
             "CITY = '{2}', STATE ='{3}',PIN ='{4}',EMAIL ='{5}',SPOUSEEMAIL ='{6}', " +
             "PRIMARYEMAIL ='{7}',MOBILENO = '{8}', SPOUSEMOBILENO ='{9}'," +
-            "PRIMARYMOBILENO ='{10}',UPDATEDON = '{11}', UPDATEDBY = {12} WHERE CID= {13}";
+            "PRIMARYMOBILENO ='{10}',UPDATEDON = '{11}', UPDATEDBY = {12} , AREA = '{13}' WHERE CID= {14}";
         private const string GET_CLIENT_NAME_QUERY = "SELECT NAME FROM CLIENT WHERE ID = {0}";
         private const string IS_RECORD_EXIST = "SELECT COUNT(*) FROM CLIENTCONTACT WHERE CID = {0}";
         private const string INSERT_QUERY = "INSERT INTO CLIENTCONTACT VALUES ({0},'{1}','{2}','{3}','{4}','{5}','{6}','{7}'," +
-            "'{8}','{9}','{10}','{11}','{12}',{13},'{14}',{15})";
+            "'{8}','{9}','{10}','{11}','{12}',{13},'{14}',{15},'{16}')";
 
         public ClientContact Get(int id)
         {
@@ -42,6 +42,7 @@ namespace FinancialPlanner.BusinessLogic.Clients
             clientContact.Street = dr.Field<string>("Street");
             clientContact.City = dr.Field<string>("City");
             clientContact.State = dr.Field<string>("State");
+            clientContact.Area = dr.Field<string>("Area");
             clientContact.Pin = dr.Field<string>("Pin");
             clientContact.Email = dr.Field<string>("Email");
             clientContact.SpouseEmail = dr.Field<string>("SpouseEmail");
@@ -69,7 +70,8 @@ namespace FinancialPlanner.BusinessLogic.Clients
                             clientContact.State, clientContact.Pin,
                             clientContact.Email, clientContact.SpouseEmail, clientContact.PrimaryEmail,
                             clientContact.Mobile, clientContact.Spousemobile, clientContact.PrimaryMobile,
-                            clientContact.UpdatedOn.ToString("yyyy-MM-dd hh:mm:ss"), clientContact.UpdatedBy, clientContact.Cid));
+                            clientContact.UpdatedOn.ToString("yyyy-MM-dd hh:mm:ss"), clientContact.UpdatedBy,
+                            clientContact.Area, clientContact.Cid));
                     Activity.ActivitiesService.Add(ActivityType.UpdateClientContact, EntryStatus.Success,
                              Source.Server, clientContact.UpdatedByUserName, clientName, clientContact.MachineName);
                 }
@@ -82,7 +84,8 @@ namespace FinancialPlanner.BusinessLogic.Clients
                             clientContact.Email, clientContact.SpouseEmail, clientContact.PrimaryEmail,
                             clientContact.Mobile, clientContact.Spousemobile, clientContact.PrimaryMobile,
                             clientContact.CreatedOn.ToString("yyyy-MM-dd hh:mm:ss"), clientContact.CreatedBy,
-                            clientContact.UpdatedOn.ToString("yyyy-MM-dd hh:mm:ss"), clientContact.UpdatedBy));
+                            clientContact.UpdatedOn.ToString("yyyy-MM-dd hh:mm:ss"), clientContact.UpdatedBy,
+                            clientContact.Area));
                     Activity.ActivitiesService.Add(ActivityType.UpdateClientContact, EntryStatus.Success,
                              Source.Server, clientContact.UpdatedByUserName, clientName, clientContact.MachineName);
                 }
