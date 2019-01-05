@@ -122,7 +122,8 @@ namespace FinancialPlanner.BusinessLogic
                       income.StartYear, income.EndYear,
                       income.Description,
                       income.CreatedOn.ToString("yyyy-MM-dd hh:mm:ss"), income.CreatedBy,
-                      income.UpdatedOn.ToString("yyyy-MM-dd hh:mm:ss"), income.UpdatedBy), true);
+                      income.UpdatedOn.ToString("yyyy-MM-dd hh:mm:ss"), income.UpdatedBy,
+                      income.IncomeTax),true);
                 }
 
                 Activity.ActivitiesService.Add(ActivityType.CreateIncome, EntryStatus.Success,

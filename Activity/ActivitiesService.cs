@@ -192,6 +192,10 @@ namespace FinancialPlanner.BusinessLogic.Activity
         private static readonly string ADD_AREA = "{0} area added successfully";
         private static readonly string DELETE_AREA = "{0} area deleted successfully";
 
+        private static readonly string ADD_ORGANISATIONTYPE ="{0} organisation type added successfully";
+        private static readonly string UPDATE_ORGANISATIONTYPE ="{0} organisation type updated successfully";
+        private static readonly string DELETE_ORGANISATIONTYPE ="{0} organisation type deleted successfully";
+
         public static IList<Activities> Get(string userName)
         {
             IList<Activities> lstActivities = new List<Activities>();
@@ -452,6 +456,11 @@ namespace FinancialPlanner.BusinessLogic.Activity
                 _lstActivityDescription.Add(new KeyValuePair<ActivityType, string>(ActivityType.CreateBankAccount, ADD_BANK_ACCOUNT));
                 _lstActivityDescription.Add(new KeyValuePair<ActivityType, string>(ActivityType.UpdateBankAccount, UPDATE_BANK_ACCOUNT));
                 _lstActivityDescription.Add(new KeyValuePair<ActivityType, string>(ActivityType.DeleteBankAccount, DELETE_BANK_ACCOUNT));
+
+                // Organisation Type
+                _lstActivityDescription.Add(new KeyValuePair<ActivityType, string>(ActivityType.CreateOrganisationType, ADD_ORGANISATIONTYPE));
+                _lstActivityDescription.Add(new KeyValuePair<ActivityType, string>(ActivityType.UpdateOrganisationType, UPDATE_ORGANISATIONTYPE));
+                _lstActivityDescription.Add(new KeyValuePair<ActivityType, string>(ActivityType.DeleteOrganisationType, DELETE_ORGANISATIONTYPE));
 
                 //Document
                 _lstActivityDescription.Add(new KeyValuePair<ActivityType, string>(ActivityType.CreateDocument, ADD_DOCUMENT));

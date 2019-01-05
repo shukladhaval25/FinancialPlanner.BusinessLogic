@@ -24,7 +24,7 @@ namespace FinancialPlanner.BusinessLogic.ApplicationMaster
         {
             try
             {
-                Logger.LogInfo("Get: CRM group process start");
+                Logger.LogInfo("Get: Area process start");
                 IList<Area> lstArea = new List<Area>();
 
                 DataTable dtAppConfig =  DataBase.DBService.ExecuteCommand(string.Format(SELECT_ALL));
@@ -33,7 +33,7 @@ namespace FinancialPlanner.BusinessLogic.ApplicationMaster
                     Area Area = convertToAreaObject(dr);
                     lstArea.Add(Area);
                 }
-                Logger.LogInfo("Get: CRM group process completed.");
+                Logger.LogInfo("Get: Area process completed.");
                 return lstArea;
             }
             catch (Exception ex)
