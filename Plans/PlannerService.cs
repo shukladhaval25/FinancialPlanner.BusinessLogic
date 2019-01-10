@@ -11,13 +11,14 @@ namespace FinancialPlanner.BusinessLogic.Plans
     public class PlannerService
     {
         private const string INSERT_QUERY = "INSERT INTO PLANNER VALUES (" +
-            "{0},'{1}','{2}','{3}','{4}','{5}',{6},'{7}',{8})";
+            "{0},'{1}','{2}','{3}','{4}','{5}',{6},'{7}',{8},{9})";
 
         private const string SELECT_BY_CLIENTID = "SELECT P1.*,U.USERNAME AS UPDATEDBYUSERNAME FROM PLANNER P1, USERS U WHERE P1.UPDATEDBY = U.ID and P1.CLIENTID = {0}";
         private const string SELECT_ID = "SELECT P1.*,U.USERNAME AS UPDATEDBYUSERNAME FROM PLANNER P1, USERS U WHERE P1.UPDATEDBY = U.ID and P1.ID = {0}";
 
         private const string UPDATE_QUERY = "UPDATE USERS SET FIRSTNAME = '{0}'," +
-                "LASTNAME = '{1}', PASSWORD = '{2}',UPDATEDON ='{3}',UPDATEDBY = {4} WHERE ID= {5}";
+                "LASTNAME = '{1}', PASSWORD = '{2}',UPDATEDON ='{3}',UPDATEDBY = {4}, PLANNERSTARTMONTH ={5}" +
+            " WHERE ID= {6}";
         private const string DELETE_QUERY = "DELETE FROM PLANNER WHERE ID = {0}";
 
         public IList<Planner> GetByClientId(int id)
@@ -52,7 +53,8 @@ namespace FinancialPlanner.BusinessLogic.Plans
                 ClientId = dr.Field<int>("ClientID"),
                 Name = dr.Field<string>("Name"),
                 StartDate = dr.Field<DateTime>("StartDate"),
-                UpdatedByUserName = dr.Field<string>("UpdatedByUserName")
+                UpdatedByUserName = dr.Field<string>("UpdatedByUserName"),
+                PlannerStartMonth = dr.Field<int>("PlannerStartMonth")
             };
             return planner;
         }
@@ -64,7 +66,8 @@ namespace FinancialPlanner.BusinessLogic.Plans
                     planner.ClientId, planner.Name, planner.StartDate.ToString("yyyy-MM-dd"),
                     planner.EndDate.ToString("yyyy-MM-dd"), planner.IsActive,
                     planner.CreatedOn.ToString("yyyy-MM-dd hh:mm:ss"), planner.CreatedBy,
-                    planner.UpdatedOn.ToString("yyyy-MM-dd hh:mm:ss"), planner.UpdatedBy));
+                    planner.UpdatedOn.ToString("yyyy-MM-dd hh:mm:ss"), planner.UpdatedBy,
+                    planner.PlannerStartMonth));
 
                 Activity.ActivitiesService.Add(ActivityType.CreatePlan, EntryStatus.Success,
                          Source.Server, planner.UpdatedByUserName, planner.Name, planner.MachineName);
