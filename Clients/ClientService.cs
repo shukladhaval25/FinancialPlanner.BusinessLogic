@@ -91,7 +91,7 @@ namespace FinancialPlanner.BusinessLogic.Clients
                             client.UpdatedOn.ToString("yyyy-MM-dd hh:mm:ss"), client.UpdatedBy,
                             client.ID), true);
 
-                Activity.ActivitiesService.Add(ActivityType.UpdateClient, EntryStatus.Success,
+                Activity.ActivitiesService.Add(ActivityType.DeleteClient, EntryStatus.Success,
                          Source.Server, client.UpdatedByUserName, client.Name, client.MachineName);
                 DataBase.DBService.CommitTransaction();
             }
