@@ -65,7 +65,7 @@ namespace FinancialPlanner.BusinessLogic.Clients
             client.Aadhar = dr.Field<string>("AADHAR");
             client.PlaceOfBirth = dr.Field<string>("PlaceOfBirth");
             client.IsMarried = dr.Field<bool>("Married");
-            client.MarriageAnniversary = dr.Field<DateTime>("MarriageAnniversary");
+            client.MarriageAnniversary = dr.Field<DateTime?>("MarriageAnniversary");
             client.FatherName = dr.Field<string>("FatherName");
             client.MotherName = dr.Field<string>("MotherName");
             client.Occupation = dr.Field<string>("Occupation");
