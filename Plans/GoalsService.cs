@@ -125,7 +125,7 @@ namespace FinancialPlanner.BusinessLogic
 
                 DataBase.DBService.BeginTransaction();
                 DataBase.DBService.ExecuteCommandString(string.Format(INSERT_QUERY,
-                      Goals.Pid, Goals.Category, Goals.Name,
+                      Goals.Pid, Goals.Category, Goals.Name.Replace("'","''"),
                       Goals.Amount,Goals.StartYear,Goals.EndYear,
                       Goals.Recurrence,Goals.Priority,Goals.Description,                      
                       Goals.CreatedOn.ToString("yyyy-MM-dd hh:mm:ss"), Goals.CreatedBy,
