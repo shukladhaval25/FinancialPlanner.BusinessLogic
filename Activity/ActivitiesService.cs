@@ -196,6 +196,10 @@ namespace FinancialPlanner.BusinessLogic.Activity
         private static readonly string UPDATE_ORGANISATIONTYPE ="{0} organisation type updated successfully";
         private static readonly string DELETE_ORGANISATIONTYPE ="{0} organisation type deleted successfully";
 
+        public static readonly string ADD_PROCESS_ACTION = "{0} process action added successfully";
+        public static readonly string UPDATE_PROCESS_ACTION = "{0} process action added successfully";
+        public static readonly string DELETE_PROCESS_ACTION = "{0} process action added successfully";
+
         public static IList<Activities> Get(string userName)
         {
             IList<Activities> lstActivities = new List<Activities>();
@@ -483,6 +487,12 @@ namespace FinancialPlanner.BusinessLogic.Activity
 
                 //PlannerAssumption
                 _lstActivityDescription.Add(new KeyValuePair<ActivityType, string>(ActivityType.UpdatePlannerAssumption, UPDATE_PLANNER_ASSUMPTION));
+
+                //Process Actions
+                //Loan
+                _lstActivityDescription.Add(new KeyValuePair<ActivityType, string>(ActivityType.CreateProcessAction, ADD_PROCESS_ACTION));
+                _lstActivityDescription.Add(new KeyValuePair<ActivityType, string>(ActivityType.UpdateProcessAction, UPDATE_PROCESS_ACTION));
+                _lstActivityDescription.Add(new KeyValuePair<ActivityType, string>(ActivityType.DeleteProcessAction, DELETE_PROCESS_ACTION));
             }
         }
 
