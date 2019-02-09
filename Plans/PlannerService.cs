@@ -75,7 +75,6 @@ namespace FinancialPlanner.BusinessLogic.Plans
             catch (Exception ex)
             {
                 FinancialPlanner.Common.Logger.LogDebug(ex.Message);
-
             }
         }
     }

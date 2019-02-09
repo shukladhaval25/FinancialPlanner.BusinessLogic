@@ -16,12 +16,11 @@ namespace FinancialPlanner.BusinessLogic.Clients
             "CITY = '{2}', STATE ='{3}',PIN ='{4}',EMAIL ='{5}',SPOUSEEMAIL ='{6}', " +
             "PRIMARYEMAIL ='{7}',MOBILENO = '{8}', SPOUSEMOBILENO ='{9}'," +
             "PRIMARYMOBILENO ='{10}',UPDATEDON = '{11}', UPDATEDBY = {12} , AREA = '{13}'," +
-            "PREFEREDPHONECALLMODE = '{14}', PREFEREDCONTACTTIMEFROM = '{15}', " +
-            "PREFEREDCONTACTTIMEUPTO = '{16}' WHERE CID= {17}";
+            "PREFEREDTIME = '{14}' WHERE CID= {15}";
         private const string GET_CLIENT_NAME_QUERY = "SELECT NAME FROM CLIENT WHERE ID = {0}";
         private const string IS_RECORD_EXIST = "SELECT COUNT(*) FROM CLIENTCONTACT WHERE CID = {0}";
         private const string INSERT_QUERY = "INSERT INTO CLIENTCONTACT VALUES ({0},'{1}','{2}','{3}','{4}','{5}','{6}','{7}'," +
-            "'{8}','{9}','{10}','{11}','{12}',{13},'{14}',{15},'{16}','{17}','{18}','{19}')";
+            "'{8}','{9}','{10}','{11}','{12}',{13},'{14}',{15},'{16}','{17}')";
 
         public ClientContact Get(int id)
         {
@@ -55,9 +54,7 @@ namespace FinancialPlanner.BusinessLogic.Clients
             clientContact.UpdatedOn = dr.Field<DateTime>("UpdatedOn");
             clientContact.UpdatedBy = dr.Field<int>("UpdatedBy");
             clientContact.UpdatedByUserName = dr.Field<string>("UpdatedByUserName");
-            clientContact.PreferedPhoneCallMode = dr.Field<string>("PreferedPhoneCallMode");
-            clientContact.PreferedContactTimeFrom = dr.Field<string>("PreferedContactTimeFrom");
-            clientContact.PreferedContactTimeUpto = dr.Field<string>("PreferedContactTimeUpto");
+            clientContact.PreferedTime = dr.Field<string>("PreferedTime");           
             return clientContact;
         }
 
@@ -76,8 +73,7 @@ namespace FinancialPlanner.BusinessLogic.Clients
                             clientContact.Email, clientContact.SpouseEmail, clientContact.PrimaryEmail,
                             clientContact.Mobile, clientContact.Spousemobile, clientContact.PrimaryMobile,
                             clientContact.UpdatedOn.ToString("yyyy-MM-dd hh:mm:ss"), clientContact.UpdatedBy,
-                            clientContact.Area, clientContact.PreferedPhoneCallMode, 
-                            clientContact.PreferedContactTimeFrom, clientContact.PreferedContactTimeUpto,
+                            clientContact.Area, clientContact.PreferedTime,                             
                             clientContact.Cid));
                     Activity.ActivitiesService.Add(ActivityType.UpdateClientContact, EntryStatus.Success,
                              Source.Server, clientContact.UpdatedByUserName, clientName, clientContact.MachineName);
@@ -86,14 +82,14 @@ namespace FinancialPlanner.BusinessLogic.Clients
                 {
                     DataBase.DBService.ExecuteCommand(string.Format(INSERT_QUERY,
                             clientContact.Cid,
-                            clientContact.Add1, clientContact.Street, clientContact.City,
+                            clientContact.Add1.Replace("'","''"), 
+                            clientContact.Street.Replace("'","''"), clientContact.City,
                             clientContact.State, clientContact.Pin,
                             clientContact.Email, clientContact.SpouseEmail, clientContact.PrimaryEmail,
                             clientContact.Mobile, clientContact.Spousemobile, clientContact.PrimaryMobile,
                             clientContact.CreatedOn.ToString("yyyy-MM-dd hh:mm:ss"), clientContact.CreatedBy,
                             clientContact.UpdatedOn.ToString("yyyy-MM-dd hh:mm:ss"), clientContact.UpdatedBy,
-                            clientContact.Area,clientContact.PreferedPhoneCallMode,
-                            clientContact.PreferedContactTimeFrom,clientContact.PreferedContactTimeUpto));
+                            clientContact.Area,clientContact.PreferedTime.Replace("'","''")));
                     Activity.ActivitiesService.Add(ActivityType.UpdateClientContact, EntryStatus.Success,
                              Source.Server, clientContact.UpdatedByUserName, clientName, clientContact.MachineName);
                 }

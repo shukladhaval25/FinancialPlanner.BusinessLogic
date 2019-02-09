@@ -83,7 +83,7 @@ namespace FinancialPlanner.BusinessLogic
                 DataBase.DBService.BeginTransaction();
                 DataBase.DBService.ExecuteCommandString(string.Format(INSERT_QUERY,
                       Expenses.Pid, Expenses.ItemCategory, Expenses.Item, 
-                      (Expenses.OccuranceType.Equals("Monthly") ? 0 : 1),
+                      (Expenses.OccuranceType.ToString().Equals("Monthly") ? 0 : 1),
                       Expenses.Amount, 
                       Expenses.CreatedOn.ToString("yyyy-MM-dd hh:mm:ss"), Expenses.CreatedBy,
                       Expenses.UpdatedOn.ToString("yyyy-MM-dd hh:mm:ss"), Expenses.UpdatedBy), true);
@@ -113,7 +113,7 @@ namespace FinancialPlanner.BusinessLogic
                 DataBase.DBService.BeginTransaction();
                 DataBase.DBService.ExecuteCommandString(string.Format(UPDATE_QUERY,
                    Expenses.ItemCategory,
-                   Expenses.Item, (Expenses.OccuranceType.Equals("Monthly") ? 0 : 1),
+                   Expenses.Item, (Expenses.OccuranceType.ToString().Equals("Monthly") ? 0 : 1),
                    Expenses.Amount, 
                    Expenses.UpdatedOn.ToString("yyyy-MM-dd hh:mm:ss"), Expenses.UpdatedBy, Expenses.Id), true);
               
