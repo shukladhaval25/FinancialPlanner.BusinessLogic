@@ -196,7 +196,7 @@ namespace FinancialPlanner.BusinessLogic.CurrentStatus
             mutualFund.SchemeName = dr.Field<string>("SchemeName");
             mutualFund.FolioNo = dr.Field<string>("FolioNo");
             mutualFund.Nav = float.Parse(dr["NAV"].ToString());
-            mutualFund.Units = dr.Field<int>("units");
+            mutualFund.Units = double.Parse(dr["units"].ToString());
             mutualFund.EquityRatio = float.Parse(dr["EquityRatio"].ToString());
             mutualFund.GoldRatio = float.Parse(dr["GoldRatio"].ToString());
             mutualFund.DebtRatio = float.Parse(dr["DebtRatio"].ToString());
