@@ -21,7 +21,7 @@ namespace FinancialPlanner.BusinessLogic
         const string SELECT_LOANGFORGOAL_BYID = "SELECT N1.*,U.USERNAME AS UPDATEDBYUSERNAME FROM LOANFORGOALS N1, USERS U WHERE N1.UPDATEDBY = U.ID AND N1.GOALID ={0}";
 
         const string INSERT_QUERY = "INSERT INTO Goals VALUES (" +
-            "{0},'{1}','{2}',{3},'{4}','{5}',{6},{7},'{8}','{9}',{10},'{11}',{12},{13})";
+            "{0},'{1}','{2}',{3},'{4}','{5}',{6},{7},'{8}','{9}',{10},'{11}',{12},{13},'{14}')";
         const string INSERT_GOALLOAN_QUERY = "INSERT INTO LOANFORGOALS " + 
             "VALUES ({0},{1},{2},{3},{4},{5},{6},'{7}',{8},'{9}',{10})";
 
@@ -29,7 +29,7 @@ namespace FinancialPlanner.BusinessLogic
             "CATEGORY = '{0}',NAME ='{1}',AMOUNT = {2}, " +
             "STARTYEAR = '{3}', ENDYEAR = '{4}',RECURRENCE ={5}," +
             "PRIORITY ={6},DESCRIPTION ='{7}',UPDATEDON = '{8}'," +
-            "UPDATEDBY={9},INFLATIONRATE = {10} WHERE ID ={11}";
+            "UPDATEDBY={9},INFLATIONRATE = {10},ELIGIBLEFORINSURANCECOVER = '{11}'  WHERE ID ={12}";
 
         const string UPDATE_LOANFORGOAL_QUERY = "UPDATE LOANFORGOALS SET LOANAMOUNT = {0}," +
             "EMI = {1}, ROI = {2}, LOANYEARS = {3}, STARTYEAR = {4}, ENDYEAR = {5}, " +
@@ -117,27 +117,21 @@ namespace FinancialPlanner.BusinessLogic
             }
         }
 
-        public void Add(Goals Goals)
+        public void Add(Goals goals)
         {
             try
             {
-                string clientName = DataBase.DBService.ExecuteCommandScalar(string.Format(GET_CLIENT_NAME_QUERY,Goals.Pid));
+                string clientName = DataBase.DBService.ExecuteCommandScalar(string.Format(GET_CLIENT_NAME_QUERY,goals.Pid));
+                
+                if (goals.StartYear != "" && goals.EndYear != "" && goals.Recurrence != null)
+                {
+                    addRepeatGoalsBasedOnFrequency(goals, clientName);
+                }
+                else
+                {
+                    addSingleGoal(goals, clientName);
+                }
 
-                DataBase.DBService.BeginTransaction();
-                DataBase.DBService.ExecuteCommandString(string.Format(INSERT_QUERY,
-                      Goals.Pid, Goals.Category, Goals.Name.Replace("'","''"),
-                      Goals.Amount,Goals.StartYear,Goals.EndYear,
-                      Goals.Recurrence,Goals.Priority,Goals.Description,                      
-                      Goals.CreatedOn.ToString("yyyy-MM-dd hh:mm:ss"), Goals.CreatedBy,
-                      Goals.UpdatedOn.ToString("yyyy-MM-dd hh:mm:ss"), Goals.UpdatedBy,
-                      Goals.InflationRate), true);
-
-                if (Goals.LoanForGoal != null)
-                    addLoanForGoal(Goals);
-
-                Activity.ActivitiesService.Add(ActivityType.CreateGoals, EntryStatus.Success,
-                         Source.Server, Goals.UpdatedByUserName, clientName, Goals.MachineName);
-                DataBase.DBService.CommitTransaction();
             }
             catch (Exception ex)
             {
@@ -148,6 +142,66 @@ namespace FinancialPlanner.BusinessLogic
                 LogDebug(currentMethodName.Name, ex);
                 throw ex;
             }
+        }
+
+        private static void addRepeatGoalsBasedOnFrequency(Goals goals, string clientName)
+        {
+            int startYear = int.Parse(goals.StartYear);
+            int endYear = int.Parse(goals.EndYear);
+            int? frequency = goals.Recurrence;
+            int goalPriority = goals.Priority;
+            double goalValue = goals.Amount;
+            decimal inflationRate = goals.InflationRate;
+            Goals yearWiseGoal = goals;
+            DataBase.DBService.BeginTransaction();
+            for (int year = startYear; year < endYear;)
+            {                
+                goals.Name = yearWiseGoal.Name + " " + year;
+                goals.StartYear = year.ToString();
+                goals.EndYear = "";
+                goals.Priority = goalPriority;
+                if (year != startYear)
+                {
+                    goalValue = goalValue + ((goalValue * (double)inflationRate) / 100);
+                    goals.Amount = goalValue;
+                }
+
+                DataBase.DBService.ExecuteCommandString(string.Format(INSERT_QUERY,
+                     goals.Pid, goals.Category, goals.Name.Replace("'", "''"),
+                     goals.Amount, goals.StartYear, goals.EndYear,
+                     goals.Recurrence, goals.Priority, goals.Description,
+                     goals.CreatedOn.ToString("yyyy-MM-dd hh:mm:ss"), goals.CreatedBy,
+                     goals.UpdatedOn.ToString("yyyy-MM-dd hh:mm:ss"), goals.UpdatedBy,
+                     goals.InflationRate, goals.EligibleForInsuranceCoverage), true);
+
+                if (goals.LoanForGoal != null && year == startYear)
+                    addLoanForGoal(goals);
+
+                Activity.ActivitiesService.Add(ActivityType.CreateGoals, EntryStatus.Success,
+                         Source.Server, goals.UpdatedByUserName, clientName, goals.MachineName);
+                year = year + (int)frequency;
+                goalPriority++;
+            }
+            DataBase.DBService.CommitTransaction();
+        }
+
+        private static void addSingleGoal(Goals goals, string clientName)
+        {
+            DataBase.DBService.BeginTransaction();
+            DataBase.DBService.ExecuteCommandString(string.Format(INSERT_QUERY,
+                     goals.Pid, goals.Category, goals.Name.Replace("'", "''"),
+                     goals.Amount, goals.StartYear, goals.EndYear,
+                     goals.Recurrence, goals.Priority, goals.Description,
+                     goals.CreatedOn.ToString("yyyy-MM-dd hh:mm:ss"), goals.CreatedBy,
+                     goals.UpdatedOn.ToString("yyyy-MM-dd hh:mm:ss"), goals.UpdatedBy,
+                     goals.InflationRate, goals.EligibleForInsuranceCoverage), true);
+
+            if (goals.LoanForGoal != null)
+                addLoanForGoal(goals);
+
+            Activity.ActivitiesService.Add(ActivityType.CreateGoals, EntryStatus.Success,
+                     Source.Server, goals.UpdatedByUserName, clientName, goals.MachineName);
+            DataBase.DBService.CommitTransaction();
         }
 
         private static void addLoanForGoal(Goals Goals)
@@ -180,7 +234,8 @@ namespace FinancialPlanner.BusinessLogic
                    Goals.StartYear,Goals.EndYear,
                    Goals.Recurrence, Goals.Priority,Goals.Description,
                    Goals.UpdatedOn.ToString("yyyy-MM-dd hh:mm:ss"), 
-                   Goals.UpdatedBy,Goals.InflationRate, Goals.Id), true);
+                   Goals.UpdatedBy,Goals.InflationRate, 
+                   Goals.EligibleForInsuranceCoverage,Goals.Id), true);
 
                 if (Goals.LoanForGoal != null && Goals.LoanForGoal.Id == 0)
                     addLoanForGoal(Goals);
@@ -253,6 +308,7 @@ namespace FinancialPlanner.BusinessLogic
             Goals.UpdatedOn = dr.Field<DateTime>("UpdatedOn");
             Goals.UpdatedBy = dr.Field<int>("UpdatedBy");
             Goals.InflationRate = dr.Field<decimal>("InflationRate");
+            Goals.EligibleForInsuranceCoverage = dr.Field<bool>("EligibleForInsuranceCover");
             return Goals;
         }
 

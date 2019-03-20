@@ -18,10 +18,10 @@ namespace FinancialPlanner.BusinessLogic
         const string SELECT_BYID = "SELECT N1.*,U.USERNAME AS UPDATEDBYUSERNAME FROM EXPENSES N1, USERS U WHERE N1.UPDATEDBY = U.ID AND N1.ID = {0} AND N1.PID ={1}";
       
         const string INSERT_QUERY = "INSERT INTO EXPENSES VALUES (" +
-            "{0},'{1}','{2}',{3},{4},'{5}',{6},'{7}',{8})";
+            "{0},'{1}','{2}',{3},{4},'{5}',{6},'{7}',{8},'{9}')";
         const string UPDATE_QUERY = "UPDATE Expenses SET ITEMCATEGORY = '{0}',ITEM ='{1}',OCCURANCETYPE = {2}, " +             
             "AMOUNT ={3},UPDATEDON = '{4}'," +
-            "UPDATEDBY={5} WHERE ID ={6}";
+            "UPDATEDBY={5},ELIGIBLEFORINSURANCECOVER ='{6}'  WHERE ID ={7}";
         const string DELET_QUERY = "DELETE FROM Expenses WHERE ID ={0}";
         public IList<Expenses> GetAll(int plannerId)
         {
@@ -86,7 +86,8 @@ namespace FinancialPlanner.BusinessLogic
                       (Expenses.OccuranceType.ToString().Equals("Monthly") ? 0 : 1),
                       Expenses.Amount, 
                       Expenses.CreatedOn.ToString("yyyy-MM-dd hh:mm:ss"), Expenses.CreatedBy,
-                      Expenses.UpdatedOn.ToString("yyyy-MM-dd hh:mm:ss"), Expenses.UpdatedBy), true);
+                      Expenses.UpdatedOn.ToString("yyyy-MM-dd hh:mm:ss"), Expenses.UpdatedBy,
+                      Expenses.EligibleForInsuranceCoverage), true);
               
                 Activity.ActivitiesService.Add(ActivityType.CreateExpenses, EntryStatus.Success,
                          Source.Server, Expenses.UpdatedByUserName, clientName, Expenses.MachineName);
@@ -115,7 +116,8 @@ namespace FinancialPlanner.BusinessLogic
                    Expenses.ItemCategory,
                    Expenses.Item, (Expenses.OccuranceType.ToString().Equals("Monthly") ? 0 : 1),
                    Expenses.Amount, 
-                   Expenses.UpdatedOn.ToString("yyyy-MM-dd hh:mm:ss"), Expenses.UpdatedBy, Expenses.Id), true);
+                   Expenses.UpdatedOn.ToString("yyyy-MM-dd hh:mm:ss"), Expenses.UpdatedBy,
+                   Expenses.EligibleForInsuranceCoverage,Expenses.Id), true);
               
                 Activity.ActivitiesService.Add(ActivityType.UpdateExpenses, EntryStatus.Success,
                          Source.Server, Expenses.UpdatedByUserName, clientName, Expenses.MachineName);
@@ -165,6 +167,7 @@ namespace FinancialPlanner.BusinessLogic
             Expenses.Amount = double.Parse(dr["Amount"].ToString());            
             Expenses.UpdatedOn = dr.Field<DateTime>("UpdatedOn");
             Expenses.UpdatedBy = dr.Field<int>("UpdatedBy");
+            Expenses.EligibleForInsuranceCoverage = dr.Field<bool>("EligibleForInsuranceCover");
             return Expenses;
         }
 
