@@ -16,7 +16,7 @@ namespace FinancialPlanner.BusinessLogic.PlanOption
     {
         private readonly string SELECT_ID = "SELECT N1.*,U.USERNAME AS UPDATEDBYUSERNAME,G.NAME AS GOALNAME FROM CURRESNTSTATUSTOGOAL N1," +
             " USERS U,GOALS G WHERE N1.UPDATEDBY = U.ID AND N1.OID = {0} AND " +
-            " N1.GOALID = G.ID; ";
+            " N1.GOALID = G.ID  AND N1.PID ={1}; ";
 
         const string INSERT_CurrentStatusToGoal= "INSERT INTO CURRESNTSTATUSTOGOAL VALUES (" +
             "{0},{1},{2},{3},'{4}',{5},'{6}',{7})";
@@ -27,7 +27,7 @@ namespace FinancialPlanner.BusinessLogic.PlanOption
 
         const string DELETE_CurrentStatusToGoal = "DELETE FROM CURRESNTSTATUSTOGOAL WHERE OID = {0}";
 
-        public IList<CurrentStatusToGoal> Get(int id)
+        public IList<CurrentStatusToGoal> Get(int id,int planId)
         {
             try
             {
@@ -36,7 +36,7 @@ namespace FinancialPlanner.BusinessLogic.PlanOption
 
                 CurrentStatusToGoal currentStatusToGoal = new CurrentStatusToGoal();
 
-                DataTable dtAppConfig =  DataBase.DBService.ExecuteCommand(string.Format(SELECT_ID,id));
+                DataTable dtAppConfig =  DataBase.DBService.ExecuteCommand(string.Format(SELECT_ID,id,planId));
                 foreach (DataRow dr in dtAppConfig.Rows)
                 {
                     currentStatusToGoal = convertToCurrentStatusToGoal(dr);
@@ -59,7 +59,7 @@ namespace FinancialPlanner.BusinessLogic.PlanOption
         {
             try
             {
-                string clientName = DataBase.DBService.ExecuteCommandScalar(string.Format(SELECT_ID,CurrentStatusToGoal.Id));
+                string clientName = DataBase.DBService.ExecuteCommandScalar(string.Format(SELECT_ID,CurrentStatusToGoal.Id,CurrentStatusToGoal.PlannerId));
 
                 DataBase.DBService.BeginTransaction();
                 DataBase.DBService.ExecuteCommandString(string.Format(INSERT_CurrentStatusToGoal,
@@ -115,7 +115,8 @@ namespace FinancialPlanner.BusinessLogic.PlanOption
         {
             try
             {
-                string clientName = DataBase.DBService.ExecuteCommandScalar(string.Format(SELECT_ID,CurrentStatusToGoal.Id));
+                string clientName = DataBase.DBService.ExecuteCommandScalar(
+                    string.Format(SELECT_ID,CurrentStatusToGoal.Id,CurrentStatusToGoal.PlannerId));
 
                 DataBase.DBService.BeginTransaction();
                 DataBase.DBService.ExecuteCommandString(string.Format(DELETE_CurrentStatusToGoal,
