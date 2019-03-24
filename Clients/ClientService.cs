@@ -27,7 +27,7 @@ namespace FinancialPlanner.BusinessLogic.Clients
                 "PLACEOFBIRTH ='{7}',Married ='{8}',MARRIAGEANNIVERSARY ='{9}', Occupation = '{10}'," +
                 "INCOMESLAB = '{11}', UPDATEDON = '{12}', UPDATEDBY = {13},IMAGEPATH = '{14}' WHERE ID= {15}";
         private const string DELETE_QUERY = "UPDATE CLIENT SET ISDELETED = 1, " +
-            "UPDATEDON = '{0}', UPDATEDBY = {1} FROM USERS WHERE ID = {2}";
+            "UPDATEDON = '{0}', UPDATEDBY = {1} WHERE ID = {2}";
 
         public IList<Client> Get()
         {
