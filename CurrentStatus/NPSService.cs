@@ -19,15 +19,15 @@ namespace FinancialPlanner.BusinessLogic.CurrentStatus
         private readonly string SELECT_ALL = "SELECT N1.*,U.USERNAME AS UPDATEDBYUSERNAME FROM NPS N1, USERS U WHERE N1.UPDATEDBY = U.ID AND N1.PID = {0}";
 
         const string INSERT_NPS= "INSERT INTO NPS VALUES (" +
-            "{0},'{1}','{2}','{3}',{4},{5},{6},{7},{8},{9},{10},'{11}',{12},'{13}',{14})";
+            "{0},'{1}','{2}','{3}',{4},{5},{6},{7},{8},{9},{10},'{11}',{12},'{13}',{14},{15})";
 
         const string UPDATE_NPS = "UPDATE NPS SET " +
             "[INVESTERNAME] = '{0}'," +
             "[SCHEMENAME] = '{1}'," +
             "[NAV] ={2}, UNITS ={3},EquityRatio = {4},GoldRatio ={5},DebtRatio = {6}," +
             "SIP ={7},GoalId ={8}, " +
-            "[UpdatedOn] = '{9}', [UpdatedBy] ={10},FOLIONO = '{11}' " +
-            "WHERE ID = {12} ";
+            "[UpdatedOn] = '{9}', [UpdatedBy] ={10},FOLIONO = '{11}',INVESTMENTRETURNRATE ={12} " +
+            "WHERE ID = {13} ";
 
         const string DELETE_NPS = "DELETE FROM NPS WHERE ID = {0}";
 
@@ -98,7 +98,8 @@ namespace FinancialPlanner.BusinessLogic.CurrentStatus
                       NPS.Nav, NPS.Units, NPS.EquityRatio,
                       NPS.GoldRatio, NPS.DebtRatio, NPS.SIP,NPS.GoalID,
                       NPS.CreatedOn.ToString("yyyy-MM-dd hh:mm:ss"), NPS.CreatedBy,
-                      NPS.UpdatedOn.ToString("yyyy-MM-dd hh:mm:ss"), NPS.UpdatedBy), true);
+                      NPS.UpdatedOn.ToString("yyyy-MM-dd hh:mm:ss"), NPS.UpdatedBy,
+                      NPS.InvestmentReturnRate), true);
 
                 Activity.ActivitiesService.Add(ActivityType.CreateNPS, EntryStatus.Success,
                          Source.Server, NPS.UpdatedByUserName, "NPS", NPS.MachineName);
@@ -132,6 +133,7 @@ namespace FinancialPlanner.BusinessLogic.CurrentStatus
                       (NPS.GoalID == null) ? null : NPS.GoalID.Value.ToString(),
                       NPS.UpdatedOn.ToString("yyyy-MM-dd hh:mm:ss"),
                       NPS.UpdatedBy, NPS.FolioNo,
+                      NPS.InvestmentReturnRate,
                       NPS.Id), true);
 
                 Activity.ActivitiesService.Add(ActivityType.UpdateNPS, EntryStatus.Success,
@@ -205,6 +207,7 @@ namespace FinancialPlanner.BusinessLogic.CurrentStatus
             NPS.UpdatedBy = dr.Field<int>("UpdatedBy");
             NPS.UpdatedOn = dr.Field<DateTime>("UpdatedOn");
             NPS.UpdatedByUserName = dr.Field<string>("UpdatedByUserName");
+            NPS.InvestmentReturnRate = float.Parse(dr["InvestmentReturnRate"].ToString());
             return NPS;
         }
     }

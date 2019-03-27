@@ -19,7 +19,8 @@ namespace FinancialPlanner.BusinessLogic.CurrentStatus
 
         private readonly string SELECT_ALL = "SELECT N1.*,U.USERNAME AS UPDATEDBYUSERNAME FROM Shares N1, USERS U WHERE N1.UPDATEDBY = U.ID AND N1.PID = {0}";
         const string INSERT_SHARES = "INSERT INTO SHARES VALUES (" +
-            "{0},'{1}','{2}',{3},{4},{5},{6},{7},'{8}',{9},'{10}',{11},'{12}','{13}','{14}')";
+            "{0},'{1}','{2}',{3},{4},{5},{6},{7},'{8}',{9},'{10}',{11},'{12}','{13}'," +
+            "'{14}',{15})";
 
         const string UPDATE_SHARES = "UPDATE SHARES SET " +
             "[INVESTERNAME] = '{0}'," +
@@ -27,8 +28,8 @@ namespace FinancialPlanner.BusinessLogic.CurrentStatus
             "[FACEVALUE] ={2}, NOOFSHARES ={3},MARKETPRICE = {4},CURRENTVALUE ={5}," +
             "GoalId ={6}, " +
             "[UpdatedOn] = '{7}', [UpdatedBy] ={8}," +
-            "FIRSTHOLDER = '{9}', SECONDHOLDER ='{10}', NOMINEE = '{11}' " +
-            "WHERE ID = {12} ";
+            "FIRSTHOLDER = '{9}', SECONDHOLDER ='{10}', NOMINEE = '{11}', INVESTMENTRETURNRATE = {12} " +
+            "WHERE ID = {13} ";
 
         const string DELETE_Shares = "DELETE FROM SHARES WHERE ID = {0}";
         public IList<Shares> GetAll(int plannerId)
@@ -72,7 +73,8 @@ namespace FinancialPlanner.BusinessLogic.CurrentStatus
                       shares.GoalID,
                       shares.CreatedOn.ToString("yyyy-MM-dd hh:mm:ss"), shares.CreatedBy,
                       shares.UpdatedOn.ToString("yyyy-MM-dd hh:mm:ss"), shares.UpdatedBy,
-                      shares.FirstHolder,shares.SecondHolder,shares.Nominee), true);
+                      shares.FirstHolder,shares.SecondHolder,shares.Nominee,
+                      shares.InvestmentReturnRate), true);
 
                 Activity.ActivitiesService.Add(ActivityType.CreateShares, EntryStatus.Success,
                          Source.Server, shares.UpdatedByUserName, "Shares", shares.MachineName);
@@ -106,6 +108,7 @@ namespace FinancialPlanner.BusinessLogic.CurrentStatus
                       Shares.UpdatedOn.ToString("yyyy-MM-dd hh:mm:ss"),
                       Shares.UpdatedBy,
                       Shares.FirstHolder,Shares.SecondHolder,Shares.Nominee,
+                      Shares.InvestmentReturnRate,
                       Shares.Id), true);
 
                 Activity.ActivitiesService.Add(ActivityType.UpdateShares, EntryStatus.Success,
@@ -174,6 +177,7 @@ namespace FinancialPlanner.BusinessLogic.CurrentStatus
             Shares.FirstHolder = dr.Field<string>("FirstHolder");
             Shares.SecondHolder = dr.Field<string>("SecondHolder");
             Shares.Nominee = dr.Field<string>("Nominee");
+            Shares.InvestmentReturnRate = float.Parse(dr["InvestmentReturnRate"].ToString());
             return Shares;
         }
     }

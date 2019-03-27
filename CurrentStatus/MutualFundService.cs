@@ -19,15 +19,17 @@ namespace FinancialPlanner.BusinessLogic.CurrentStatus
         private readonly string SELECT_ALL = "SELECT N1.*,U.USERNAME AS UPDATEDBYUSERNAME FROM MutualFund N1, USERS U WHERE N1.UPDATEDBY = U.ID AND N1.PID = {0}";
 
         const string INSERT_MutualFund= "INSERT INTO MUTUALFUND VALUES (" +
-            "{0},'{1}','{2}','{3}',{4},{5},{6},{7},{8},{9},{10},{11},{12},'{13}',{14},'{15}',{16},'{17}','{18}','{19}')";
+            "{0},'{1}','{2}','{3}',{4},{5},{6},{7},{8},{9},{10},{11},{12},'{13}'," +
+            "{14},'{15}',{16},'{17}','{18}','{19}',{20})";
 
         const string UPDATE_MutualFund = "UPDATE MUTUALFUND SET " +
             "[INVESTERNAME] = '{0}'," +
             "[SCHEMENAME] = '{1}'," +
             "[NAV] ={2}, UNITS ={3},EquityRatio = {4},GoldRatio ={5},DebtRatio = {6}," +
             "SIP ={7},FreeUnits ={8},REDUMPTIONAMOUNT ={9},GoalId ={10}, " +
-            "[UpdatedOn] = '{11}', [UpdatedBy] ={12},FOLIONO = '{13}',FIRSTHOLDER = '{14}', SECONDHOLDER ='{15}', NOMINEE = '{16}' " +
-            "WHERE ID = {17} ";
+            "[UpdatedOn] = '{11}', [UpdatedBy] ={12},FOLIONO = '{13}',FIRSTHOLDER = '{14}', SECONDHOLDER ='{15}', " +
+            "NOMINEE = '{16}',INVESTMENTRETURNRATE = {17} " +
+            "WHERE ID = {18} ";
 
         const string DELETE_MutualFund = "DELETE FROM MutualFund WHERE ID = {0}";
 
@@ -100,7 +102,8 @@ namespace FinancialPlanner.BusinessLogic.CurrentStatus
                       mutualFund.RedumptionAmount,mutualFund.GoalID,
                       mutualFund.CreatedOn.ToString("yyyy-MM-dd hh:mm:ss"), mutualFund.CreatedBy,
                       mutualFund.UpdatedOn.ToString("yyyy-MM-dd hh:mm:ss"), mutualFund.UpdatedBy,
-                      mutualFund.FirstHolder,mutualFund.SecondHolder,mutualFund.Nominee), true);
+                      mutualFund.FirstHolder,mutualFund.SecondHolder,mutualFund.Nominee,
+                      mutualFund.InvestmentReturnRate), true);
 
                 Activity.ActivitiesService.Add(ActivityType.CreateMutualFund, EntryStatus.Success,
                          Source.Server, mutualFund.UpdatedByUserName, "MutualFund", mutualFund.MachineName);
@@ -137,6 +140,7 @@ namespace FinancialPlanner.BusinessLogic.CurrentStatus
                       mutualFund.UpdatedOn.ToString("yyyy-MM-dd hh:mm:ss"), 
                       mutualFund.UpdatedBy,mutualFund.FolioNo,
                       mutualFund.FirstHolder,mutualFund.SecondHolder,mutualFund.Nominee,
+                      mutualFund.InvestmentReturnRate,
                       mutualFund.Id), true);
 
                 Activity.ActivitiesService.Add(ActivityType.UpdateMutualFund, EntryStatus.Success,
@@ -212,6 +216,7 @@ namespace FinancialPlanner.BusinessLogic.CurrentStatus
             mutualFund.FirstHolder  = dr.Field<string>("FirstHolder");
             mutualFund.SecondHolder = dr.Field<string>("SecondHolder");
             mutualFund.Nominee = dr.Field<string>("Nominee");
+            mutualFund.InvestmentReturnRate = float.Parse(dr["InvestmentReturnRate"].ToString());
             return mutualFund;
         }
     }
