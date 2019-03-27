@@ -14,7 +14,8 @@ namespace FinancialPlanner.BusinessLogic
     public class GoalsService
     {
         private const string GET_CLIENT_NAME_QUERY = "SELECT C.NAME FROM CLIENT C, PLANNER P  WHERE P.CLIENTID = C.ID AND P.ID = {0}";
-        const string SELECT_ALL = "SELECT N1.*,U.USERNAME AS UPDATEDBYUSERNAME FROM Goals N1, USERS U WHERE N1.UPDATEDBY = U.ID AND N1.PID = {0}";
+        const string SELECT_ALL = "SELECT N1.*,U.USERNAME AS UPDATEDBYUSERNAME FROM Goals N1, " +
+            "USERS U WHERE N1.UPDATEDBY = U.ID AND N1.PID = {0} ORDER BY N1.PRIORITY";
         const string SELECT_BYID = "SELECT N1.*,U.USERNAME AS UPDATEDBYUSERNAME FROM Goals N1, USERS U WHERE N1.UPDATEDBY = U.ID AND N1.ID = {0} AND N1.PID ={1}";
         const string SELECT_GOAL_ID = "SELECT ID FROM GOALS WHERE NAME = '{0}' and PID = {1} AND AMOUNT = {2}";
 
