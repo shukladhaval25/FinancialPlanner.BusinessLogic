@@ -34,7 +34,7 @@ namespace FinancialPlanner.BusinessLogic.CurrentStatus
 
         readonly string GET_PPF_VALUE = "SELECT SUM(CURRENTVALUE) AS PPFVALUE FROM [PPF] WHERE PID = {0} AND GOALID = {1}";
 
-        //readonly string GET_EPF_VALUE = "SELECT SUM(CURRENTVALUE) AS EPFVALUE FROM [EPF] WHERE PID = {0} AND GOALID = {1}";
+        readonly string GET_EPF_VALUE = "SELECT SUM(AMOUNT) AS EPFVALUE FROM [EPF] WHERE PID = {0} AND GOALID = {1}";
 
         readonly string GET_SS_VALUE = "SELECT SUM(CURRENTVALUE) AS SSVALUE FROM [SukanyaSamrudhi] WHERE PID = {0} AND GOALID = {1}";
 
@@ -72,7 +72,7 @@ namespace FinancialPlanner.BusinessLogic.CurrentStatus
 
         readonly string GET_ALL_PPF_VALUE = "SELECT SUM(CURRENTVALUE) AS PPFVALUE FROM [PPF] WHERE PID = {0}";
 
-        //readonly string GET_ALL_EPF_VALUE = "SELECT SUM(CURRENTVALUE) AS EPFVALUE FROM [EPF] WHERE PID = {0} AND GOALID = {1}";
+        readonly string GET_ALL_EPF_VALUE = "SELECT SUM(AMOUNT) AS EPFVALUE FROM [EPF] WHERE PID = {0}";
 
         readonly string GET_ALL_SS_VALUE = "SELECT SUM(CURRENTVALUE) AS SSVALUE FROM [SukanyaSamrudhi] WHERE PID = {0} ";
 
@@ -159,13 +159,13 @@ namespace FinancialPlanner.BusinessLogic.CurrentStatus
             csCal.PPFValue  = ppfValue;
             #endregion
 
-            //#region "EPF"
-            ////PPF
-            //double epfValue = 0;
-            //returnvalue = DataBase.DBService.ExecuteCommandScalar(string.Format(GET_EPF_VALUE, plannerId, goalId));
-            //double.TryParse(returnvalue, out epfValue);
-            //csCal.EPFValue = epfValue;
-            //#endregion
+            #region "EPF"
+            //EPF
+            double epfValue = 0;
+            returnvalue = DataBase.DBService.ExecuteCommandScalar(string.Format(GET_EPF_VALUE, plannerId, goalId));
+            double.TryParse(returnvalue, out epfValue);
+            csCal.EPFValue = epfValue;
+            #endregion
 
             #region "SS"
             //Sukanya Samrudhi
@@ -278,13 +278,13 @@ namespace FinancialPlanner.BusinessLogic.CurrentStatus
             csCal.PPFValue = ppfValue;
             #endregion
 
-            //#region "EPF"
-            ////PPF
-            //double epfValue = 0;
-            //returnvalue = DataBase.DBService.ExecuteCommandScalar(string.Format(GET_ALL_EPF_VALUE, plannerId, goalId));
-            //double.TryParse(returnvalue, out epfValue);
-            //csCal.EPFValue = epfValue;
-            //#endregion
+            #region "EPF"
+            //EPF
+            double epfValue = 0;
+            returnvalue = DataBase.DBService.ExecuteCommandScalar(string.Format(GET_ALL_EPF_VALUE, plannerId));
+            double.TryParse(returnvalue, out epfValue);
+            csCal.EPFValue = epfValue;
+            #endregion
 
             #region "SS"
             //Sukanya Samrudhi
