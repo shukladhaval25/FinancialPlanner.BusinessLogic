@@ -19,15 +19,16 @@ namespace FinancialPlanner.BusinessLogic.CurrentStatus
         private readonly string SELECT_ALL = "SELECT N1.*,U.USERNAME AS UPDATEDBYUSERNAME FROM Bonds N1, USERS U WHERE N1.UPDATEDBY = U.ID AND N1.PID = {0}";
 
         const string INSERT_Bonds= "INSERT INTO Bonds VALUES (" +
-            "{0},'{1}','{2}','{3}',{4},{5},{6},{7},'{8}',{9},'{10}',{11},'{12}',{13})";
+            "{0},'{1}','{2}','{3}',{4},{5},{6},{7},'{8}',{9},'{10}',{11},'{12}',{13},{14})";
 
         const string UPDATE_Bonds = "UPDATE Bonds SET " +
             "[INVESTERNAME] = '{0}'," +
             "[COMPANYNAME] = '{1}'," +
             "[FOLIONO] ='{2}', RATE ={3}, NOOFBOND = {4},FACEVALUE ={5},CURRENTVALUE = {6}," +
             "MATURITYDATE = '{7}',GoalId ={8}, " +
-            "[UpdatedOn] = '{9}', [UpdatedBy] ={10} " +
-            "WHERE ID = {11} ";
+            "[UpdatedOn] = '{9}', [UpdatedBy] ={10}, " +
+            "[InvestmentReturnRate] = {11}" + 
+            "WHERE ID = {12} ";
 
         const string DELETE_Bonds = "DELETE FROM Bonds WHERE ID = {0}";
 
@@ -97,7 +98,8 @@ namespace FinancialPlanner.BusinessLogic.CurrentStatus
                       Bonds.Rate, Bonds.NoOfBond, Bonds.FaceValue,
                       Bonds.CurrentValue, Bonds.MaturityDate.ToString("yyyy-MM-dd hh:mm:ss"), Bonds.GoalId,
                       Bonds.CreatedOn.ToString("yyyy-MM-dd hh:mm:ss"), Bonds.CreatedBy,
-                      Bonds.UpdatedOn.ToString("yyyy-MM-dd hh:mm:ss"), Bonds.UpdatedBy), true);
+                      Bonds.UpdatedOn.ToString("yyyy-MM-dd hh:mm:ss"), Bonds.UpdatedBy,
+                      Bonds.InvestmentReturnRate), true);
 
                 Activity.ActivitiesService.Add(ActivityType.CreateBonds, EntryStatus.Success,
                          Source.Server, Bonds.UpdatedByUserName, Bonds.CompanyName, Bonds.MachineName);
@@ -133,6 +135,7 @@ namespace FinancialPlanner.BusinessLogic.CurrentStatus
                       (Bonds.GoalId == null) ? null : Bonds.GoalId.Value.ToString(),
                       Bonds.UpdatedOn.ToString("yyyy-MM-dd hh:mm:ss"),
                       Bonds.UpdatedBy,
+                      Bonds.InvestmentReturnRate,
                       Bonds.Id), true);
 
                 Activity.ActivitiesService.Add(ActivityType.UpdateBonds, EntryStatus.Success,
@@ -203,6 +206,7 @@ namespace FinancialPlanner.BusinessLogic.CurrentStatus
             bonds.UpdatedBy = dr.Field<int>("UpdatedBy");
             bonds.UpdatedOn = dr.Field<DateTime>("UpdatedOn");
             bonds.UpdatedByUserName = dr.Field<string>("UpdatedByUserName");
+            bonds.InvestmentReturnRate = float.Parse(dr["InvestmentReturnRate"].ToString());
             return bonds;
         }
     }

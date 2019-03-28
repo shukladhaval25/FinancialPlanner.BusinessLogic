@@ -19,14 +19,14 @@ namespace FinancialPlanner.BusinessLogic.CurrentStatus
         private readonly string SELECT_ALL = "SELECT N1.*,U.USERNAME AS UPDATEDBYUSERNAME FROM PPF N1, USERS U WHERE N1.UPDATEDBY = U.ID AND N1.PID = {0}";
 
         const string INSERT_PPF= "INSERT INTO PPF VALUES (" +
-            "{0},'{1}','{2}','{3}','{4}','{5}',{6},{7},'{8}',{9},'{10}',{11})";
+            "{0},'{1}','{2}','{3}','{4}','{5}',{6},{7},'{8}',{9},'{10}',{11},{12})";
 
         const string UPDATE_PPF = "UPDATE PPF SET " +
             "[INVESTERNAME] = '{0}'," +
             "[ACCOUNTNO] = '{1}'," +
             "[BANK] ='{2}', OPENINGDATE ='{3}', MATURITYDATE = '{4}',CURRENTVALUE ={5}, GoalId ={6}, " +
-            "[UpdatedOn] = '{7}', [UpdatedBy] ={8} " +
-            "WHERE ID = {9} ";
+            "[UpdatedOn] = '{7}', [UpdatedBy] ={8},[InvestmentReturnRate] ={9} " +
+            "WHERE ID = {10} ";
 
         const string DELETE_PPF = "DELETE FROM PPF WHERE ID = {0}";
 
@@ -98,7 +98,8 @@ namespace FinancialPlanner.BusinessLogic.CurrentStatus
                       PPF.CurrentValue,
                       PPF.GoalId,
                       PPF.CreatedOn.ToString("yyyy-MM-dd hh:mm:ss"), PPF.CreatedBy,
-                      PPF.UpdatedOn.ToString("yyyy-MM-dd hh:mm:ss"), PPF.UpdatedBy), true);
+                      PPF.UpdatedOn.ToString("yyyy-MM-dd hh:mm:ss"), PPF.UpdatedBy,
+                      PPF.InvestmentReturnRate), true);
 
                 Activity.ActivitiesService.Add(ActivityType.CreatePPF, EntryStatus.Success,
                          Source.Server, PPF.UpdatedByUserName, PPF.AccountNo, PPF.MachineName);
@@ -131,7 +132,7 @@ namespace FinancialPlanner.BusinessLogic.CurrentStatus
                       ppf.CurrentValue,                  
                       (ppf.GoalId == null) ? null : ppf.GoalId.Value.ToString(),
                       ppf.UpdatedOn.ToString("yyyy-MM-dd hh:mm:ss"),
-                      ppf.UpdatedBy,                     
+                      ppf.UpdatedBy,ppf.InvestmentReturnRate,                     
                       ppf.Id), true);
 
                 Activity.ActivitiesService.Add(ActivityType.UpdatePPF, EntryStatus.Success,
@@ -200,6 +201,7 @@ namespace FinancialPlanner.BusinessLogic.CurrentStatus
             PPF.UpdatedBy = dr.Field<int>("UpdatedBy");
             PPF.UpdatedOn = dr.Field<DateTime>("UpdatedOn");
             PPF.UpdatedByUserName = dr.Field<string>("UpdatedByUserName");
+            PPF.InvestmentReturnRate = float.Parse(dr["InvestmentReturnRate"].ToString());
             return PPF;
         }
     }
