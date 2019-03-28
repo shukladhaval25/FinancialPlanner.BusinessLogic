@@ -19,14 +19,14 @@ namespace FinancialPlanner.BusinessLogic.CurrentStatus
         private readonly string SELECT_ALL = "SELECT N1.*,U.USERNAME AS UPDATEDBYUSERNAME FROM SCSS N1, USERS U WHERE N1.UPDATEDBY = U.ID AND N1.PID = {0}";
 
         const string INSERT_SCSS= "INSERT INTO SCSS VALUES (" +
-            "{0},'{1}','{2}','{3}','{4}','{5}',{6},{7},'{8}',{9},'{10}',{11})";
+            "{0},'{1}','{2}','{3}','{4}','{5}',{6},{7},'{8}',{9},'{10}',{11},{12})";
 
         const string UPDATE_SCSS = "UPDATE SCSS SET " +
             "[INVESTERNAME] = '{0}'," +
             "[ACCOUNTNO] = '{1}'," +
             "[BANK] ='{2}', OPENINGDATE ='{3}', MATURITYDATE = '{4}',CURRENTVALUE ={5}, GoalId ={6}, " +
-            "[UpdatedOn] = '{7}', [UpdatedBy] ={8} " +
-            "WHERE ID = {9} ";
+            "[UpdatedOn] = '{7}', [UpdatedBy] ={8}, [InvestmentReturnRate] ={9} " +
+            "WHERE ID = {10} ";
 
         const string DELETE_SCSS = "DELETE FROM SCSS WHERE ID = {0}";
 
@@ -98,7 +98,8 @@ namespace FinancialPlanner.BusinessLogic.CurrentStatus
                       SCSS.CurrentValue,
                       SCSS.GoalId,
                       SCSS.CreatedOn.ToString("yyyy-MM-dd hh:mm:ss"), SCSS.CreatedBy,
-                      SCSS.UpdatedOn.ToString("yyyy-MM-dd hh:mm:ss"), SCSS.UpdatedBy), true);
+                      SCSS.UpdatedOn.ToString("yyyy-MM-dd hh:mm:ss"), SCSS.UpdatedBy,
+                      SCSS.InvestmentReturnRate),true);
 
                 Activity.ActivitiesService.Add(ActivityType.CreateSCSS, EntryStatus.Success,
                          Source.Server, SCSS.UpdatedByUserName, SCSS.AccountNo, SCSS.MachineName);
@@ -132,6 +133,7 @@ namespace FinancialPlanner.BusinessLogic.CurrentStatus
                       (SCSS.GoalId == null) ? null : SCSS.GoalId.Value.ToString(),
                       SCSS.UpdatedOn.ToString("yyyy-MM-dd hh:mm:ss"),
                       SCSS.UpdatedBy,
+                      SCSS.InvestmentReturnRate,
                       SCSS.Id), true);
 
                 Activity.ActivitiesService.Add(ActivityType.UpdateSCSS, EntryStatus.Success,
@@ -200,6 +202,7 @@ namespace FinancialPlanner.BusinessLogic.CurrentStatus
             SCSS.UpdatedBy = dr.Field<int>("UpdatedBy");
             SCSS.UpdatedOn = dr.Field<DateTime>("UpdatedOn");
             SCSS.UpdatedByUserName = dr.Field<string>("UpdatedByUserName");
+            SCSS.InvestmentReturnRate = float.Parse(dr["InvestmentReturnRate"].ToString());
             return SCSS;
         }
     }

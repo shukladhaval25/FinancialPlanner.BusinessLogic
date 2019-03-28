@@ -19,15 +19,15 @@ namespace FinancialPlanner.BusinessLogic.CurrentStatus
         private readonly string SELECT_ALL = "SELECT N1.*,U.USERNAME AS UPDATEDBYUSERNAME FROM ULIP N1, USERS U WHERE N1.UPDATEDBY = U.ID AND N1.PID = {0}";
 
         const string INSERT_ULIP= "INSERT INTO ULIP VALUES (" +
-            "{0},'{1}','{2}','{3}',{4},{5},{6},{7},{8},{9},{10},{11},{12},'{13}',{14},'{15}',{16},'{17}','{18}','{19}')";
+            "{0},'{1}','{2}','{3}',{4},{5},{6},{7},{8},{9},{10},{11},{12},'{13}',{14},'{15}',{16},'{17}','{18}','{19}',{20})";
 
         const string UPDATE_ULIP = "UPDATE ULIP SET " +
             "[INVESTERNAME] = '{0}'," +
             "[SCHEMENAME] = '{1}'," +
             "[NAV] ={2}, UNITS ={3},EquityRatio = {4},GoldRatio ={5},DebtRatio = {6}," +
             "SIP ={7},FreeUnits ={8},REDUMPTIONAMOUNT ={9},GoalId ={10}, " +
-            "[UpdatedOn] = '{11}', [UpdatedBy] ={12},FOLIONO = '{13}',FIRSTHOLDER = '{14}', SECONDHOLDER ='{15}', NOMINEE = '{16}' " +
-            "WHERE ID = {17} ";
+            "[UpdatedOn] = '{11}', [UpdatedBy] ={12},FOLIONO = '{13}',FIRSTHOLDER = '{14}', SECONDHOLDER ='{15}', NOMINEE = '{16}',INVESTMENTRETURNRATE = {17} " +
+            "WHERE ID = {18} ";
 
         const string DELETE_ULIP = "DELETE FROM ULIP WHERE ID = {0}";
 
@@ -98,7 +98,8 @@ namespace FinancialPlanner.BusinessLogic.CurrentStatus
                       ULIP.RedumptionAmount, ULIP.GoalID,
                       ULIP.CreatedOn.ToString("yyyy-MM-dd hh:mm:ss"), ULIP.CreatedBy,
                       ULIP.UpdatedOn.ToString("yyyy-MM-dd hh:mm:ss"), ULIP.UpdatedBy,
-                      ULIP.FirstHolder, ULIP.SecondHolder, ULIP.Nominee), true);
+                      ULIP.FirstHolder, ULIP.SecondHolder, ULIP.Nominee,
+                      ULIP.InvestmentReturnRate), true);
 
                 Activity.ActivitiesService.Add(ActivityType.CreateULIP, EntryStatus.Success,
                          Source.Server, ULIP.UpdatedByUserName, "ULIP", ULIP.MachineName);
@@ -135,6 +136,7 @@ namespace FinancialPlanner.BusinessLogic.CurrentStatus
                       ULIP.UpdatedOn.ToString("yyyy-MM-dd hh:mm:ss"),
                       ULIP.UpdatedBy, ULIP.FolioNo,
                       ULIP.FirstHolder, ULIP.SecondHolder, ULIP.Nominee,
+                      ULIP.InvestmentReturnRate,
                       ULIP.Id), true);
 
                 Activity.ActivitiesService.Add(ActivityType.UpdateULIP, EntryStatus.Success,
@@ -210,6 +212,7 @@ namespace FinancialPlanner.BusinessLogic.CurrentStatus
             ULIP.FirstHolder = dr.Field<string>("FirstHolder");
             ULIP.SecondHolder = dr.Field<string>("SecondHolder");
             ULIP.Nominee = dr.Field<string>("Nominee");
+            ULIP.InvestmentReturnRate = float.Parse(dr["InvestmentReturnRate"].ToString());
             return ULIP;
         }
     }

@@ -20,14 +20,14 @@ namespace FinancialPlanner.BusinessLogic.CurrentStatus
         private readonly string SELECT_ALL = "SELECT N1.*,U.USERNAME AS UPDATEDBYUSERNAME FROM SukanyaSamrudhi N1, USERS U WHERE N1.UPDATEDBY = U.ID AND N1.PID = {0}";
 
         const string INSERT_SukanyaSamrudhi= "INSERT INTO SukanyaSamrudhi VALUES (" +
-            "{0},'{1}','{2}','{3}','{4}','{5}',{6},{7},'{8}',{9},'{10}',{11})";
+            "{0},'{1}','{2}','{3}','{4}','{5}',{6},{7},'{8}',{9},'{10}',{11},{12})";
 
         const string UPDATE_SukanyaSamrudhi = "UPDATE SukanyaSamrudhi SET " +
             "[INVESTERNAME] = '{0}'," +
             "[ACCOUNTNO] = '{1}'," +
             "[BANK] ='{2}', OPENINGDATE ='{3}', MATURITYDATE = '{4}',CURRENTVALUE ={5}, GoalId ={6}, " +
-            "[UpdatedOn] = '{7}', [UpdatedBy] ={8} " +
-            "WHERE ID = {9} ";
+            "[UpdatedOn] = '{7}', [UpdatedBy] ={8},[InvestmentReturnRate] ={9} " +
+            "WHERE ID = {10} ";
 
         const string DELETE_SukanyaSamrudhi = "DELETE FROM SukanyaSamrudhi WHERE ID = {0}";
 
@@ -92,14 +92,18 @@ namespace FinancialPlanner.BusinessLogic.CurrentStatus
 
                 DataBase.DBService.BeginTransaction();
                 DataBase.DBService.ExecuteCommandString(string.Format(INSERT_SukanyaSamrudhi,
-                      SukanyaSamrudhi.Pid, SukanyaSamrudhi.InvesterName, SukanyaSamrudhi.AccountNo,
+                      SukanyaSamrudhi.Pid, SukanyaSamrudhi.InvesterName,
+                      SukanyaSamrudhi.AccountNo,
                       SukanyaSamrudhi.Bank,
                       SukanyaSamrudhi.OpeningDate.ToString("yyyy-MM-dd hh:mm:ss"),
                       SukanyaSamrudhi.MaturityDate.ToString("yyyy-MM-dd hh:mm:ss"),
                       SukanyaSamrudhi.CurrentValue,
                       SukanyaSamrudhi.GoalId,
-                      SukanyaSamrudhi.CreatedOn.ToString("yyyy-MM-dd hh:mm:ss"), SukanyaSamrudhi.CreatedBy,
-                      SukanyaSamrudhi.UpdatedOn.ToString("yyyy-MM-dd hh:mm:ss"), SukanyaSamrudhi.UpdatedBy), true);
+                      SukanyaSamrudhi.CreatedOn.ToString("yyyy-MM-dd hh:mm:ss"),
+                      SukanyaSamrudhi.CreatedBy,
+                      SukanyaSamrudhi.UpdatedOn.ToString("yyyy-MM-dd hh:mm:ss"),
+                      SukanyaSamrudhi.UpdatedBy,
+                      SukanyaSamrudhi.InvestmentReturnRate), true);
 
                 Activity.ActivitiesService.Add(ActivityType.CreateSukanyaSamrudhi, EntryStatus.Success,
                          Source.Server, SukanyaSamrudhi.UpdatedByUserName, SukanyaSamrudhi.AccountNo, SukanyaSamrudhi.MachineName);
@@ -130,9 +134,11 @@ namespace FinancialPlanner.BusinessLogic.CurrentStatus
                       SukanyaSamrudhi.OpeningDate.ToString("yyyy-MM-dd hh:mm:ss"),
                       SukanyaSamrudhi.MaturityDate.ToString("yyyy-MM-dd hh:mm:ss"),
                       SukanyaSamrudhi.CurrentValue,
-                      (SukanyaSamrudhi.GoalId == null) ? null : SukanyaSamrudhi.GoalId.Value.ToString(),
+                      (SukanyaSamrudhi.GoalId == null) ? null :
+                      SukanyaSamrudhi.GoalId.Value.ToString(),
                       SukanyaSamrudhi.UpdatedOn.ToString("yyyy-MM-dd hh:mm:ss"),
                       SukanyaSamrudhi.UpdatedBy,
+                      SukanyaSamrudhi.InvestmentReturnRate,
                       SukanyaSamrudhi.Id), true);
 
                 Activity.ActivitiesService.Add(ActivityType.UpdateSukanyaSamrudhi, EntryStatus.Success,
@@ -201,6 +207,7 @@ namespace FinancialPlanner.BusinessLogic.CurrentStatus
             SukanyaSamrudhi.UpdatedBy = dr.Field<int>("UpdatedBy");
             SukanyaSamrudhi.UpdatedOn = dr.Field<DateTime>("UpdatedOn");
             SukanyaSamrudhi.UpdatedByUserName = dr.Field<string>("UpdatedByUserName");
+            SukanyaSamrudhi.InvestmentReturnRate = float.Parse(dr["InvestmentReturnRate"].ToString());
             return SukanyaSamrudhi;
         }
     }

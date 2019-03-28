@@ -16,14 +16,14 @@ namespace FinancialPlanner.BusinessLogic.CurrentStatus
         private readonly string SELECT_ALL = "SELECT N1.*,U.USERNAME AS UPDATEDBYUSERNAME FROM NSC N1, USERS U WHERE N1.UPDATEDBY = U.ID AND N1.PID = {0}";
 
         const string INSERT_NSC= "INSERT INTO NSC VALUES (" +
-            "{0},'{1}','{2}','{3}',{4},'{5}',{6},{7},{8},{9},'{10}',{11},'{12}',{13})";
+            "{0},'{1}','{2}','{3}',{4},'{5}',{6},{7},{8},{9},'{10}',{11},'{12}',{13},{14})";
 
         const string UPDATE_NSC = "UPDATE NSC SET " +
             "[INVESTERNAME] = '{0}'," +            
             "[PostOfficeBranch] ='{1}', DOCUMENTNO ='{2}', RATE = {3}, MATURITYDATE = '{4}'," +
             "UNITS = {5}, VALUEOFONE ={6}, CURRENTVALUE ={7}, GoalId ={8}, " +
-            "[UpdatedOn] = '{9}', [UpdatedBy] ={10} " +
-            "WHERE ID = {11} ";
+            "[UpdatedOn] = '{9}', [UpdatedBy] ={10},[InvestmentReturnRate] = {11} " +
+            "WHERE ID = {12} ";
 
         const string DELETE_NSC = "DELETE FROM NSC WHERE ID = {0}";
 
@@ -97,7 +97,8 @@ namespace FinancialPlanner.BusinessLogic.CurrentStatus
                       NSC.CurrentValue,
                       NSC.GoalId,
                       NSC.CreatedOn.ToString("yyyy-MM-dd hh:mm:ss"), NSC.CreatedBy,
-                      NSC.UpdatedOn.ToString("yyyy-MM-dd hh:mm:ss"), NSC.UpdatedBy), true);
+                      NSC.UpdatedOn.ToString("yyyy-MM-dd hh:mm:ss"), NSC.UpdatedBy,
+                      NSC.InvestmentReturnRate), true);
 
                 Activity.ActivitiesService.Add(ActivityType.CreateNSC, EntryStatus.Success,
                          Source.Server, NSC.UpdatedByUserName, NSC.DocumentNo, NSC.MachineName);
@@ -133,6 +134,7 @@ namespace FinancialPlanner.BusinessLogic.CurrentStatus
                       (NSC.GoalId == null) ? null : NSC.GoalId.Value.ToString(),
                       NSC.UpdatedOn.ToString("yyyy-MM-dd hh:mm:ss"),
                       NSC.UpdatedBy,
+                      NSC.InvestmentReturnRate,
                       NSC.Id), true);
 
                 Activity.ActivitiesService.Add(ActivityType.UpdateNSC, EntryStatus.Success,
@@ -203,6 +205,7 @@ namespace FinancialPlanner.BusinessLogic.CurrentStatus
             NSC.UpdatedBy = dr.Field<int>("UpdatedBy");
             NSC.UpdatedOn = dr.Field<DateTime>("UpdatedOn");
             NSC.UpdatedByUserName = dr.Field<string>("UpdatedByUserName");
+            NSC.InvestmentReturnRate = float.Parse(dr["InvestmentReturnRate"].ToString());
             return NSC;
         }
     }
