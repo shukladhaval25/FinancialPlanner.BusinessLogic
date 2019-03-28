@@ -58,6 +58,7 @@
     <Compile Include="Compnay\CompanyService.cs" />
     <Compile Include="CurrentStatus\BondsService.cs" />
     <Compile Include="CurrentStatus\CurrentStatusService.cs" />
+    <Compile Include="CurrentStatus\EPFService.cs" />
     <Compile Include="CurrentStatus\FixedDepositeService.cs" />
     <Compile Include="CurrentStatus\MFTransactrionService.cs" />
     <Compile Include="CurrentStatus\MutualFundService.cs" />

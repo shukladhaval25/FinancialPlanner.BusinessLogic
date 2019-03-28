@@ -149,7 +149,11 @@ namespace FinancialPlanner.BusinessLogic.Activity
 
         private static readonly string ADD_PPF ="PPF account ''{0}'' added successfully.";
         private static readonly string UPDATE_PPF = "PPF account ''{0}'' edited successfully.";
-        private static readonly string DELETE_PPF = "PPf account ''{0}'' deleted successfully.";
+        private static readonly string DELETE_PPF = "PPF account ''{0}'' deleted successfully.";
+
+        private static readonly string ADD_EPF ="EPF account ''{0}'' added successfully.";
+        private static readonly string UPDATE_EPF = "EPF account ''{0}'' edited successfully.";
+        private static readonly string DELETE_EPF = "EPF account ''{0}'' deleted successfully.";
 
         private static readonly string ADD_SUKANYASAMRUDHI = "Sukanya Samrudhi ''{0}'' added successfully.";
         private static readonly string UPDATE_SUKANYASAMRUDHI= "Sukanya Samrudhi ''{0}'' updated successfully.";
@@ -435,6 +439,11 @@ namespace FinancialPlanner.BusinessLogic.Activity
                 _lstActivityDescription.Add(new KeyValuePair<ActivityType, string>(ActivityType.CreatePPF, ADD_PPF));
                 _lstActivityDescription.Add(new KeyValuePair<ActivityType, string>(ActivityType.UpdatePPF, UPDATE_PPF));
                 _lstActivityDescription.Add(new KeyValuePair<ActivityType, string>(ActivityType.DeletePPF, DELETE_PPF));
+
+                // EPF
+                _lstActivityDescription.Add(new KeyValuePair<ActivityType, string>(ActivityType.CreateEPF, ADD_EPF));
+                _lstActivityDescription.Add(new KeyValuePair<ActivityType, string>(ActivityType.UpdateEPF, UPDATE_EPF));
+                _lstActivityDescription.Add(new KeyValuePair<ActivityType, string>(ActivityType.DeleteEPF, DELETE_EPF));
 
                 //Sukanya Samrudhi
                 _lstActivityDescription.Add(new KeyValuePair<ActivityType, string>(ActivityType.CreateSukanyaSamrudhi, ADD_SUKANYASAMRUDHI));
