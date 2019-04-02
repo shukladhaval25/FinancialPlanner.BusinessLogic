@@ -124,7 +124,7 @@ namespace FinancialPlanner.BusinessLogic
             {
                 string clientName = DataBase.DBService.ExecuteCommandScalar(string.Format(GET_CLIENT_NAME_QUERY,goals.Pid));
                 
-                if (goals.StartYear != "" && goals.EndYear != "" && goals.Recurrence != null)
+                if (goals.StartYear != "" && goals.EndYear != "" && goals.Recurrence != null && goals.Category  != "Retirement")
                 {
                     addRepeatGoalsBasedOnFrequency(goals, clientName);
                 }
@@ -157,7 +157,6 @@ namespace FinancialPlanner.BusinessLogic
             DataBase.DBService.BeginTransaction();
             for (int year = startYear; year < endYear;)
             {                
-                goals.Name = yearWiseGoal.Name + " " + year;
                 goals.StartYear = year.ToString();
                 goals.EndYear = "";
                 goals.Priority = goalPriority;
@@ -168,7 +167,7 @@ namespace FinancialPlanner.BusinessLogic
                 }
 
                 DataBase.DBService.ExecuteCommandString(string.Format(INSERT_QUERY,
-                     goals.Pid, goals.Category, goals.Name.Replace("'", "''"),
+                     goals.Pid, goals.Category, goals.Name.Replace("'", "''") + " " + year,
                      goals.Amount, goals.StartYear, goals.EndYear,
                      goals.Recurrence, goals.Priority, goals.Description,
                      goals.CreatedOn.ToString("yyyy-MM-dd hh:mm:ss"), goals.CreatedBy,
