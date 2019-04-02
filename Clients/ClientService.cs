@@ -21,7 +21,9 @@ namespace FinancialPlanner.BusinessLogic.Clients
 
         private const string SELECT_ALL = "SELECT C1.*,U.USERNAME AS UPDATEDBYUSERNAME FROM CLIENT C1, USERS U WHERE C1.UPDATEDBY = U.ID AND C1.ISDELETED = 0";
         private const string SELECT_ID = "SELECT C1.*,U.USERNAME AS UPDATEDBYUSERNAME FROM CLIENT C1, USERS U WHERE C1.UPDATEDBY = U.ID and C1.ID = {0} AND C1.ISDELETED = 0";
-        
+        private const string SELECT_WITH_OTHER_VALUES = "SELECT C1.*, U.USERNAME AS UPDATEDBYUSERNAME FROM CLIENT C1, USERS U WHERE C1.UPDATEDBY = U.ID and " +
+            "C1.NAME = '{0}' AND C1.PAN ='{1}'  AND C1.ISDELETED = 0";
+
         private const string UPDATE_QUERY = "UPDATE CLIENT SET  NAME = '{0}'," +
                 "FATHERNAME = '{1}', MOTHERNAME = '{2}',GENDER ='{3}',DOB ='{4}',PAN ='{5}', AADHAR = '{6}'," +
                 "PLACEOFBIRTH ='{7}',Married ='{8}',MARRIAGEANNIVERSARY ='{9}', Occupation = '{10}'," +
@@ -52,6 +54,18 @@ namespace FinancialPlanner.BusinessLogic.Clients
                 client = convertToClientObject(dr);               
             }
             return  client;
+        }
+
+        public Client GetByOtherValues(string name, string pancard)
+        {
+            Client client = new Client();
+
+            DataTable dtAppConfig = DataBase.DBService.ExecuteCommand(string.Format(SELECT_WITH_OTHER_VALUES, name,pancard));
+            foreach (DataRow dr in dtAppConfig.Rows)
+            {
+                client = convertToClientObject(dr);
+            }
+            return client;
         }
 
         private Client convertToClientObject(DataRow dr)
