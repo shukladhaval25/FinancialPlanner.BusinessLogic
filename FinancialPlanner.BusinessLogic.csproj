@@ -83,6 +83,7 @@
     <Compile Include="PlanOption\CashFlowService.cs" />
     <Compile Include="PlanOption\CurrentStatusToGoalService.cs" />
     <Compile Include="PlanOption\PlanOptionService.cs" />
+    <Compile Include="Plans\AssumptionMasterService.cs" />
     <Compile Include="Plans\DocumentService.cs" />
     <Compile Include="Plans\ExpensesSesrvice.cs" />
     <Compile Include="Plans\GoalsService.cs" />

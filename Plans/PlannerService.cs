@@ -11,7 +11,7 @@ namespace FinancialPlanner.BusinessLogic.Plans
     public class PlannerService
     {
         private const string INSERT_QUERY = "INSERT INTO PLANNER VALUES (" +
-            "{0},'{1}','{2}','{3}','{4}','{5}',{6},'{7}',{8},{9},{10},'{11}','{12}')";
+            "{0},'{1}','{2}','{3}','{4}','{5}',{6},'{7}',{8},{9},{10},'{11}','{12}','{13}')";
 
         private const string SELECT_BY_CLIENTID = "SELECT P1.*,U.USERNAME AS UPDATEDBYUSERNAME FROM PLANNER P1, USERS U WHERE P1.UPDATEDBY = U.ID and P1.CLIENTID = {0} AND ISDELETED = 'FALSE'";
         private const string SELECT_ID = "SELECT P1.*,U.USERNAME AS UPDATEDBYUSERNAME FROM PLANNER P1, USERS U WHERE P1.UPDATEDBY = U.ID and P1.ID = {0} AND ISDELETED = 'FALSE'";
@@ -19,7 +19,7 @@ namespace FinancialPlanner.BusinessLogic.Plans
         private const string UPDATE_QUERY = "UPDATE PLANNER SET " +
             "[Name] = '{0}', [StartDate] ='{1}', [EndDate] ='{2}',[IsActive]='{3}',[CreatedOn] ='{4}'," +
             "[CreatedBy] = {5}, [UpdatedOn] ='{6}', [UpdatedBy] = {7}, [PlannerStartMonth] = {8}," +
-            "[AccountManagedBy] = {9}, [Description] = '{10}' WHERE ID = {11}";
+            "[AccountManagedBy] = {9}, [Description] = '{10}',[ReviewFrequency] ='{11}' WHERE ID = {12}";
     
         private const string DELETE_QUERY = "UPDATE PLANNER SET ISDELETED = 'TRUE' WHERE ID = {0}";
 
@@ -59,7 +59,8 @@ namespace FinancialPlanner.BusinessLogic.Plans
                 PlannerStartMonth = dr.Field<int>("PlannerStartMonth"),
                 AccountManagedBy = dr.Field<int>("AccountManagedBy"),
                 Description = dr.Field<string>("Description"),
-                IsDeleted = dr.Field<bool>("IsDeleted")
+                IsDeleted = dr.Field<bool>("IsDeleted"),
+                ReviewFrequency = dr.Field<string>("ReviewFrequency")
             };
             return planner;
         }
@@ -73,7 +74,7 @@ namespace FinancialPlanner.BusinessLogic.Plans
                     planner.CreatedOn.ToString("yyyy-MM-dd hh:mm:ss"), planner.CreatedBy,
                     planner.UpdatedOn.ToString("yyyy-MM-dd hh:mm:ss"), planner.UpdatedBy,
                     planner.PlannerStartMonth,planner.AccountManagedBy,planner.Description,
-                    planner.IsDeleted));
+                    planner.IsDeleted,planner.ReviewFrequency));
 
                 Activity.ActivitiesService.Add(ActivityType.CreatePlan, EntryStatus.Success,
                          Source.Server, planner.UpdatedByUserName, planner.Name, planner.MachineName);
@@ -93,7 +94,8 @@ namespace FinancialPlanner.BusinessLogic.Plans
                     planner.EndDate.ToString("yyyy-MM-dd"), planner.IsActive,
                     planner.CreatedOn.ToString("yyyy-MM-dd hh:mm:ss"), planner.CreatedBy,
                     planner.UpdatedOn.ToString("yyyy-MM-dd hh:mm:ss"), planner.UpdatedBy,
-                    planner.PlannerStartMonth, planner.AccountManagedBy, planner.Description, planner.ID));
+                    planner.PlannerStartMonth, planner.AccountManagedBy, planner.Description,
+                    planner.ReviewFrequency,planner.ID));
 
                 Activity.ActivitiesService.Add(ActivityType.UpdatePlan, EntryStatus.Success,
                          Source.Server, planner.UpdatedByUserName, planner.Name, planner.MachineName);

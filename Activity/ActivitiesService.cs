@@ -66,6 +66,7 @@ namespace FinancialPlanner.BusinessLogic.Activity
         private const string DELETE_GOAL ="Goal for ''{0}'' deleted successfully.";
 
         private const string UPDATE_PLANNER_ASSUMPTION = "Planner assumption updated for ''{0}'' successfully.";
+        private const string UPDATE_ASSUMPTION_MASTER = "Assumption master updated successfully.";
 
         private const string ADD_NON_FINANCIAL_ASSET = "Non financial asset added for ''{0}'' successfully.";
         private const string UPDATE_NON_FINANCIAL_ASSET = "Non financial asset updated for ''{0}'' successfully.";
@@ -496,6 +497,9 @@ namespace FinancialPlanner.BusinessLogic.Activity
 
                 //PlannerAssumption
                 _lstActivityDescription.Add(new KeyValuePair<ActivityType, string>(ActivityType.UpdatePlannerAssumption, UPDATE_PLANNER_ASSUMPTION));
+
+                //Assumpitn Master
+                _lstActivityDescription.Add(new KeyValuePair<ActivityType, string>(ActivityType.UpdateAssumptionMaster, UPDATE_ASSUMPTION_MASTER));
 
                 //Process Actions
                 //Loan
