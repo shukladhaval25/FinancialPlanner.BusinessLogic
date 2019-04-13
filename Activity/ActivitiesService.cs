@@ -204,6 +204,8 @@ namespace FinancialPlanner.BusinessLogic.Activity
         public static readonly string ADD_PROCESS_ACTION = "{0} process action added successfully";
         public static readonly string UPDATE_PROCESS_ACTION = "{0} process action added successfully";
         public static readonly string DELETE_PROCESS_ACTION = "{0} process action added successfully";
+        private static readonly string ADD_CLIENT_RATING = "{0} client rating added successfully";
+        private static readonly string DELETE_CLIENT_RATING = "{0} clcient rating deleted successfully";
 
         public static IList<Activities> Get(string userName)
         {
@@ -491,6 +493,10 @@ namespace FinancialPlanner.BusinessLogic.Activity
                 //Area
                 _lstActivityDescription.Add(new KeyValuePair<ActivityType, string>(ActivityType.CreateArea, ADD_AREA));
                 _lstActivityDescription.Add(new KeyValuePair<ActivityType, string>(ActivityType.DeleteArea, DELETE_AREA));
+
+                //Client Rating
+                _lstActivityDescription.Add(new KeyValuePair<ActivityType, string>(ActivityType.CreateClientRating, ADD_CLIENT_RATING));
+                _lstActivityDescription.Add(new KeyValuePair<ActivityType, string>(ActivityType.DeleteClientRating, DELETE_CLIENT_RATING));
 
                 //Company
                 _lstActivityDescription.Add(new KeyValuePair<ActivityType, string>(ActivityType.UpdateCompany, UPDATE_COMPANY));

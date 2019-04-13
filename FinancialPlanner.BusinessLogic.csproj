@@ -42,6 +42,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Activity\ActivitiesService.cs" />
+    <Compile Include="ApplicationMaster\ClientRatingService.cs" />
     <Compile Include="ApplicationMaster\AreaService.cs" />
     <Compile Include="ApplicationMaster\OrganisationTypeService.cs" />
     <Compile Include="ApplictionConfiguration\ApplicationConfiService.cs" />

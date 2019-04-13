@@ -157,6 +157,7 @@ namespace FinancialPlanner.BusinessLogic.DataBase
             catch(Exception ex)
             {
                 Logger.LogDebug(ex);
+                throw ex;
             }
             return dt;
         }
