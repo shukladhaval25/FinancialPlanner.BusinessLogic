@@ -51,14 +51,22 @@ namespace FinancialPlanner.BusinessLogic.CurrentStatus
         readonly string GET_ALL_SHARES_VALUE = "SELECT 'SHARES' AS NAME,(CURRENTVALUE) AS SHARESVALUE," +
             "INVESTMENTRETURNRATE AS ROI,GOALID FROM [SHARES] WHERE PID =  {0}";
 
-        readonly string GET_ALL_EQUITY_VALUE = "SELECT 'MF' AS NAME, SUM(((NAV * UNITS) * EQUITYRATIO /100)) AS EQUITYMFSHARES," +
-           "SUM(((NAV * UNITS) * DEBTRATIO /100)) AS DEBTMFSHARES," +
-           "SUM((NAV * UNITS)) AS TOTALVALUE, INVESTMENTRETURNRATE AS ROI, GOALID " +
-            " FROM [MUTUALFUND] WHERE PID ={0}";
+        //readonly string GET_ALL_EQUITY_VALUE = "SELECT 'MF' AS NAME, SUM(((NAV * UNITS) * EQUITYRATIO /100)) AS EQUITYMFSHARES," +
+        //   "SUM(((NAV * UNITS) * DEBTRATIO /100)) AS DEBTMFSHARES," +
+        //   "SUM((NAV * UNITS)) AS TOTALVALUE,InvestmentReturnRate AS ROI, GOALID " +
+        //    " FROM [MUTUALFUND] WHERE PID ={0}";
 
-        readonly string GET_ALL_EQUITY_NPS_VALUE = "SELECT 'NPS' AS NAME, ((NAV * UNITS) * EQUITYRATIO /100) AS EQUITYNPSSHARES," +
-            "((NAV * UNITS) * DEBTRATIO /100) AS DEBTNPSSHARES," +
-            "(NAV * UNITS) AS TOTALVALUE,INVESTMENTRETURNRATE AS ROI, GOALID FROM [NPS] WHERE PID ={0}";
+        readonly string GET_ALL_EQUITY_VALUE = "SELECT 'MF' AS NAME, SUM(((NAV * UNITS) * EQUITYRATIO / 100)) AS EQUITYMFSHARES," +
+            "SUM(((NAV * UNITS) * DEBTRATIO / 100)) AS DEBTMFSHARES," +
+            "SUM((NAV * UNITS)) AS TOTALVALUE, InvestmentReturnRate AS ROI," +
+            "GOALID FROM [MUTUALFUND] GROUP BY INVESTMENTRETURNRATE, GOALID, PID HAVING PID = {0}";
+
+        readonly string GET_ALL_EQUITY_NPS_VALUE = "SELECT 'NPS' AS NAME, SUM((NAV * UNITS) * EQUITYRATIO /100) AS EQUITYNPSSHARES," +
+            "SUM((NAV * UNITS) * DEBTRATIO /100) AS DEBTNPSSHARES," +
+            "SUM(NAV * UNITS) AS TOTALVALUE,INVESTMENTRETURNRATE AS ROI, GOALID FROM [NPS]" +
+            " GROUP BY INVESTMENTRETURNRATE, GOALID, PID HAVING PID = {0}";
+
+        
         #endregion
 
         #region "Debt part"
@@ -103,30 +111,71 @@ namespace FinancialPlanner.BusinessLogic.CurrentStatus
 
         public IList<CurrentStatusInstrument> GetAllCurrentStatusAmount(int plannerId)
         {
+            FinancialPlanner.Common.Logger.LogInfo("Get all current status amount for plannerId :" + plannerId.ToString());
+            try
+            {
+                //CurrentStatusCalculation csCal = new CurrentStatusCalculation();
+                IList<CurrentStatusInstrument> csCal = new List<CurrentStatusInstrument>();
+                #region "Equity"
+                FinancialPlanner.Common.Logger.LogInfo("Get shares information for current status proces start.");
+                addSharesToCurrentStatusInstrument(plannerId, csCal);
+                FinancialPlanner.Common.Logger.LogInfo("Get shares information for current status process completed.");
 
-            //CurrentStatusCalculation csCal = new CurrentStatusCalculation();
-            IList<CurrentStatusInstrument> csCal = new List<CurrentStatusInstrument>();            
-            #region "Equity"
-            addSharesToCurrentStatusInstrument(plannerId, csCal);
+                FinancialPlanner.Common.Logger.LogInfo("Get matual fund information for current status proces start.");
+                addMFToCurrentStatusInstrument(plannerId, csCal);
+                FinancialPlanner.Common.Logger.LogInfo("Get matual fund information for current status proces completed.");
 
-            addMFToCurrentStatusInstrument(plannerId, csCal);
+                FinancialPlanner.Common.Logger.LogInfo("Get NPS information for current status proces start.");
+                addNPSToCurrentStatusInstrument(plannerId, csCal);
+                FinancialPlanner.Common.Logger.LogInfo("Get NPS fund information for current status proces completed.");
+                #endregion
 
-            addNPSToCurrentStatusInstrument(plannerId, csCal);
-            #endregion
+                #region "DEBT"
+                FinancialPlanner.Common.Logger.LogInfo("Get recurring deposit information for current status proces start.");         
+                addRDToCurrentStatusInstrument(plannerId, csCal);
+                FinancialPlanner.Common.Logger.LogInfo("Get recurrning deposit information for current status proces completed.");
 
-            #region "DEBT"
-            addRDToCurrentStatusInstrument(plannerId, csCal);
-            addFDToCurrentStatusInstrument(plannerId, csCal);
-            addSavingAccountToCurrentStatusInstrument(plannerId, csCal);
-            addPPFToCurrentStatusInstrument(plannerId, csCal);
-            addEPFToCurrentStatusInstrument(plannerId, csCal);
-            addSSToCurrentStatusInstrument(plannerId, csCal);
-            addSCSSToCurrentSatusInstrument(plannerId, csCal);
-            addNSCToCurrentStatusInstrument(plannerId, csCal);
-            addBondsToCurrentStatusInstrument(plannerId, csCal);
-            #endregion
+                FinancialPlanner.Common.Logger.LogInfo("Get fixed deposit fund information for current status proces start.");
+                addFDToCurrentStatusInstrument(plannerId, csCal);
+                FinancialPlanner.Common.Logger.LogInfo("Get fixed deposit fund information for current status proces completed.");
 
-            return csCal;
+                FinancialPlanner.Common.Logger.LogInfo("Get saving account information for current status proces start.");
+                addSavingAccountToCurrentStatusInstrument(plannerId, csCal);
+                FinancialPlanner.Common.Logger.LogInfo("Get saving account information for current status proces completed.");
+
+                FinancialPlanner.Common.Logger.LogInfo("Get current account information for current status proces start.");
+                addPPFToCurrentStatusInstrument(plannerId, csCal);
+                FinancialPlanner.Common.Logger.LogInfo("Get current account information for current status proces completed.");
+
+                FinancialPlanner.Common.Logger.LogInfo("Get EPF information for current status proces start.");
+                addEPFToCurrentStatusInstrument(plannerId, csCal);
+                FinancialPlanner.Common.Logger.LogInfo("Get EPF information for current status proces completed.");
+
+                FinancialPlanner.Common.Logger.LogInfo("Get ss information for current status proces start.");
+                addSSToCurrentStatusInstrument(plannerId, csCal);
+                FinancialPlanner.Common.Logger.LogInfo("Get ss information for current status proces compelted.");
+
+                FinancialPlanner.Common.Logger.LogInfo("Get SCSS information for current status proces start.");
+                addSCSSToCurrentSatusInstrument(plannerId, csCal);
+                FinancialPlanner.Common.Logger.LogInfo("Get SCSS information for current status proces completed.");
+
+                FinancialPlanner.Common.Logger.LogInfo("Get NSC information for current status proces start.");
+                addNSCToCurrentStatusInstrument(plannerId, csCal);
+                FinancialPlanner.Common.Logger.LogInfo("Get NSC information for current status proces completed.");
+
+                FinancialPlanner.Common.Logger.LogInfo("Get bonds information for current status proces start.");
+                addBondsToCurrentStatusInstrument(plannerId, csCal);
+                FinancialPlanner.Common.Logger.LogInfo("Get bonds information for current status proces completed.");
+                #endregion
+
+                return csCal;
+            }
+            catch(Exception ex)
+            {
+                FinancialPlanner.Common.Logger.LogDebug(ex.Message);
+                FinancialPlanner.Common.Logger.LogInfo("Error occured in get all current status amount for plannerId :" + plannerId.ToString());
+                throw ex;
+            }
         }
 
         private void addBondsToCurrentStatusInstrument(int plannerId, IList<CurrentStatusInstrument> csCal)
@@ -294,7 +343,7 @@ namespace FinancialPlanner.BusinessLogic.CurrentStatus
                     string name = "MF_EQUITY";
                     double value = equityMFValue;
                     float roi = (string.IsNullOrEmpty(dr[2].ToString()) ? 0 : float.Parse(dr[2].ToString()));
-                    int goalid = (dr[3] == DBNull.Value) ? 0 : int.Parse(dr[3].ToString());
+                    int goalid = (dr[5] == DBNull.Value) ? 0 : int.Parse(dr[5].ToString());
 
                     CurrentStatusInstrument currentStatus = new CurrentStatusInstrument();
                     currentStatus.InstrumentName = name;
