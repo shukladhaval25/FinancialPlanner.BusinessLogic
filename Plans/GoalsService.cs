@@ -122,9 +122,9 @@ namespace FinancialPlanner.BusinessLogic
         {
             try
             {
-                string clientName = DataBase.DBService.ExecuteCommandScalar(string.Format(GET_CLIENT_NAME_QUERY,goals.Pid));
-                
-                if (goals.StartYear != "" && goals.EndYear != "" && goals.Recurrence != null && goals.Category  != "Retirement")
+                string clientName = DataBase.DBService.ExecuteCommandScalar(string.Format(GET_CLIENT_NAME_QUERY, goals.Pid));
+
+                if (isGoalRepeatAgain(goals))
                 {
                     addRepeatGoalsBasedOnFrequency(goals, clientName);
                 }
@@ -143,6 +143,13 @@ namespace FinancialPlanner.BusinessLogic
                 LogDebug(currentMethodName.Name, ex);
                 throw ex;
             }
+        }
+
+        private static bool isGoalRepeatAgain(Goals goals)
+        {
+            return goals.StartYear != "" && goals.EndYear != "" &&
+                                int.Parse(goals.EndYear) > int.Parse(goals.StartYear) &&
+                                goals.Recurrence != null && goals.Recurrence != 0 && goals.Category != "Retirement";
         }
 
         private static void addRepeatGoalsBasedOnFrequency(Goals goals, string clientName)
