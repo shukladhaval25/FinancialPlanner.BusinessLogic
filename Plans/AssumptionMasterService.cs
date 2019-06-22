@@ -22,14 +22,14 @@ namespace FinancialPlanner.BusinessLogic.Plans
         const string UPDATE_QUERY = "UPDATE ASSUMPTIONMASTER SET " +
             "RetirementAge = {0}," +
             "LifeExpectancy = {1}," +           
-            "PreRetirementInflactionRate ={3}," +
-            "PostRetirementInflactionRate ={4}," +
-            "EquityReturnRate = {5}," +
-            "DebtReturnRate = {6}," +
-            "OtherReturnRate = {7}," +
-            "IncomeRaise = {8}," +
-            "OngoingExpRise ={9}," +
-            "NonFinancialRateOfReturn = {10}," +
+            "PreRetirementInflactionRate ={2}," +
+            "PostRetirementInflactionRate ={3}," +
+            "EquityReturnRate = {4}," +
+            "DebtReturnRate = {5}," +
+            "OtherReturnRate = {6}," +
+            "IncomeRise = {7}," +
+            "OngoingExpRise ={8}," +
+            "NonFinancialRateOfReturn = {9}," +
             "UPDATEDON = '{10}'," +
             "UPDATEDBY={11} WHERE ID ={12}";
 

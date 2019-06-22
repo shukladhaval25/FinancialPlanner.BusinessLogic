@@ -23,3 +23,4 @@ C:\Application Development\Financial Planner Project\FinancialPlanner.BusinessLo
 C:\Application Development\Financial Planner Project\FinancialPlanner.BusinessLogic\obj\Debug\FinancialPlanner.BusinessLogic.csproj.CopyComplete
 C:\Application Development\Financial Planner Project\FinancialPlanner.BusinessLogic\obj\Debug\FinancialPlanner.BusinessLogic.dll
 C:\Application Development\Financial Planner Project\FinancialPlanner.BusinessLogic\obj\Debug\FinancialPlanner.BusinessLogic.pdb
+C:\Application Development\Financial Planner Project\FinancialPlanner.BusinessLogic\bin\Debug\ChilkatDotNet4.dll

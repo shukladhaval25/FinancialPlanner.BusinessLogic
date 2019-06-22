@@ -1,4 +1,5 @@
 ﻿using FinancialPlanner.Common;
+using FinancialPlanner.Common.EmailManager;
 using FinancialPlanner.Common.Model;
 using System;
 using System.Data;
@@ -8,38 +9,46 @@ namespace FinancialPlanner.BusinessLogic
 {
     public class EmailService
     {
-        Common.Model.Email  _emailobj;
+        //Common.Model.Email  _mailServer;
         DataTable _dtSMTPSetting;
-        private const string GET_SMTP_SETTING_QUERY = "SELECT * FROM APPLICATIONCONFIGURATION WHERE CATEGORY = 'SMTP Setting'";
+        private const string GET_MAILSERVER_SETTING_QUERY = "SELECT * FROM APPLICATIONCONFIGURATION WHERE CATEGORY = 'Mail Server Setting'";
         public EmailService ()
         {
-            _emailobj = new Common.Model.Email();
-            _dtSMTPSetting = DataBase.DBService.ExecuteCommand(GET_SMTP_SETTING_QUERY);
+            //_mailServer = new Common.Model.Email();
+            _dtSMTPSetting = DataBase.DBService.ExecuteCommand(GET_MAILSERVER_SETTING_QUERY);
             foreach (DataRow dr in _dtSMTPSetting.Rows)
             {
                 if (dr.Field<string>("SettingKey") == "FromEmail")
                 {
-                   _emailobj.FromEmail = dr.Field<string>("Value");
+                   MailServer.FromEmail = dr.Field<string>("Value");
                 }
                 else if (dr.Field<string>("SettingKey") == "SMTPPort")
                 {
-                   _emailobj.SMTPPort = int.Parse(dr.Field<string>("Value"));
+                   MailServer.HostPort = int.Parse(dr.Field<string>("Value"));
                 }
                 else if (dr.Field<string>("SettingKey") == "SMTPHost")
                 {
-                    _emailobj.SMTPServerHost = dr.Field<string>("Value");
+                    MailServer.HostName = dr.Field<string>("Value");
                 }
                 else if (dr.Field<string>("SettingKey") == "UserName")
                 {
-                    _emailobj.UserName = dr.Field<string>("Value");
+                    MailServer.UserName = dr.Field<string>("Value");
                 }
                 else if (dr.Field<string>("SettingKey") == "Password")
                 {
-                    _emailobj.Password = dr.Field<string>("Value");
+                    MailServer.Password = dr.Field<string>("Value");
                 }
                 else if (dr.Field<string>("SettingKey") == "IsSSL")
                 {
-                    _emailobj.IsSSL = Boolean.Parse(dr.Field<string>("Value"));
+                    MailServer.IsSSL = Boolean.Parse(dr.Field<string>("Value"));
+                }
+                else if (dr.Field<string>("SettingKey") == "POP3HostName")
+                {
+                    MailServer.POP3_IMPS_HostName = (dr.Field<string>("Value"));
+                }
+                else if (dr.Field<string>("SettingKey") == "POP3HostPort")
+                {
+                    MailServer.POP3_IMPS_HostPort = (dr.Field<string>("Value"));
                 }
             }
         }
@@ -48,12 +57,12 @@ namespace FinancialPlanner.BusinessLogic
             try
             {
                 MailMessage mail = mailMsg;                              
-                SmtpClient SmtpServer = new SmtpClient(_emailobj.SMTPServerHost);
-                mail.From = new MailAddress(_emailobj.FromEmail);
-                SmtpServer.Port = _emailobj.SMTPPort;
-                SmtpServer.Credentials = new System.Net.NetworkCredential(_emailobj.UserName, 
-                   FinancialPlanner.Common.DataEncrypterDecrypter.CryptoEngine.Decrypt(_emailobj.Password));
-                SmtpServer.EnableSsl = _emailobj.IsSSL;
+                SmtpClient SmtpServer = new SmtpClient(MailServer.HostName);
+                mail.From = new MailAddress(MailServer.FromEmail);
+                SmtpServer.Port = MailServer.HostPort;
+                SmtpServer.Credentials = new System.Net.NetworkCredential(MailServer.UserName, 
+                   FinancialPlanner.Common.DataEncrypterDecrypter.CryptoEngine.Decrypt(MailServer.Password));
+                SmtpServer.EnableSsl = MailServer.IsSSL;
                 
                 SmtpServer.Send(mail);
             }
