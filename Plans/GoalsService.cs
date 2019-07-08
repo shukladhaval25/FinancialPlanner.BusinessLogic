@@ -22,7 +22,7 @@ namespace FinancialPlanner.BusinessLogic
         const string SELECT_LOANGFORGOAL_BYID = "SELECT N1.*,U.USERNAME AS UPDATEDBYUSERNAME FROM LOANFORGOALS N1, USERS U WHERE N1.UPDATEDBY = U.ID AND N1.GOALID ={0}";
 
         const string INSERT_QUERY = "INSERT INTO Goals VALUES (" +
-            "{0},'{1}','{2}',{3},'{4}','{5}',{6},{7},'{8}','{9}',{10},'{11}',{12},{13},'{14}')";
+            "{0},'{1}','{2}',{3},'{4}','{5}',{6},{7},'{8}','{9}',{10},'{11}',{12},{13},'{14}',{15})";
         const string INSERT_GOALLOAN_QUERY = "INSERT INTO LOANFORGOALS " + 
             "VALUES ({0},{1},{2},{3},{4},{5},{6},'{7}',{8},'{9}',{10})";
 
@@ -30,7 +30,8 @@ namespace FinancialPlanner.BusinessLogic
             "CATEGORY = '{0}',NAME ='{1}',AMOUNT = {2}, " +
             "STARTYEAR = '{3}', ENDYEAR = '{4}',RECURRENCE ={5}," +
             "PRIORITY ={6},DESCRIPTION ='{7}',UPDATEDON = '{8}'," +
-            "UPDATEDBY={9},INFLATIONRATE = {10},ELIGIBLEFORINSURANCECOVER = '{11}'  WHERE ID ={12}";
+            "UPDATEDBY={9},INFLATIONRATE = {10},ELIGIBLEFORINSURANCECOVER = '{11}',"+
+            "OTHERAMOUNT = {13} WHERE ID ={12}";
 
         const string UPDATE_LOANFORGOAL_QUERY = "UPDATE LOANFORGOALS SET LOANAMOUNT = {0}," +
             "EMI = {1}, ROI = {2}, LOANYEARS = {3}, STARTYEAR = {4}, ENDYEAR = {5}, " +
@@ -179,7 +180,8 @@ namespace FinancialPlanner.BusinessLogic
                      goals.Recurrence, goals.Priority, goals.Description,
                      goals.CreatedOn.ToString("yyyy-MM-dd hh:mm:ss"), goals.CreatedBy,
                      goals.UpdatedOn.ToString("yyyy-MM-dd hh:mm:ss"), goals.UpdatedBy,
-                     goals.InflationRate, goals.EligibleForInsuranceCoverage), true);
+                     goals.InflationRate, goals.EligibleForInsuranceCoverage,
+                     goals.OtherAmount), true);
 
                 if (goals.LoanForGoal != null && year == startYear)
                     addLoanForGoal(goals);
@@ -201,7 +203,8 @@ namespace FinancialPlanner.BusinessLogic
                      goals.Recurrence, goals.Priority, goals.Description,
                      goals.CreatedOn.ToString("yyyy-MM-dd hh:mm:ss"), goals.CreatedBy,
                      goals.UpdatedOn.ToString("yyyy-MM-dd hh:mm:ss"), goals.UpdatedBy,
-                     goals.InflationRate, goals.EligibleForInsuranceCoverage), true);
+                     goals.InflationRate, goals.EligibleForInsuranceCoverage,
+                     goals.OtherAmount), true);
 
             if (goals.LoanForGoal != null)
                 addLoanForGoal(goals);
@@ -242,7 +245,7 @@ namespace FinancialPlanner.BusinessLogic
                    Goals.Recurrence, Goals.Priority,Goals.Description,
                    Goals.UpdatedOn.ToString("yyyy-MM-dd hh:mm:ss"), 
                    Goals.UpdatedBy,Goals.InflationRate, 
-                   Goals.EligibleForInsuranceCoverage,Goals.Id), true);
+                   Goals.EligibleForInsuranceCoverage,Goals.Id,Goals.OtherAmount), true);
 
                 if (Goals.LoanForGoal != null && Goals.LoanForGoal.Id == 0)
                     addLoanForGoal(Goals);
@@ -316,6 +319,7 @@ namespace FinancialPlanner.BusinessLogic
             Goals.UpdatedBy = dr.Field<int>("UpdatedBy");
             Goals.InflationRate = dr.Field<decimal>("InflationRate");
             Goals.EligibleForInsuranceCoverage = dr.Field<bool>("EligibleForInsuranceCover");
+            Goals.OtherAmount = double.Parse(dr["OtherAmount"].ToString());
             return Goals;
         }
 
