@@ -17,10 +17,10 @@ namespace FinancialPlanner.BusinessLogic.Plans
         const string SELECT_ALL = "SELECT N1.*,U.USERNAME AS UPDATEDBYUSERNAME FROM LOAN N1, USERS U WHERE N1.UPDATEDBY = U.ID AND N1.PID = {0}";
         const string SELECT_BYID = "SELECT N1.*,U.USERNAME AS UPDATEDBYUSERNAME FROM LOAN N1, USERS U WHERE N1.UPDATEDBY = U.ID AND N1.ID = {0} AND N1.PID ={1}";
 
-        const string INSERT_QUERY = "INSERT INTO LOAN VALUES ({0},'{1}',{2},{3},{4},{5},{6},'{7}','{8}',{9},'{10}',{11})";
+        const string INSERT_QUERY = "INSERT INTO LOAN VALUES ({0},'{1}',{2},{3},{4},{5},{6},'{7}','{8}',{9},'{10}',{11},'{12}')";
         const string UPDATE_QUERY = "UPDATE LOAN SET TYPEOFLOAN ='{0}',OUTSTANDINGAMT = {1},EMIS ={2},INTERESTRATE ={3}," + 
             "TERMLEFTINMONTHS ={4},NOEMISPAYABLEUNTILYEAR ={5},DESCRIPTION = '{6}', UPDATEDON = '{7}'," +
-            "UPDATEDBY={8} WHERE ID ={9}";
+            "UPDATEDBY={8},LOANSTARTDATE ='{9}' WHERE ID ={10}";
         const string DELET_QUERY = "DELETE FROM LOAN WHERE ID ={0}";
         public IList<Loan> GetAll(int plannerId)
         {            
@@ -85,7 +85,8 @@ namespace FinancialPlanner.BusinessLogic.Plans
                    loan.TermLeftInMonths, loan.NoEmisPayableUntilYear,                   
                    loan.Description,
                    loan.CreatedOn.ToString("yyyy-MM-dd hh:mm:ss"), loan.CreatedBy,
-                   loan.UpdatedOn.ToString("yyyy-MM-dd hh:mm:ss"), loan.UpdatedBy));
+                   loan.UpdatedOn.ToString("yyyy-MM-dd hh:mm:ss"), loan.UpdatedBy,
+                   loan.LoanStartDate));
 
                 Activity.ActivitiesService.Add(ActivityType.CreateLoan, EntryStatus.Success,
                          Source.Server, loan.UpdatedByUserName, clientName, loan.MachineName);
@@ -110,7 +111,8 @@ namespace FinancialPlanner.BusinessLogic.Plans
                    loan.Emis, loan.InterestRate,
                    loan.TermLeftInMonths, loan.NoEmisPayableUntilYear,
                    loan.Description,
-                   loan.UpdatedOn.ToString("yyyy-MM-dd hh:mm:ss"), loan.UpdatedBy,loan.Id));
+                   loan.UpdatedOn.ToString("yyyy-MM-dd hh:mm:ss"),
+                   loan.UpdatedBy, loan.LoanStartDate, loan.Id));
 
                 Activity.ActivitiesService.Add(ActivityType.UpdateLoan, EntryStatus.Success,
                          Source.Server, loan.UpdatedByUserName, clientName, loan.MachineName);
@@ -157,6 +159,7 @@ namespace FinancialPlanner.BusinessLogic.Plans
             loan.TermLeftInMonths = dr.Field<int>("TermLeftInMonths");
             loan.NoEmisPayableUntilYear = dr.Field<int>("NoEMISPayableUntilYear");            
             loan.Description = dr.Field<string>("Description");
+            loan.LoanStartDate = dr.Field<DateTime>("LoanStartDate");
             return loan;
         }
 
