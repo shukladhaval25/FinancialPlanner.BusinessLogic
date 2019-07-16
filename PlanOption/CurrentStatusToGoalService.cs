@@ -23,9 +23,9 @@ namespace FinancialPlanner.BusinessLogic.PlanOption
 
         const string UPDATE_CurrentStatusToGoal = "UPDATE CURRESNTSTATUSTOGOAL SET " +
             "[FUNDALLOCATION] = {0}, [UpdatedOn] = '{1}', [UpdatedBy] ={2} " +
-            "WHERE OID = {3}";
+            "WHERE OID = {3} AND ID ={4}";
 
-        const string DELETE_CurrentStatusToGoal = "DELETE FROM CURRESNTSTATUSTOGOAL WHERE OID = {0}";
+        const string DELETE_CurrentStatusToGoal = "DELETE FROM CURRESNTSTATUSTOGOAL WHERE ID = {0}";
 
         public IList<CurrentStatusToGoal> Get(int id,int planId)
         {
@@ -88,13 +88,14 @@ namespace FinancialPlanner.BusinessLogic.PlanOption
         {
             try
             {
-                string clientName = DataBase.DBService.ExecuteCommandScalar(string.Format(SELECT_ID,CurrentStatusToGoal.Id));
+               // string clientName = DataBase.DBService.ExecuteCommandScalar(string.Format(SELECT_ID,CurrentStatusToGoal.PlannerId));
 
                 DataBase.DBService.BeginTransaction();
                 DataBase.DBService.ExecuteCommandString(string.Format(UPDATE_CurrentStatusToGoal,
                       CurrentStatusToGoal.FundAllocation,
                       CurrentStatusToGoal.UpdatedOn.ToString("yyyy-MM-dd hh:mm:ss"), CurrentStatusToGoal.UpdatedBy,
-                      CurrentStatusToGoal.OptionId), true);
+                      CurrentStatusToGoal.OptionId,
+                      CurrentStatusToGoal.Id), true);
 
                 Activity.ActivitiesService.Add(ActivityType.UpdateCurrentStatusToGoal, EntryStatus.Success,
                          Source.Server, CurrentStatusToGoal.UpdatedByUserName, "CurrentStatusToGoal", CurrentStatusToGoal.MachineName);
@@ -120,7 +121,7 @@ namespace FinancialPlanner.BusinessLogic.PlanOption
 
                 DataBase.DBService.BeginTransaction();
                 DataBase.DBService.ExecuteCommandString(string.Format(DELETE_CurrentStatusToGoal,
-                      CurrentStatusToGoal.OptionId), true);
+                      CurrentStatusToGoal.Id), true);
 
                 Activity.ActivitiesService.Add(ActivityType.DeleteCurrentStatusToGoal, EntryStatus.Success,
                          Source.Server, CurrentStatusToGoal.UpdatedByUserName, "CurrentStatusToGoal", CurrentStatusToGoal.MachineName);
