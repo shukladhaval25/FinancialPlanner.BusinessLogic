@@ -15,7 +15,7 @@ namespace FinancialPlanner.BusinessLogic
         const string SELECT_COUNT = "SELECT COUNT(*) FROM PLANNERASSUMPTION N1, USERS U WHERE N1.UPDATEDBY = U.ID AND N1.PID = {0}";
 
         const string INSERT_QUERY = "INSERT INTO PLANNERASSUMPTION VALUES (" +
-            "{0},{1},{2},{3},{4},{5},{6},{7},{8},{9},'{10}','{11}',{12},'{13}',{14},'{15}',{16},{17},{18})";
+            "{0},{1},{2},{3},{4},{5},{6},{7},{8},{9},'{10}','{11}',{12},'{13}',{14},'{15}',{16},{17},{18},{19})";
 
         const string UPDATE_QUERY = "UPDATE PLANNERASSUMPTION SET " +
             "ClientRetirementAge = {0}," +
@@ -31,7 +31,8 @@ namespace FinancialPlanner.BusinessLogic
             "UPDATEDON = '{10}'," +
             "UPDATEDBY={11}, ConsiderClientAgeForRetirment = '{12}'," +
             "ClientIncomeRise ={13}, SpouseIncomeRise = {14}," +
-            "OngoingExpRise ={15} WHERE ID ={16}";
+            "OngoingExpRise ={15}," +
+            "PostRetirementInvestmentReturnRate ={17} WHERE ID ={16}";
 
         public PlannerAssumption GetAll(int plannerId)
         {
@@ -84,7 +85,8 @@ namespace FinancialPlanner.BusinessLogic
                        PlannerAssumption.IsClientRetirmentAgeIsPrimary,
                        PlannerAssumption.ClientIncomeRise, PlannerAssumption.SpouseIncomeRise,
                        PlannerAssumption.OngoingExpRise,
-                       PlannerAssumption.Id), true);
+                       PlannerAssumption.Id,
+                       PlannerAssumption.PostRetirementInvestmentReturnRate), true);
                 }
                 else
                 {
@@ -107,7 +109,8 @@ namespace FinancialPlanner.BusinessLogic
                       PlannerAssumption.IsClientRetirmentAgeIsPrimary,
                       PlannerAssumption.ClientIncomeRise, PlannerAssumption.SpouseIncomeRise,
                       PlannerAssumption.OngoingExpRise,
-                      PlannerAssumption.Id), true);
+                      PlannerAssumption.Id,
+                      PlannerAssumption.PostRetirementInvestmentReturnRate), true);
                 }
                 Activity.ActivitiesService.Add(ActivityType.UpdatePlannerAssumption, EntryStatus.Success,
                             Source.Server, PlannerAssumption.UpdatedByUserName, clientName, PlannerAssumption.MachineName);
@@ -145,6 +148,7 @@ namespace FinancialPlanner.BusinessLogic
             plannerAssumption.ClientIncomeRise = dr.Field<decimal>("ClientIncomeRise");
             plannerAssumption.SpouseIncomeRise = dr.Field<decimal>("SpouseIncomeRise");
             plannerAssumption.OngoingExpRise = dr.Field<decimal>("OngoingExpRise");
+            plannerAssumption.PostRetirementInvestmentReturnRate = dr.Field<decimal>("PostRetirementInvestmentReturnRate");
             return plannerAssumption;
         }
 
