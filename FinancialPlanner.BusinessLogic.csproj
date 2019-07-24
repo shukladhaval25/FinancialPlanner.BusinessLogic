@@ -96,6 +96,7 @@
     <Compile Include="CurrentStatus\BondsService.cs" />
     <Compile Include="CurrentStatus\CurrentStatusInstrumentService.cs" />
     <Compile Include="CurrentStatus\CurrentStatusService.cs" />
+    <Compile Include="CurrentStatus\OthersService.cs" />
     <Compile Include="CurrentStatus\EPFService.cs" />
     <Compile Include="CurrentStatus\FixedDepositeService.cs" />
     <Compile Include="CurrentStatus\MFTransactrionService.cs" />
@@ -136,6 +137,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ProspectClients\ProspectClientConversationService.cs" />
     <Compile Include="ProspectClients\ProspectClientService.cs" />
+    <Compile Include="TaskManagements\TaskProjectService.cs" />
     <Compile Include="Users\AuthenticationService.cs" />
     <Compile Include="Users\UserService.cs" />
     <Compile Include="Users\UserSessionService.cs" />

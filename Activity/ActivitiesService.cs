@@ -202,10 +202,19 @@ namespace FinancialPlanner.BusinessLogic.Activity
         private static readonly string DELETE_ORGANISATIONTYPE ="{0} organisation type deleted successfully";
 
         public static readonly string ADD_PROCESS_ACTION = "{0} process action added successfully";
-        public static readonly string UPDATE_PROCESS_ACTION = "{0} process action added successfully";
+        public static readonly string UPDATE_PROCESS_ACTION = "{0} process action updated successfully";
         public static readonly string DELETE_PROCESS_ACTION = "{0} process action added successfully";
+
         private static readonly string ADD_CLIENT_RATING = "{0} client rating added successfully";
         private static readonly string DELETE_CLIENT_RATING = "{0} clcient rating deleted successfully";
+
+        public static readonly string ADD_TASKPROJECT_ACTION = "{0} task project added sucessfully";
+        public static readonly string UPDATE_TASKPROJECT_ACTION = "{0} task project updated sucessfully";
+        public static readonly string DELETE_TASKPROJECT_ACTION = "{0} task project deleted sucessfully";
+
+        private static readonly string ADD_OTHERS = "OTHERS account ''{0}'' added successfully.";
+        private static readonly string UPDATE_OTHERS = "OTHERS account ''{0}'' edited successfully.";
+        private static readonly string DELETE_OTHERS = "OTHERS account ''{0}'' deleted successfully.";
 
         public static IList<Activities> Get(string userName)
         {
@@ -448,6 +457,11 @@ namespace FinancialPlanner.BusinessLogic.Activity
                 _lstActivityDescription.Add(new KeyValuePair<ActivityType, string>(ActivityType.UpdateEPF, UPDATE_EPF));
                 _lstActivityDescription.Add(new KeyValuePair<ActivityType, string>(ActivityType.DeleteEPF, DELETE_EPF));
 
+                // Others
+                _lstActivityDescription.Add(new KeyValuePair<ActivityType, string>(ActivityType.CreateOthers, ADD_OTHERS));
+                _lstActivityDescription.Add(new KeyValuePair<ActivityType, string>(ActivityType.UpdateOthers, UPDATE_OTHERS));
+                _lstActivityDescription.Add(new KeyValuePair<ActivityType, string>(ActivityType.DeleteOthers, DELETE_OTHERS));
+
                 //Sukanya Samrudhi
                 _lstActivityDescription.Add(new KeyValuePair<ActivityType, string>(ActivityType.CreateSukanyaSamrudhi, ADD_SUKANYASAMRUDHI));
                 _lstActivityDescription.Add(new KeyValuePair<ActivityType, string>(ActivityType.UpdateSukanyaSamrudhi, UPDATE_SUKANYASAMRUDHI));
@@ -512,6 +526,11 @@ namespace FinancialPlanner.BusinessLogic.Activity
                 _lstActivityDescription.Add(new KeyValuePair<ActivityType, string>(ActivityType.CreateProcessAction, ADD_PROCESS_ACTION));
                 _lstActivityDescription.Add(new KeyValuePair<ActivityType, string>(ActivityType.UpdateProcessAction, UPDATE_PROCESS_ACTION));
                 _lstActivityDescription.Add(new KeyValuePair<ActivityType, string>(ActivityType.DeleteProcessAction, DELETE_PROCESS_ACTION));
+
+                //Task Project
+                _lstActivityDescription.Add(new KeyValuePair<ActivityType, string>(ActivityType.CreateTaskProject, ADD_TASKPROJECT_ACTION));
+                _lstActivityDescription.Add(new KeyValuePair<ActivityType, string>(ActivityType.UpdateTaskProject, UPDATE_TASKPROJECT_ACTION));
+                _lstActivityDescription.Add(new KeyValuePair<ActivityType, string>(ActivityType.DeleteTaskProject, DELETE_TASKPROJECT_ACTION));
             }
         }
 
