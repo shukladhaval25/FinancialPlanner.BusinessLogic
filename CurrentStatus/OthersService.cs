@@ -19,14 +19,14 @@ namespace FinancialPlanner.BusinessLogic.CurrentStatus
         private readonly string SELECT_ALL = "SELECT N1.*,U.USERNAME AS UPDATEDBYUSERNAME FROM Others N1, USERS U WHERE N1.UPDATEDBY = U.ID AND N1.PID = {0}";
 
         const string INSERT_Others= "INSERT INTO Others VALUES (" +
-            "{0},'{1}','{2}','{3}',{4},{5},{6},'{7}',{8},'{9}',{10})";
+            "{0},'{1}','{2}','{3}',{4},{5},{6},'{7}',{8},'{9}',{10},'{11}')";
 
         const string UPDATE_Others = "UPDATE Others SET " +
             "[INVESTERNAME] = '{0}'," +
             "[ACCOUNTNO] = '{1}'," +
             "[PARTICULAR] ='{2}',AMOUNT ={3}, INVESTMENTRETURNRATE = {4}, GoalId ={5}, " +
-            "[UpdatedOn] = '{6}', [UpdatedBy] ={7} " +
-            "WHERE ID = {8} ";
+            "[UpdatedOn] = '{6}', [UpdatedBy] ={7},[TransactionType] = '{8}' " +
+            "WHERE ID = {9} ";
 
         const string DELETE_Others = "DELETE FROM Others WHERE ID = {0}";
 
@@ -97,7 +97,8 @@ namespace FinancialPlanner.BusinessLogic.CurrentStatus
                       Others.GoalId,
                       Others.InvestmentReturnRate,
                       Others.CreatedOn.ToString("yyyy-MM-dd hh:mm:ss"), Others.CreatedBy,
-                      Others.UpdatedOn.ToString("yyyy-MM-dd hh:mm:ss"), Others.UpdatedBy), true);
+                      Others.UpdatedOn.ToString("yyyy-MM-dd hh:mm:ss"), Others.UpdatedBy,
+                      Others.TransactionType), true);
 
                 Activity.ActivitiesService.Add(ActivityType.CreateOthers, EntryStatus.Success,
                          Source.Server, Others.UpdatedByUserName, Others.AccountNo, Others.MachineName);
@@ -130,6 +131,7 @@ namespace FinancialPlanner.BusinessLogic.CurrentStatus
                       (Others.GoalId == null) ? null : Others.GoalId.Value.ToString(),
                       Others.UpdatedOn.ToString("yyyy-MM-dd hh:mm:ss"),
                       Others.UpdatedBy,
+                      Others.TransactionType,
                       Others.Id), true);
 
                 Activity.ActivitiesService.Add(ActivityType.UpdateOthers, EntryStatus.Success,
@@ -197,6 +199,7 @@ namespace FinancialPlanner.BusinessLogic.CurrentStatus
             Others.UpdatedBy = dr.Field<int>("UpdatedBy");
             Others.UpdatedOn = dr.Field<DateTime>("UpdatedOn");
             Others.UpdatedByUserName = dr.Field<string>("UpdatedByUserName");
+            Others.TransactionType = dr.Field<string>("TransactionType");
             return Others;
         }
     }

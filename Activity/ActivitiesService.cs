@@ -216,6 +216,10 @@ namespace FinancialPlanner.BusinessLogic.Activity
         private static readonly string UPDATE_OTHERS = "OTHERS account ''{0}'' edited successfully.";
         private static readonly string DELETE_OTHERS = "OTHERS account ''{0}'' deleted successfully.";
 
+        private static readonly string ADD_ARN_ACTION ="ARN  ''{0}'' added sucessfully";
+        private static readonly string UPDATE_ARN_ACTION = "ARN  ''{0}'' edited sucessfully";
+        private static readonly string DELETE_ARN_ACTION = "ARN  ''{0}'' deleted sucessfully";
+
         public static IList<Activities> Get(string userName)
         {
             IList<Activities> lstActivities = new List<Activities>();
@@ -531,6 +535,11 @@ namespace FinancialPlanner.BusinessLogic.Activity
                 _lstActivityDescription.Add(new KeyValuePair<ActivityType, string>(ActivityType.CreateTaskProject, ADD_TASKPROJECT_ACTION));
                 _lstActivityDescription.Add(new KeyValuePair<ActivityType, string>(ActivityType.UpdateTaskProject, UPDATE_TASKPROJECT_ACTION));
                 _lstActivityDescription.Add(new KeyValuePair<ActivityType, string>(ActivityType.DeleteTaskProject, DELETE_TASKPROJECT_ACTION));
+
+                //Task Project
+                _lstActivityDescription.Add(new KeyValuePair<ActivityType, string>(ActivityType.CreateARN, ADD_ARN_ACTION));
+                _lstActivityDescription.Add(new KeyValuePair<ActivityType, string>(ActivityType.UpdateARN, UPDATE_ARN_ACTION));
+                _lstActivityDescription.Add(new KeyValuePair<ActivityType, string>(ActivityType.DeleteARN, DELETE_ARN_ACTION));
             }
         }
 

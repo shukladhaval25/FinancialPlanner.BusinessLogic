@@ -14,7 +14,7 @@ namespace FinancialPlanner.BusinessLogic.TaskManagements
 {
     public class TaskProjectService
     {
-        const string GET_PROJECT_NAME_QUERY = "SELECT C.NAME FROM CLIENT C, PLANNER P  WHERE P.CLIENTID = C.ID AND P.ID = {0}";
+        const string GET_PROJECT_NAME_QUERY = "SELECT NAME FROM TASKPROJECT ID = {0}";
         const string SELECT_ALL = "SELECT[ID],[NAME],[INITIALID],[DETAILS],[ISCUSTOMTYPE],[CREATEDON],[CREATEDBY]" +
             ",[UPDATEDON] ,[UPDATEDBY] FROM [TASKPROJECT]";
 
@@ -22,15 +22,12 @@ namespace FinancialPlanner.BusinessLogic.TaskManagements
         const string INSERT_PROJECT = "INSERT INTO TASKPROJECT VALUES (" +
             "'{0}','{1}','{2}','{3}'," +
             "'{4}',{5},'{6}',{7})";
-        const string UPDATE_PROJECT = "UPDATE GENERALINSURANCE SET " +
-            "[Applicant] = '{0}', [ISSUEDATE] ='{1}', [TERMSINYEARS] ={2},[MaturityDate] = '{3}', " +
-            "[PolicyNo] ='{4}',[Company] ='{5}',[Policy] ='{6}',[Type] ='{7}'," +
-            "[SumAssured]= {8},[Bonus] = {9}, [Premium] = {10}," +
-            "[Remark] = '{11}', " +
-            "[AttachmentPath] = '{12}', [UpdatedOn] = '{13}', [UpdatedBy] ={14} " +
-            "WHERE ID = {15} AND PID = {16}";
+        const string UPDATE_PROJECT = "UPDATE TASKPROJECT SET " +
+            "[NAME] = '{0}', [INITIALID] ='{1}', [DETAILS] = '{2}',[ISCUSTOMTYPE] = '{3}', " +
+            "[UpdatedOn] = '{4}', [UpdatedBy] ={5} " +
+            "WHERE ID = {6}";
 
-        const string DELETE_PROJECT = "DELETE FROM GENERALINSURANCE WHERE ID = {0} AND PID ={1}";
+        const string DELETE_PROJECT = "DELETE FROM TASKPROJECT WHERE ID = {0}";
 
         public IList<Common.Model.TaskManagement.Project> GetAll()
         {
@@ -102,7 +99,7 @@ namespace FinancialPlanner.BusinessLogic.TaskManagements
         {
             try
             {
-                string clientName = DataBase.DBService.ExecuteCommandScalar(string.Format(GET_PROJECT_NAME_QUERY, project.Id));
+                //string clientName = DataBase.DBService.ExecuteCommandScalar(string.Format(GET_PROJECT_NAME_QUERY, project.Id));
 
                 DataBase.DBService.BeginTransaction();
                 DataBase.DBService.ExecuteCommandString(string.Format(INSERT_PROJECT,
@@ -112,7 +109,60 @@ namespace FinancialPlanner.BusinessLogic.TaskManagements
                       project.UpdatedOn.ToString("yyyy-MM-dd hh:mm:ss"), project.UpdatedBy), true);
 
                 Activity.ActivitiesService.Add(ActivityType.CreateTaskProject, EntryStatus.Success,
-                         Source.Server, project.UpdatedByUserName, clientName, project.MachineName);
+                         Source.Server, project.UpdatedByUserName, project.Name, project.MachineName);
+                DataBase.DBService.CommitTransaction();
+            }
+            catch (Exception ex)
+            {
+                DataBase.DBService.RollbackTransaction();
+                StackTrace st = new StackTrace();
+                StackFrame sf = st.GetFrame(0);
+                MethodBase currentMethodName = sf.GetMethod();
+                LogDebug(currentMethodName.Name, ex);
+                throw ex;
+            }
+        }
+
+        public void Update(Project project)
+        {
+            try
+            {
+                //string clientName = DataBase.DBService.ExecuteCommandScalar(string.Format(GET_PROJECT_NAME_QUERY, project.Id));
+
+                DataBase.DBService.BeginTransaction();
+                DataBase.DBService.ExecuteCommandString(string.Format(UPDATE_PROJECT,
+                      project.Name, project.InitialId,
+                      project.Description, project.IsCustomType,                     
+                      project.UpdatedOn.ToString("yyyy-MM-dd hh:mm:ss"), project.UpdatedBy,
+                      project.Id), true);
+
+                Activity.ActivitiesService.Add(ActivityType.UpdateTaskProject, EntryStatus.Success,
+                         Source.Server, project.UpdatedByUserName, project.Name, project.MachineName);
+                DataBase.DBService.CommitTransaction();
+            }
+            catch (Exception ex)
+            {
+                DataBase.DBService.RollbackTransaction();
+                StackTrace st = new StackTrace();
+                StackFrame sf = st.GetFrame(0);
+                MethodBase currentMethodName = sf.GetMethod();
+                LogDebug(currentMethodName.Name, ex);
+                throw ex;
+            }
+        }
+
+        public void Delete(Project project)
+        {
+            try
+            {
+                //string clientName = DataBase.DBService.ExecuteCommandScalar(string.Format(GET_PROJECT_NAME_QUERY, project.Id));
+
+                DataBase.DBService.BeginTransaction();
+                DataBase.DBService.ExecuteCommandString(string.Format(DELETE_PROJECT,                     
+                      project.Id), true);
+
+                Activity.ActivitiesService.Add(ActivityType.DeleteTaskProject, EntryStatus.Success,
+                         Source.Server, project.UpdatedByUserName, project.Name, project.MachineName);
                 DataBase.DBService.CommitTransaction();
             }
             catch (Exception ex)

@@ -17,7 +17,7 @@ namespace FinancialPlanner.BusinessLogic.Clients
     {
         private const string INSERT_QUERY = "INSERT INTO CLIENT VALUES (" +
             "'{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','{8}','{9}','{10}'," +
-            "'{11}','{12}',{13},'{14}',{15},'{16}',{17},'{18}','{19}')";
+            "'{11}','{12}',{13},'{14}',{15},'{16}',{17},'{18}','{19}','{20}')";
 
         private const string SELECT_ALL = "SELECT C1.*,U.USERNAME AS UPDATEDBYUSERNAME FROM CLIENT C1, USERS U WHERE C1.UPDATEDBY = U.ID AND C1.ISDELETED = 0";
         private const string SELECT_ID = "SELECT C1.*,U.USERNAME AS UPDATEDBYUSERNAME FROM CLIENT C1, USERS U WHERE C1.UPDATEDBY = U.ID and C1.ID = {0} AND C1.ISDELETED = 0";
@@ -28,7 +28,7 @@ namespace FinancialPlanner.BusinessLogic.Clients
                 "FATHERNAME = '{1}', MOTHERNAME = '{2}',GENDER ='{3}',DOB ='{4}',PAN ='{5}', AADHAR = '{6}'," +
                 "PLACEOFBIRTH ='{7}',Married ='{8}',MARRIAGEANNIVERSARY ='{9}', Occupation = '{10}'," +
                 "INCOMESLAB = '{11}', UPDATEDON = '{12}', UPDATEDBY = {13},IMAGEPATH = '{14}', " +
-                "RATING ='{15}', CLIENTTYPE ='{16}'  WHERE ID= {17}";
+                "RATING ='{15}', CLIENTTYPE ='{16}',RESISTATUS ='{17}'  WHERE ID= {18}";
         private const string DELETE_QUERY = "UPDATE CLIENT SET ISDELETED = 1, " +
             "UPDATEDON = '{0}', UPDATEDBY = {1} WHERE ID = {2}";
 
@@ -92,6 +92,7 @@ namespace FinancialPlanner.BusinessLogic.Clients
             client.IsDeleted = dr.Field<bool>("IsDeleted");
             client.Rating = dr.Field<string>("Rating");
             client.ClientType = dr.Field<string>("ClientType");
+            client.ResiStatus = dr.Field<string>("ResiStatus");
             
             if (!string.IsNullOrEmpty(client.ImagePath))
             {
@@ -139,7 +140,7 @@ namespace FinancialPlanner.BusinessLogic.Clients
                     ((client.MarriageAnniversary == null) ? null : client.MarriageAnniversary.Value.ToString("yyyy-MM-dd")),client.Occupation,client.IncomeSlab,
                     client.CreatedOn.ToString("yyyy-MM-dd hh:mm:ss"), client.CreatedBy, 
                     client.UpdatedOn.ToString("yyyy-MM-dd hh:mm:ss"), client.UpdatedBy,
-                    imagePath,0,client.Rating,client.ClientType),true);
+                    imagePath,0,client.Rating,client.ClientType,client.ResiStatus),true);
 
 
                 Activity.ActivitiesService.Add(ActivityType.CreateClient, EntryStatus.Success,
@@ -192,6 +193,7 @@ namespace FinancialPlanner.BusinessLogic.Clients
                             client.Occupation, client.IncomeSlab,
                             client.UpdatedOn.ToString("yyyy-MM-dd hh:mm:ss"), client.UpdatedBy,imagePath,
                             client.Rating,client.ClientType,
+                            client.ResiStatus,
                             client.ID),true);
 
                 Activity.ActivitiesService.Add(ActivityType.UpdateClient, EntryStatus.Success,

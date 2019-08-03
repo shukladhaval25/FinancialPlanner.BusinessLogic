@@ -14,13 +14,16 @@ namespace FinancialPlanner.BusinessLogic.CurrentStatus
         readonly string GET_SHARES_VALUE  = "SELECT SUM(CURRENTVALUE) AS SHARESVALUE FROM [SHARES] WHERE " +
                         "PID =  {0} AND GOALID = {1}";
 
-        readonly string GET_EQUITY_VALUE = "SELECT SUM(((NAV * UNITS) * EQUITYRATIO /100)) AS EQUITYMFSHARES," +
-            "SUM(((NAV * UNITS) * DEBTRATIO /100)) AS DEBTMFSHARES," +
-            "SUM((NAV * UNITS)) AS TOTALVALUE FROM [MUTUALFUND] WHERE PID ={0} AND GOALID = {1} ";
+        readonly string GET_EQUITY_VALUE = "SELECT SUM((TOTALVALUE) * EQUITYRATIO /100)) AS EQUITYMFSHARES," +
+            "SUM((TOTALVALUE) * DEBTRATIO /100)) AS DEBTMFSHARES," +
+            "SUM((TOTALVALUE) AS TOTALVALUE FROM [MUTUALFUND] WHERE PID ={0} AND GOALID = {1} ";
 
         readonly string GET_EQUITY_NPS_VALUE = "SELECT ((NAV * UNITS) * EQUITYRATIO /100) AS EQUITYNPSSHARES," +
             "((NAV * UNITS) * DEBTRATIO /100) AS DEBTNPSSHARES," +
             "(NAV * UNITS) AS TOTALVALUE FROM [NPS] WHERE PID ={0} AND GOALID = {1} ";
+
+        readonly string GET_EQUITY_OTHER_VALUE = "SELECT SUM(Amount) AS EQUITYOTHERS WHERE PID ={0} AND GOALID ={1} AND " +
+            "TRANSCATIONTYPE = '{2}'";
         #endregion
 
         #region "Debt part"
@@ -35,6 +38,8 @@ namespace FinancialPlanner.BusinessLogic.CurrentStatus
         readonly string GET_PPF_VALUE = "SELECT SUM(CURRENTVALUE) AS PPFVALUE FROM [PPF] WHERE PID = {0} AND GOALID = {1}";
 
         readonly string GET_EPF_VALUE = "SELECT SUM(AMOUNT) AS EPFVALUE FROM [EPF] WHERE PID = {0} AND GOALID = {1}";
+
+        readonly string GET_OTHER_VALUE = "SELECT SUM(Amount) AS OTHERS WHERE PID ={0} AND GOALID ={1} ";
 
         readonly string GET_SS_VALUE = "SELECT SUM(CURRENTVALUE) AS SSVALUE FROM [SukanyaSamrudhi] WHERE PID = {0} AND GOALID = {1}";
 
@@ -52,13 +57,15 @@ namespace FinancialPlanner.BusinessLogic.CurrentStatus
         readonly string GET_ALL_SHARES_VALUE  = "SELECT SUM(CURRENTVALUE) AS SHARESVALUE FROM [SHARES] WHERE " +
                         "PID =  {0}";
 
-        readonly string GET_ALL_EQUITY_VALUE = "SELECT SUM(((NAV * UNITS) * EQUITYRATIO /100)) AS EQUITYMFSHARES," +
-            "SUM(((NAV * UNITS) * DEBTRATIO /100)) AS DEBTMFSHARES," +
-            "SUM((NAV * UNITS)) AS TOTALVALUE FROM [MUTUALFUND] WHERE PID ={0} ";
+        readonly string GET_ALL_EQUITY_VALUE = "SELECT SUM((TOTALVALUE * EQUITYRATIO )/100) AS EQUITYMFSHARES," +
+            "SUM((TOTALVALUE * DEBTRATIO) /100) AS DEBTMFSHARES," +
+            "SUM((TOTALVALUE)) AS TOTALVALUE FROM [MUTUALFUND] WHERE PID ={0} ";
 
         readonly string GET_ALL_EQUITY_NPS_VALUE = "SELECT ((NAV * UNITS) * EQUITYRATIO /100) AS EQUITYNPSSHARES," +
             "((NAV * UNITS) * DEBTRATIO /100) AS DEBTNPSSHARES," +
             "(NAV * UNITS) AS TOTALVALUE FROM [NPS] WHERE PID ={0} ";
+
+        readonly string GET_ALL_EQUITY_OTHERS_VALUE = "SELECT SUM(AMOUNT) AS EQUITYOTHERS FROM OTHERS WHERE TRANSACTIONTYPE ='Equity' and PID ={0}";
         #endregion
 
         #region "Debt part"
@@ -73,6 +80,8 @@ namespace FinancialPlanner.BusinessLogic.CurrentStatus
         readonly string GET_ALL_PPF_VALUE = "SELECT SUM(CURRENTVALUE) AS PPFVALUE FROM [PPF] WHERE PID = {0}";
 
         readonly string GET_ALL_EPF_VALUE = "SELECT SUM(AMOUNT) AS EPFVALUE FROM [EPF] WHERE PID = {0}";
+
+        readonly string GET_ALL_OTHERS_DEBT_VALUE = "SELECT SUM(AMOUNT) AS OTHERSVALUE FROM [OTHERS] WHERE TRANSACTIONTYPE ='Debt' and PID = {0}";
 
         readonly string GET_ALL_SS_VALUE = "SELECT SUM(CURRENTVALUE) AS SSVALUE FROM [SukanyaSamrudhi] WHERE PID = {0} ";
 
@@ -167,6 +176,14 @@ namespace FinancialPlanner.BusinessLogic.CurrentStatus
             csCal.EPFValue = epfValue;
             #endregion
 
+            #region "Others"
+            //Others
+            double othersValue = 0;
+            returnvalue = DataBase.DBService.ExecuteCommandScalar(string.Format(GET_OTHER_VALUE, plannerId,goalId));
+            double.TryParse(returnvalue, out othersValue);
+            csCal.Others = othersValue;
+            #endregion
+
             #region "SS"
             //Sukanya Samrudhi
             double ssValue = 0;
@@ -244,6 +261,18 @@ namespace FinancialPlanner.BusinessLogic.CurrentStatus
             csCal.NpsDebtValue = debtNPSValue;
             #endregion
 
+            #region "Others Equity"
+            double equityOtherValue = 0;
+            DataTable dtOthersEquity  = DataBase.DBService.ExecuteCommand(string.Format(GET_ALL_EQUITY_OTHERS_VALUE, plannerId));
+            if (dtOthersEquity != null && dtOthersEquity.Rows.Count > 0)
+            {
+                double.TryParse(dtOthersEquity.Rows[0]["EQUITYOTHERS"].ToString(), out equityOtherValue);
+                //double.TryParse(dtOthersEquity.Rows[0]["DEBTNPSSHARES"].ToString(), out debtNPSValue);
+            }
+            csCal.OtherEquityValue = equityOtherValue;
+            //csCal.NpsDebtValue = debtNPSValue;
+            #endregion
+
             #region "DEBT"
 
             #region "RD"
@@ -284,6 +313,14 @@ namespace FinancialPlanner.BusinessLogic.CurrentStatus
             returnvalue = DataBase.DBService.ExecuteCommandScalar(string.Format(GET_ALL_EPF_VALUE, plannerId));
             double.TryParse(returnvalue, out epfValue);
             csCal.EPFValue = epfValue;
+            #endregion
+
+            #region "Others"
+            //Others
+            double othersValue = 0;
+            returnvalue = DataBase.DBService.ExecuteCommandScalar(string.Format(GET_ALL_OTHERS_DEBT_VALUE, plannerId));
+            double.TryParse(returnvalue, out othersValue);
+            csCal.OtherDebtValue = othersValue;
             #endregion
 
             #region "SS"

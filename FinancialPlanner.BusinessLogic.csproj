@@ -78,6 +78,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Activity\ActivitiesService.cs" />
+    <Compile Include="ApplicationMaster\ARNService.cs" />
     <Compile Include="ApplicationMaster\ClientRatingService.cs" />
     <Compile Include="ApplicationMaster\AreaService.cs" />
     <Compile Include="ApplicationMaster\OrganisationTypeService.cs" />

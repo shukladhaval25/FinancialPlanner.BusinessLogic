@@ -20,7 +20,7 @@ namespace FinancialPlanner.BusinessLogic.CurrentStatus
 
         const string INSERT_MutualFund= "INSERT INTO MUTUALFUND VALUES (" +
             "{0},'{1}','{2}','{3}',{4},{5},{6},{7},{8},{9},{10},{11},{12},'{13}'," +
-            "{14},'{15}',{16},'{17}','{18}','{19}',{20})";
+            "{14},'{15}',{16},'{17}','{18}','{19}',{20},{21})";
 
         const string UPDATE_MutualFund = "UPDATE MUTUALFUND SET " +
             "[INVESTERNAME] = '{0}'," +
@@ -103,7 +103,8 @@ namespace FinancialPlanner.BusinessLogic.CurrentStatus
                       mutualFund.CreatedOn.ToString("yyyy-MM-dd hh:mm:ss"), mutualFund.CreatedBy,
                       mutualFund.UpdatedOn.ToString("yyyy-MM-dd hh:mm:ss"), mutualFund.UpdatedBy,
                       mutualFund.FirstHolder,mutualFund.SecondHolder,mutualFund.Nominee,
-                      mutualFund.InvestmentReturnRate), true);
+                      mutualFund.InvestmentReturnRate,
+                      mutualFund.CurrentValue), true);
 
                 Activity.ActivitiesService.Add(ActivityType.CreateMutualFund, EntryStatus.Success,
                          Source.Server, mutualFund.UpdatedByUserName, "MutualFund", mutualFund.MachineName);
@@ -217,6 +218,7 @@ namespace FinancialPlanner.BusinessLogic.CurrentStatus
             mutualFund.SecondHolder = dr.Field<string>("SecondHolder");
             mutualFund.Nominee = dr.Field<string>("Nominee");
             mutualFund.InvestmentReturnRate = float.Parse(dr["InvestmentReturnRate"].ToString());
+            mutualFund.CurrentValue = double.Parse(dr["TotalValue"].ToString());
             return mutualFund;
         }
     }

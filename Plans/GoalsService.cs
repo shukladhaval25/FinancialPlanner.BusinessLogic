@@ -170,7 +170,7 @@ namespace FinancialPlanner.BusinessLogic
                 goals.Priority = goalPriority;
                 if (year != startYear)
                 {
-                    goalValue = goalValue + ((goalValue * (double)inflationRate) / 100);
+                   // goalValue = goalValue + ((goalValue * (double)inflationRate) / 100);
                     goals.Amount = goalValue;
                 }
 

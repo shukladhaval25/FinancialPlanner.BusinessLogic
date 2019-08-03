@@ -24,7 +24,7 @@ namespace FinancialPlanner.BusinessLogic.CurrentStatus
         const string UPDATE_MFTransactions = "UPDATE MFTransactions SET " +
             "[NAV] ={0}, UNITS = {1},CurrentValue = {2}," +
             "[UpdatedOn] = '{3}', [UpdatedBy] ={4},TransactionType = '{5}',"+
-            " TransactionDate = '{6}' WHERE ID = {7} ";
+            " TransactionDate = '{6}',TotalValue ={7} WHERE ID = {8} ";
 
         const string DELETE_MFTransactions = "DELETE FROM MFTransactions WHERE ID = {0}";
 
@@ -125,6 +125,7 @@ namespace FinancialPlanner.BusinessLogic.CurrentStatus
                       MFTransactions.UpdatedOn.ToString("yyyy-MM-dd hh:mm:ss"),
                       MFTransactions.UpdatedBy,
                       MFTransactions.TransactionType,MFTransactions.TransactionDate,
+                      MFTransactions.CurrentValue,
                       MFTransactions.Id), true);
 
                 Activity.ActivitiesService.Add(ActivityType.UpdateMFTransactions, EntryStatus.Success,
