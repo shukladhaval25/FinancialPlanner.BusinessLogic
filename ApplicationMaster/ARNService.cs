@@ -130,7 +130,7 @@ namespace FinancialPlanner.BusinessLogic.ApplicationMaster
         {
             ARN arn = new ARN ();
             arn.Id = dr.Field<int>("ID");
-            arn.ArnNumber = dr.Field<string>("ARNNo");
+            arn.ArnNumber = dr.Field<string>("ARNNumber");
             arn.Name = dr.Field<string>("Name");
             arn.UpdatedBy = dr.Field<int>("UpdatedBy");
             arn.UpdatedOn = dr.Field<DateTime>("UpdatedOn");
