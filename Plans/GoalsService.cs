@@ -15,14 +15,14 @@ namespace FinancialPlanner.BusinessLogic
     {
         private const string GET_CLIENT_NAME_QUERY = "SELECT C.NAME FROM CLIENT C, PLANNER P  WHERE P.CLIENTID = C.ID AND P.ID = {0}";
         const string SELECT_ALL = "SELECT N1.*,U.USERNAME AS UPDATEDBYUSERNAME FROM Goals N1, " +
-            "USERS U WHERE N1.UPDATEDBY = U.ID AND N1.PID = {0} ORDER BY N1.PRIORITY";
-        const string SELECT_BYID = "SELECT N1.*,U.USERNAME AS UPDATEDBYUSERNAME FROM Goals N1, USERS U WHERE N1.UPDATEDBY = U.ID AND N1.ID = {0} AND N1.PID ={1}";
-        const string SELECT_GOAL_ID = "SELECT ID FROM GOALS WHERE NAME = '{0}' and PID = {1} AND AMOUNT = {2}";
+            "USERS U WHERE N1.UPDATEDBY = U.ID AND N1.PID = {0} AND ISDELETED = 0 ORDER BY N1.PRIORITY";
+        const string SELECT_BYID = "SELECT N1.*,U.USERNAME AS UPDATEDBYUSERNAME FROM Goals N1, USERS U WHERE N1.UPDATEDBY = U.ID AND N1.ID = {0} AND N1.PID ={1} AND N1.ISDELETED = 0";
+        const string SELECT_GOAL_ID = "SELECT ID FROM GOALS WHERE NAME = '{0}' and PID = {1} AND AMOUNT = {2} AND ISDELETED = 0";
 
         const string SELECT_LOANGFORGOAL_BYID = "SELECT N1.*,U.USERNAME AS UPDATEDBYUSERNAME FROM LOANFORGOALS N1, USERS U WHERE N1.UPDATEDBY = U.ID AND N1.GOALID ={0}";
 
         const string INSERT_QUERY = "INSERT INTO Goals VALUES (" +
-            "{0},'{1}','{2}',{3},'{4}','{5}',{6},{7},'{8}','{9}',{10},'{11}',{12},{13},'{14}',{15})";
+            "{0},'{1}','{2}',{3},'{4}','{5}',{6},{7},'{8}','{9}',{10},'{11}',{12},{13},'{14}',{15},'{16}')";
         const string INSERT_GOALLOAN_QUERY = "INSERT INTO LOANFORGOALS " + 
             "VALUES ({0},{1},{2},{3},{4},{5},{6},'{7}',{8},'{9}',{10})";
 
@@ -37,7 +37,7 @@ namespace FinancialPlanner.BusinessLogic
             "EMI = {1}, ROI = {2}, LOANYEARS = {3}, STARTYEAR = {4}, ENDYEAR = {5}, " +
             "UPDATEDON = '{6}', UPDATEDBY = {7} WHERE GOALID = {8}";
 
-        const string DELET_QUERY = "DELETE FROM Goals WHERE ID ={0}";
+        const string DELET_QUERY = "UPDATE Goals SET ISDELETED = '1' WHERE ID ={0}";
         private readonly string DELETE_LOANFORGOAL_QUERY = "DELETE FROM LOANFORGOALS WHERE GOALID ={0}";
 
         public IList<Goals> GetAll(int plannerId)
@@ -181,7 +181,7 @@ namespace FinancialPlanner.BusinessLogic
                      goals.CreatedOn.ToString("yyyy-MM-dd hh:mm:ss"), goals.CreatedBy,
                      goals.UpdatedOn.ToString("yyyy-MM-dd hh:mm:ss"), goals.UpdatedBy,
                      goals.InflationRate, goals.EligibleForInsuranceCoverage,
-                     goals.OtherAmount), true);
+                     goals.OtherAmount,goals.IsDeleted), true);
 
                 if (goals.LoanForGoal != null && year == startYear)
                     addLoanForGoal(goals);
@@ -204,7 +204,7 @@ namespace FinancialPlanner.BusinessLogic
                      goals.CreatedOn.ToString("yyyy-MM-dd hh:mm:ss"), goals.CreatedBy,
                      goals.UpdatedOn.ToString("yyyy-MM-dd hh:mm:ss"), goals.UpdatedBy,
                      goals.InflationRate, goals.EligibleForInsuranceCoverage,
-                     goals.OtherAmount), true);
+                     goals.OtherAmount,goals.IsDeleted), true);
 
             if (goals.LoanForGoal != null)
                 addLoanForGoal(goals);
@@ -289,7 +289,7 @@ namespace FinancialPlanner.BusinessLogic
                 DataBase.DBService.ExecuteCommandString(string.Format(DELET_QUERY, Goals.Id), true);
 
                 Activity.ActivitiesService.Add(ActivityType.DeleteGoals, EntryStatus.Success,
-                         Source.Server, Goals.UpdatedByUserName, clientName, Goals.MachineName);
+                         Source.Server, Goals.UpdatedByUserName, Goals.Name, Goals.MachineName);
                 DataBase.DBService.CommitTransaction();
             }
             catch (Exception ex)
