@@ -139,7 +139,13 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ProspectClients\ProspectClientConversationService.cs" />
     <Compile Include="ProspectClients\ProspectClientService.cs" />
+    <Compile Include="TaskManagements\AdditionalPurchaseServiceImpl.cs" />
+    <Compile Include="TaskManagements\FreshPurchaseTransactionServiceImpl.cs" />
+    <Compile Include="TaskManagements\ITransactionTypeService.cs" />
+    <Compile Include="TaskManagements\SIPServiceImpl.cs" />
     <Compile Include="TaskManagements\TaskProjectService.cs" />
+    <Compile Include="TaskManagements\TaskService.cs" />
+    <Compile Include="TaskManagements\TransactionTypeHelper.cs" />
     <Compile Include="Users\AuthenticationService.cs" />
     <Compile Include="Users\UserService.cs" />
     <Compile Include="Users\UserSessionService.cs" />
