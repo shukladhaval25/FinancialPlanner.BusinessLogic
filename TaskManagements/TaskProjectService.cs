@@ -19,15 +19,49 @@ namespace FinancialPlanner.BusinessLogic.TaskManagements
             ",[UPDATEDON] ,[UPDATEDBY] FROM [TASKPROJECT]";
 
         readonly string SELECT_BY_ID = SELECT_ALL + "WHERE [ID] = {0}";
+        const string SELECT_OPEN_TASKCOUNT_PROJECTWISE_ASSIGNTO = "SELECT  TaskProject.Name," +
+            "count(Taskcard.ID) AS TASKCOUNT " +
+            "FROM TaskProject LEFT OUTER JOIN " +
+            "TaskCard ON TaskProject.ID = TaskCard.ProjectId " +
+            "where (TaskCard.AssignTo = {0}) AND(TaskCard.TaskStatus<> 1 or TaskCard.TaskStatus<> 2 or " +
+            "TaskCard.TaskStatus<> 3) Group by TaskProject.Name";
+
         const string INSERT_PROJECT = "INSERT INTO TASKPROJECT VALUES (" +
             "'{0}','{1}','{2}','{3}'," +
             "'{4}',{5},'{6}',{7})";
+
         const string UPDATE_PROJECT = "UPDATE TASKPROJECT SET " +
             "[NAME] = '{0}', [INITIALID] ='{1}', [DETAILS] = '{2}',[ISCUSTOMTYPE] = '{3}', " +
             "[UpdatedOn] = '{4}', [UpdatedBy] ={5} " +
             "WHERE ID = {6}";
 
         const string DELETE_PROJECT = "DELETE FROM TASKPROJECT WHERE ID = {0}";
+
+        public IList<KeyValuePair<string, int>> GetOpenTaskProjectWise(int userId)
+        {
+            try
+            {
+                Logger.LogInfo("Get: Open task count projectwise for user process start");
+                IList<KeyValuePair<string, int>> projects = new List<KeyValuePair<string, int>>();
+
+                DataTable dtAppConfig = DataBase.DBService.ExecuteCommand(string.Format(SELECT_OPEN_TASKCOUNT_PROJECTWISE_ASSIGNTO,userId));
+                foreach (DataRow dr in dtAppConfig.Rows)
+                {
+                    KeyValuePair<string, int> keyValue = new KeyValuePair<string, int>(dr[0].ToString(), (int) dr[1]);
+                    projects.Add(keyValue);
+                }
+                Logger.LogInfo("Get: Open task count projectwise for user process completed.");
+                return projects;
+            }
+            catch (Exception ex)
+            {
+                StackTrace st = new StackTrace();
+                StackFrame sf = st.GetFrame(0);
+                MethodBase currentMethodName = sf.GetMethod();
+                LogDebug(currentMethodName.Name, ex);
+                return null;
+            }
+        }
 
         public IList<Common.Model.TaskManagement.Project> GetAll()
         {

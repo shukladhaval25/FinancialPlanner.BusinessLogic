@@ -1,4 +1,6 @@
-﻿using FinancialPlanner.Common;
+﻿using FinancialPlanner.BusinessLogic.Clients;
+using FinancialPlanner.BusinessLogic.Users;
+using FinancialPlanner.Common;
 using FinancialPlanner.Common.Model;
 using FinancialPlanner.Common.Model.TaskManagement;
 using System;
@@ -14,11 +16,26 @@ namespace FinancialPlanner.BusinessLogic.TaskManagements
 {
     public class TaskService
     {
-        private readonly string SELECT_ALL = "SELECT * FROM [TaskCard]";
+        private readonly string SELECT_ALL =
+            "SELECT TaskCard.*,TaskProject.Name as ProjectName,Users.UserName AS OwnerName FROM TaskCard " +
+            "INNER JOIN TaskProject ON " +
+            "TaskCard.ProjectId = TaskProject.ID INNER JOIN Users ON TaskCard.Owner = Users.ID";
+
         private readonly string SELECT_ALL_BY_TASK_STATUS = "SELECT * FROM [TaskCard] WHERE TASKSTATUS = {0}";
         private readonly string SELECT_ALL_BY_PROJECT_ID = "SELECT * FROM [TaskCard] WHERE PROJECTID = {0}";
         private readonly string SELECT_ALL_BY_PROJECTID_TASK_STATUS = "SELECT* FROM[TaskCard] WHERE PROJECTID = {0} AND TASKSTATUS = {1}";
         private readonly string SELECT_BY_ID = "SELECT* FROM[TaskCard] WHERE TASKID = { 0 }";
+
+        private string SELECT_OVERDUE_TASKS_BY_USEID = "SELECT TaskCard.*,TaskProject.Name as ProjectName,Users.UserName AS OwnerName " +
+            "FROM TASKCARD INNER JOIN TaskProject ON " +
+            "TaskCard.ProjectId = TaskProject.ID INNER JOIN Users ON TaskCard.Owner = Users.ID WHERE DueDate < GETDATE() AND " +
+            "TASKCARD.ASSIGNTO = {0}";
+
+        private const string SELECT_TASK_BYPROJECTNAME_OPENSTATUS = "SELECT Taskcard.* FROM TaskProject " +
+            "LEFT OUTER JOIN TaskCard ON TaskProject.ID = TaskCard.ProjectId " +
+            "where (TaskCard.AssignTo = {0}) AND (TaskCard.TaskStatus<> 1 or " +
+            "TaskCard.TaskStatus<> 2 or TaskCard.TaskStatus<> 3) and TaskProject.Name ='{1}'";
+
         private readonly string SELECT_BY_ASSIGNTO = "SELECT * FROM [TaskCard] WHERE ASSIGNTO = {0}";
         private const string SELECT_BY_OVERDUE_TASKSTATUS = "SELECT * FROM [TaskCard] WHERE TASKSTATUS = {0} AND DUEDATE < {1}";
         private const string SELECT_ID_BY_TASKDETAILS = "SELECT ID FROM TASKCARD WHERE PROJECTID = {0} AND TITLE ='{1}' AND  " +
@@ -35,6 +52,61 @@ namespace FinancialPlanner.BusinessLogic.TaskManagements
                     new List<TaskCard>();
 
                 DataTable dtAppConfig = DataBase.DBService.ExecuteCommand(SELECT_ALL);
+                foreach (DataRow dr in dtAppConfig.Rows)
+                {
+                    TaskCard task = convertToTaskCard(dr);
+                    taskcards.Add(task);
+                }
+                Logger.LogInfo("Get: Task Card process completed.");
+                return taskcards;
+            }
+            catch (Exception ex)
+            {
+                StackTrace st = new StackTrace();
+                StackFrame sf = st.GetFrame(0);
+                MethodBase currentMethodName = sf.GetMethod();
+                LogDebug(currentMethodName.Name, ex);
+                return null;
+            }
+        }
+
+        public IList<TaskCard> GetOpenTaskByProjectForUser(string projectName,int userId)
+        {
+            try
+            {
+                Logger.LogInfo("Get: Task Card process start");
+                IList<TaskCard> taskcards =
+                    new List<TaskCard>();
+
+                DataTable dtAppConfig = DataBase.DBService.ExecuteCommand(
+                   string.Format(SELECT_TASK_BYPROJECTNAME_OPENSTATUS,userId,projectName));
+                foreach (DataRow dr in dtAppConfig.Rows)
+                {
+                    TaskCard task = convertToTaskCard(dr);
+                    taskcards.Add(task);
+                }
+                Logger.LogInfo("Get: Task Card process completed.");
+                return taskcards;
+            }
+            catch (Exception ex)
+            {
+                StackTrace st = new StackTrace();
+                StackFrame sf = st.GetFrame(0);
+                MethodBase currentMethodName = sf.GetMethod();
+                LogDebug(currentMethodName.Name, ex);
+                return null;
+            }
+        }
+
+        public object GetOverDueTasks(int userId)
+        {
+            try
+            {
+                Logger.LogInfo("Get: Task Card process start");
+                IList<TaskCard> taskcards =
+                    new List<TaskCard>();
+
+                DataTable dtAppConfig = DataBase.DBService.ExecuteCommand(string.Format(SELECT_OVERDUE_TASKS_BY_USEID,userId));
                 foreach (DataRow dr in dtAppConfig.Rows)
                 {
                     TaskCard task = convertToTaskCard(dr);
@@ -128,7 +200,7 @@ namespace FinancialPlanner.BusinessLogic.TaskManagements
             taskCard.Id = dr.Field<int>("ID");
             taskCard.TaskId = dr.Field<string>("TaskId");
             taskCard.ProjectId = dr.Field<int>("ProjectId");
-            taskCard.TaskTransactionType = dr.Field<string>("TransactionType");
+            taskCard.TransactionType = dr.Field<string>("TransactionType");
             taskCard.Type = (CardType) dr.Field<int>("CardType");
             taskCard.CustomerId = dr.Field<int>("Cid");
             taskCard.Title = dr.Field<string>("Title");
@@ -136,14 +208,32 @@ namespace FinancialPlanner.BusinessLogic.TaskManagements
             taskCard.Priority = (Priority) dr.Field<int>("Priority");
             taskCard.TaskStatus = (Common.Model.TaskManagement.TaskStatus) dr.Field<int>("TaskStatus");
             taskCard.Owner = dr.Field<int>("Owner");
-            taskCard.AssignTo = dr.Field<int>("AssingTo");
-            taskCard.CreatedOn = dr.Field<DateTime>("CreatedDate");
-            taskCard.UpdatedOn = dr.Field<DateTime>("UpdatedDate");
-            taskCard.ActualCompletedDate = dr.Field<DateTime>("ActualCompletedDate");
+            taskCard.AssignTo = dr.Field<int?>("AssignTo");
+            taskCard.CreatedOn = dr.Field<DateTime>("CreatedOn");
+            taskCard.UpdatedOn = dr.Field<DateTime>("UpdatedOn");
+            //taskCard.ActualCompletedDate = dr.Field<DateTime>("ActualCompletedDate");
             taskCard.DueDate = dr.Field<DateTime>("DueDate");
+            taskCard.ProjectName = dr.Field<string>("ProjectName");
+            taskCard.OwnerName = dr.Field<string>("OwnerName");
+            taskCard.AssignToName = getAssignTo(dr.Field<int?>("AssignTo"));
+            taskCard.CustomerName = getCustomerName(taskCard.CustomerId);
             return taskCard;
         }
 
+        private string getCustomerName(int? customerId)
+        {
+            if (customerId == 0)
+                return string.Empty;
+            return new ClientService().Get((int)customerId).Name;
+        }
+
+        private string getAssignTo(int? v)
+        {
+            if (v == 0)
+                return string.Empty;
+
+            return new UserService().Get((int)v).UserName;
+        }
         private void LogDebug(string methodName, Exception ex)
         {
             DebuggerLogInfo debuggerInfo = new DebuggerLogInfo();

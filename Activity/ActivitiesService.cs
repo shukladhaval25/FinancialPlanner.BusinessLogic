@@ -224,6 +224,10 @@ namespace FinancialPlanner.BusinessLogic.Activity
         private static readonly string UPDATE_SCHEME_ACTION = "Scheme  ''{0}'' edited sucessfully";
         private static readonly string DELETE_SCHEME_ACTION = "Scheme  ''{0}'' deleted sucessfully";
 
+        private static readonly string ADD_AMC_ACTION = "AMC ''{0}'' added sucessfully";
+        private static readonly string UPDATE_AMC_ACTION = "AMC ''{0}'' edited sucessfully";
+        private static readonly string DELETE_AMC_ACTION = "AMC ''{0}'' deleted sucessfully";
+
         public static IList<Activities> Get(string userName)
         {
             IList<Activities> lstActivities = new List<Activities>();
@@ -549,6 +553,11 @@ namespace FinancialPlanner.BusinessLogic.Activity
                 _lstActivityDescription.Add(new KeyValuePair<ActivityType, string>(ActivityType.CreateScheme, ADD_SCHEME_ACTION));
                 _lstActivityDescription.Add(new KeyValuePair<ActivityType, string>(ActivityType.UpdateScheme, UPDATE_SCHEME_ACTION));
                 _lstActivityDescription.Add(new KeyValuePair<ActivityType, string>(ActivityType.DeleteScheme, DELETE_SCHEME_ACTION));
+
+                //AMC
+                _lstActivityDescription.Add(new KeyValuePair<ActivityType, string>(ActivityType.CreateAMC, ADD_AMC_ACTION));
+                _lstActivityDescription.Add(new KeyValuePair<ActivityType, string>(ActivityType.UpdateAMC, UPDATE_AMC_ACTION));
+                _lstActivityDescription.Add(new KeyValuePair<ActivityType, string>(ActivityType.DeleteAMC, DELETE_AMC_ACTION));
             }
         }
 
