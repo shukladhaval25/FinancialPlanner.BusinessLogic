@@ -15,6 +15,11 @@ namespace FinancialPlanner.BusinessLogic.ApplicationMaster
         private const string SELECT_ALL = "SELECT  AMC.Name AS AMCName, Scheme.*,Users.USERNAME AS UPDATEDBYUSERNAME " +
             "FROM AMC INNER JOIN Scheme ON AMC.Id = Scheme.AMCId INNER JOIN " +
             "Users ON AMC.UpdatedBy = Users.ID";
+
+        private const string SELECT_ALL_BY_AMC = "SELECT  AMC.Name AS AMCName, Scheme.*,Users.USERNAME AS UPDATEDBYUSERNAME " +
+            "FROM AMC INNER JOIN Scheme ON AMC.Id = Scheme.AMCId INNER JOIN " +
+            "Users ON AMC.UpdatedBy = Users.ID WHERE Scheme.AMCID = {0}";
+
         private const string SELECT_COUNT_BASEDON_AMC = "SELECT COUNT(*) FROM SCHEME WHERE AMCID = {0}";
             
            // "SELECT C1.*,U.USERNAME AS UPDATEDBYUSERNAME FROM Scheme C1, USERS U WHERE C1.UPDATEDBY = U.ID";
@@ -33,6 +38,31 @@ namespace FinancialPlanner.BusinessLogic.ApplicationMaster
                 IList<Scheme> lstScheme = new List<Scheme>();
 
                 DataTable dtAppConfig = DataBase.DBService.ExecuteCommand(SELECT_ALL);
+                foreach (DataRow dr in dtAppConfig.Rows)
+                {
+                    Scheme Scheme = convertToSchemeObject(dr);
+                    lstScheme.Add(Scheme);
+                }
+                Logger.LogInfo("Get: Scheme process completed.");
+                return lstScheme;
+            }
+            catch (Exception ex)
+            {
+                StackTrace st = new StackTrace();
+                StackFrame sf = st.GetFrame(0);
+                MethodBase currentMethodName = sf.GetMethod();
+                LogDebug(currentMethodName.Name, ex);
+                return null;
+            }
+        }
+        public IList<Scheme> GetAll(int amcId)
+        {
+            try
+            {
+                Logger.LogInfo("Get: Scheme process start");
+                IList<Scheme> lstScheme = new List<Scheme>();
+
+                DataTable dtAppConfig = DataBase.DBService.ExecuteCommand(string.Format(SELECT_ALL_BY_AMC,amcId));
                 foreach (DataRow dr in dtAppConfig.Rows)
                 {
                     Scheme Scheme = convertToSchemeObject(dr);

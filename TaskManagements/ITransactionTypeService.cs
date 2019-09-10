@@ -10,5 +10,6 @@ namespace FinancialPlanner.BusinessLogic.TaskManagements
     internal interface ITransactionTypeService
     {
         void SaveTransaction(TaskCard taskCard, int id);
+        object GetTransaction(int id);
     }
 }

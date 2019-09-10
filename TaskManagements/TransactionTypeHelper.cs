@@ -28,12 +28,17 @@ namespace FinancialPlanner.BusinessLogic.TaskManagements
                     transactionTypeService = new SIPServiceImpl();
                     break;
                 default:
+                    transactionTypeService = null;
                     break;
             }
         }
         public void SaveTransaction()
         {
             transactionTypeService.SaveTransaction(taskCard, id);
+        }
+        public object GetTransaction()
+        {
+            return (transactionTypeService == null) ? null : transactionTypeService.GetTransaction(id);
         }
     }
 }
