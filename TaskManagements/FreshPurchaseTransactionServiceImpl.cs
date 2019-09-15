@@ -16,6 +16,13 @@ namespace FinancialPlanner.BusinessLogic.TaskManagements
     {
         private const string INSERT_FRESHPURCHASE = "INSERT INTO FRESHPURCHASE VALUES ({0},{1},{2},'{3}','{4}','{5}','{6}'," +
             "'{7}','{8}',{9},'{10}',{11},'{12}',{13},'{14}','{15}','{16}')";
+
+        private const string UPDATE_FRESHPURCHASE = "UPDATE FRESHPURCHASE SET ARN = {0}," +
+            "CID = {1},MEMBERNAME ='{2}',SECONDHOLDER = '{3}',THIRDHOLDER ='{4}'," +
+            "NOMINEE = '{5}',GUARDIAN = '{6}',MODEOFHOLDING = '{7}',AMC ={8},FOLIONUMBER ='{9}'," +
+            "SCHEMEID = {10},[OPTION] = '{11}',AMOUNT = {12},TRANSACTIONDATE = '{13}',MODEOFEXECUTION ='{14}'," +
+            "REMARK = '{15}' WHERE TASKID = {16}";
+
         private const string SELECT_BY_ID = "SELECT * FROM FRESHPURCHASE WHERE TASKID ={0}";
         FreshPurchase freshPurchase;
 
@@ -98,6 +105,29 @@ namespace FinancialPlanner.BusinessLogic.TaskManagements
                    freshPurchase.TransactionDate,
                    freshPurchase.ModeOfExecution,
                    freshPurchase.Remark), true);
+        }
+
+        public void UpdateTransaction(TaskCard taskCard)
+        {
+            freshPurchase = new FinancialPlanner.Common.JSONSerialization().DeserializeFromString<FreshPurchase>(taskCard.TaskTransactionType.ToString());
+            DataBase.DBService.ExecuteCommandString(string.Format(UPDATE_FRESHPURCHASE,
+                   freshPurchase.Arn,
+                   freshPurchase.Cid,
+                   freshPurchase.MemberName,
+                   freshPurchase.SecondHolder,
+                   freshPurchase.ThirdHolder,
+                   freshPurchase.Nominee,
+                   freshPurchase.Guardian,
+                   freshPurchase.ModeOfHolding,
+                   freshPurchase.Amc,
+                   freshPurchase.FolioNumber,
+                   freshPurchase.Scheme,
+                   freshPurchase.Options,
+                   freshPurchase.Amount,
+                   freshPurchase.TransactionDate,
+                   freshPurchase.ModeOfExecution,
+                   freshPurchase.Remark,
+                   taskCard.Id), true);
         }
     }
 }

@@ -144,6 +144,7 @@
     <Compile Include="TaskManagements\FreshPurchaseTransactionServiceImpl.cs" />
     <Compile Include="TaskManagements\ITransactionTypeService.cs" />
     <Compile Include="TaskManagements\SIPServiceImpl.cs" />
+    <Compile Include="TaskManagements\TaskCommentService.cs" />
     <Compile Include="TaskManagements\TaskNotificationService.cs" />
     <Compile Include="TaskManagements\TaskProjectService.cs" />
     <Compile Include="TaskManagements\TaskService.cs" />

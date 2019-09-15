@@ -11,5 +11,6 @@ namespace FinancialPlanner.BusinessLogic.TaskManagements
     {
         void SaveTransaction(TaskCard taskCard, int id);
         object GetTransaction(int id);
+        void UpdateTransaction(TaskCard taskCard);
     }
 }

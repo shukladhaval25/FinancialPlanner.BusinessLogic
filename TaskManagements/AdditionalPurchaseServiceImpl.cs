@@ -21,5 +21,10 @@ namespace FinancialPlanner.BusinessLogic.TaskManagements
         {
             additionalPurchase = new FinancialPlanner.Common.JSONSerialization().DeserializeFromString<AdditionalPurchase>(taskCard.TaskTransactionType.ToString());
         }
+
+        public void UpdateTransaction(TaskCard taskCard)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

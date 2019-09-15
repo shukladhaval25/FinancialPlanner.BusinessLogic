@@ -23,8 +23,8 @@ namespace FinancialPlanner.BusinessLogic.TaskManagements
             "count(Taskcard.ID) AS TASKCOUNT " +
             "FROM TaskProject LEFT OUTER JOIN " +
             "TaskCard ON TaskProject.ID = TaskCard.ProjectId " +
-            "where (TaskCard.AssignTo = {0}) AND(TaskCard.TaskStatus<> 1 or TaskCard.TaskStatus<> 2 or " +
-            "TaskCard.TaskStatus<> 3) Group by TaskProject.Name";
+            "where (TaskCard.AssignTo = {0}) AND(TaskCard.TaskStatus <> 4 and TaskCard.TaskStatus<> 5) "+
+            "Group by TaskProject.Name";
 
         const string INSERT_PROJECT = "INSERT INTO TASKPROJECT VALUES (" +
             "'{0}','{1}','{2}','{3}'," +

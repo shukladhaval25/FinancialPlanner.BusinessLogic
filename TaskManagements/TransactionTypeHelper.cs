@@ -36,6 +36,10 @@ namespace FinancialPlanner.BusinessLogic.TaskManagements
         {
             transactionTypeService.SaveTransaction(taskCard, id);
         }
+        public void UpdateTransaction()
+        {
+            transactionTypeService.UpdateTransaction(taskCard);
+        }
         public object GetTransaction()
         {
             return (transactionTypeService == null) ? null : transactionTypeService.GetTransaction(id);

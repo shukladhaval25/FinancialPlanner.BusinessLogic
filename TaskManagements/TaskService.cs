@@ -20,7 +20,7 @@ namespace FinancialPlanner.BusinessLogic.TaskManagements
             "SELECT TaskCard.*,TaskProject.Name as ProjectName,Users.UserName AS OwnerName FROM TaskCard " +
             "INNER JOIN TaskProject ON " +
             "TaskCard.ProjectId = TaskProject.ID INNER JOIN Users ON TaskCard.Owner = Users.ID AND " +
-            "(TaskCard.TaskStatus <> 1 or TaskCard.TaskStatus<> 2 or TaskCard.TaskStatus<> 3)";
+            "(TaskCard.TaskStatus <> 4 and TaskCard.TaskStatus<> 5)";
 
         private readonly string SELECT_ALL_NOTIFIED_BY_USER = "SELECT  TaskCard.*, Users.UserName AS OwnerName, " +
                          "TaskProject.Name AS ProjectName FROM Users INNER JOIN " +
@@ -38,18 +38,22 @@ namespace FinancialPlanner.BusinessLogic.TaskManagements
         private string SELECT_OVERDUE_TASKS_BY_USEID = "SELECT TaskCard.*,TaskProject.Name as ProjectName,Users.UserName AS OwnerName " +
             "FROM TASKCARD INNER JOIN TaskProject ON " +
             "TaskCard.ProjectId = TaskProject.ID INNER JOIN Users ON TaskCard.Owner = Users.ID WHERE DueDate < GETDATE() AND " +
-            "TASKCARD.ASSIGNTO = {0} AND (TaskCard.TaskStatus<> 1 or " +
-            "TaskCard.TaskStatus<> 2 or TaskCard.TaskStatus<> 3)";
+            "TASKCARD.ASSIGNTO = {0} AND (TaskCard.TaskStatus <> 4 and TaskCard.TaskStatus<> 5)";
 
-        private const string SELECT_TASK_BYPROJECTNAME_OPENSTATUS = "SELECT Taskcard.* FROM TaskProject " +
+        private const string SELECT_TASK_BYPROJECTNAME_OPENSTATUS_ASSIGNTO = "SELECT Taskcard.* FROM TaskProject " +
             "LEFT OUTER JOIN TaskCard ON TaskProject.ID = TaskCard.ProjectId " +
-            "where (TaskCard.AssignTo = {0}) AND (TaskCard.TaskStatus<> 1 or " +
-            "TaskCard.TaskStatus<> 2 or TaskCard.TaskStatus<> 3) and TaskProject.Name ='{1}'";
+            "where (TaskCard.AssignTo = {0}) AND (TaskCard.TaskStatus <> 4 and TaskCard.TaskStatus<> 5) " + 
+            "and TaskProject.Name ='{1}'";
+
+        private const string SELECT_TASK_BYPROJECTNAME = "SELECT Taskcard.* FROM TaskProject " +
+            "LEFT OUTER JOIN TaskCard ON TaskProject.ID = TaskCard.ProjectId " +
+            "where (TaskCard.TaskStatus <> 4 and TaskCard.TaskStatus<> 5) " +
+            "and TaskProject.Name ='{1}'";
 
         private readonly string SELECT_BY_ASSIGNTO = "SELECT TaskCard.*, Users.UserName AS OwnerName,TaskProject.Name AS ProjectName " +
             "FROM Users INNER JOIN TaskCard ON Users.ID = TaskCard.Owner INNER JOIN " +
             "TaskProject ON TaskCard.ProjectId = TaskProject.ID WHERE (TaskCard.AssignTo = {0}) AND "+
-            "(TaskCard.TaskStatus <> 1 or TaskCard.TaskStatus<> 2 or TaskCard.TaskStatus<> 3)";
+            "(TaskCard.TaskStatus <> 4 and TaskCard.TaskStatus<> 5)";
            
         private const string SELECT_BY_OVERDUE_TASKSTATUS = "SELECT * FROM [TaskCard] WHERE DUEDATE < {0} AND " +
             "(TaskCard.TaskStatus <> 1 or TaskCard.TaskStatus<> 2 or TaskCard.TaskStatus<> 3)";
@@ -59,6 +63,11 @@ namespace FinancialPlanner.BusinessLogic.TaskManagements
 
         private readonly string INSERT_TASK = "INSERT INTO TASKCARD " +
             " VALUES ('{0}',{1},'{2}',{3},{4},'{5}','{6}',{7},{8},{9},{10},{11},'{12}',{13},'{14}',{15},'{16}','{17}')";
+
+        private readonly string UPDATE_TASK = "UPDATE TASKCARD SET TRANSACTIONTYPE = '{0}'," +
+            "CARDTYPE ={1},CID = {2},TITLE ='{3}',DESCRIPTION = '{4}',PRIORITY = {5}, TASKSTATUS = {6}," +
+            "OWNER = {7},ASSIGNTO = {8},COMPLETEDPERCENTAGE ={9}, UPDATEDON ='{10}',UPDATEDBY = {11}, " +
+            "ACTUALCOMPLETEDON ='{12}',DUEDATE = '{13}' WHERE ID ={14}";
 
         private readonly string UPDATE_TASKID = "UPDATE TASKCARD SET TASKID ='{0}' WHERE ID ={1}";
         private readonly string DELETE_NOTIFIED_TASK_BY_USER = "DELETE FROM TASKNOTIFICATION WHERE MotifyTo ={0}";
@@ -90,6 +99,83 @@ namespace FinancialPlanner.BusinessLogic.TaskManagements
                 LogDebug(currentMethodName.Name, ex);
                 return null;
             }
+        }
+
+        public object GetAll(string projectName)
+        {
+            try
+            {
+                Logger.LogInfo("Get: Task Card process start");
+                IList<TaskCard> taskcards =
+                    new List<TaskCard>();
+
+                DataTable dtAppConfig = DataBase.DBService.ExecuteCommand(
+                   string.Format(SELECT_TASK_BYPROJECTNAME, projectName));
+                foreach (DataRow dr in dtAppConfig.Rows)
+                {
+                    TaskCard task = convertToTaskCard(dr);
+                    taskcards.Add(task);
+                }
+                Logger.LogInfo("Get: Task Card process completed.");
+                return taskcards;
+            }
+            catch (Exception ex)
+            {
+                StackTrace st = new StackTrace();
+                StackFrame sf = st.GetFrame(0);
+                MethodBase currentMethodName = sf.GetMethod();
+                LogDebug(currentMethodName.Name, ex);
+                return null;
+            }
+        }
+
+        public int Update(TaskCard taskCard)
+        {
+            try
+            {                
+                DataBase.DBService.ExecuteCommand(SELECT_ALL);
+                DataBase.DBService.BeginTransaction();
+                DataBase.DBService.ExecuteCommandString(string.Format(UPDATE_TASK,                    
+                    taskCard.TransactionType,
+                    (int)taskCard.Type,
+                    taskCard.CustomerId,
+                    taskCard.Title,
+                    taskCard.Description,
+                    (int)taskCard.Priority,
+                    (int)taskCard.TaskStatus,
+                    taskCard.Owner,
+                    taskCard.AssignTo,
+                    taskCard.CompletedPercentage,                    
+                    taskCard.UpdatedOn,
+                    taskCard.UpdatedBy,
+                    taskCard.DueDate,
+                    taskCard.DueDate,taskCard.Id), true);
+
+                if (taskCard.ProjectId == 1)
+                {
+                    updateTransactionType(taskCard, taskCard.Id);
+                }
+                //DataBase.DBService.ExecuteCommandString(string.Format(UPDATE_TASKID, taskCard.TaskId + "-" + id, id), true);
+                //Activity.ActivitiesService.Add(ActivityType.CreateTask, EntryStatus.Success,
+                //        Source.Server, taskCard.UpdatedByUserName, taskCard.TaskId, taskCard.MachineName);
+                DataBase.DBService.CommitTransaction();
+                return taskCard.Id;
+            }
+            catch (Exception ex)
+            {
+                DataBase.DBService.RollbackTransaction();
+                StackTrace st = new StackTrace();
+                StackFrame sf = st.GetFrame(0);
+                MethodBase currentMethodName = sf.GetMethod();
+                LogDebug(currentMethodName.Name, ex);
+                throw ex;
+            }
+        }
+
+        private void updateTransactionType(TaskCard taskCard, int id)
+        {
+            TransactionTypeHelper transactionTypeHelper = new TransactionTypeHelper(taskCard, id);
+            transactionTypeHelper.UpdateTransaction();
         }
 
         public IList<TaskCard> GetByAssignTo(int userId)
@@ -156,7 +242,7 @@ namespace FinancialPlanner.BusinessLogic.TaskManagements
                     new List<TaskCard>();
 
                 DataTable dtAppConfig = DataBase.DBService.ExecuteCommand(
-                   string.Format(SELECT_TASK_BYPROJECTNAME_OPENSTATUS,userId,projectName));
+                   string.Format(SELECT_TASK_BYPROJECTNAME_OPENSTATUS_ASSIGNTO,userId,projectName));
                 foreach (DataRow dr in dtAppConfig.Rows)
                 {
                     TaskCard task = convertToTaskCard(dr);
@@ -205,10 +291,7 @@ namespace FinancialPlanner.BusinessLogic.TaskManagements
         public int Add(TaskCard taskcard)
         {
             try
-            {
-                //string clientName = DataBase.DBService.ExecuteCommandScalar(string.Format(GET_PROJECT_NAME_QUERY, project.Id));
-                //JSONSerialization jSON = new JSONSerialization();
-                //TaskCard taskcard = jSON.DeserializeFromString<TaskCard>(jsonString);
+            {               
                 DataBase.DBService.ExecuteCommand(SELECT_ALL);
                 DataBase.DBService.BeginTransaction();
                 DataBase.DBService.ExecuteCommandString(string.Format(INSERT_TASK,
