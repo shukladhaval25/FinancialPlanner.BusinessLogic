@@ -14,16 +14,14 @@ namespace FinancialPlanner.BusinessLogic.CurrentStatus
         readonly string GET_SHARES_VALUE  = "SELECT SUM(CURRENTVALUE) AS SHARESVALUE FROM [SHARES] WHERE " +
                         "PID =  {0} AND GOALID = {1}";
 
-        readonly string GET_EQUITY_VALUE = "SELECT SUM((TOTALVALUE) * EQUITYRATIO /100)) AS EQUITYMFSHARES," +
-            "SUM((TOTALVALUE) * DEBTRATIO /100)) AS DEBTMFSHARES," +
-            "SUM((TOTALVALUE) AS TOTALVALUE FROM [MUTUALFUND] WHERE PID ={0} AND GOALID = {1} ";
-
+        readonly string GET_EQUITY_VALUE = "SELECT SUM(((TOTALVALUE) * EQUITYRATIO) /100) AS EQUITYMFSHARES," +
+                    "SUM(((TOTALVALUE) * DEBTRATIO) / 100) AS DEBTMFSHARES," +
+                    "SUM(TOTALVALUE) AS TOTALVALUE FROM[MUTUALFUND] WHERE PID ={0} AND GOALID = {1}";
+                    
         readonly string GET_EQUITY_NPS_VALUE = "SELECT ((NAV * UNITS) * EQUITYRATIO /100) AS EQUITYNPSSHARES," +
             "((NAV * UNITS) * DEBTRATIO /100) AS DEBTNPSSHARES," +
             "(NAV * UNITS) AS TOTALVALUE FROM [NPS] WHERE PID ={0} AND GOALID = {1} ";
 
-        readonly string GET_EQUITY_OTHER_VALUE = "SELECT SUM(Amount) AS EQUITYOTHERS WHERE PID ={0} AND GOALID ={1} AND " +
-            "TRANSCATIONTYPE = '{2}'";
         #endregion
 
         #region "Debt part"
@@ -39,7 +37,7 @@ namespace FinancialPlanner.BusinessLogic.CurrentStatus
 
         readonly string GET_EPF_VALUE = "SELECT SUM(AMOUNT) AS EPFVALUE FROM [EPF] WHERE PID = {0} AND GOALID = {1}";
 
-        readonly string GET_OTHER_VALUE = "SELECT SUM(Amount) AS OTHERS WHERE PID ={0} AND GOALID ={1} ";
+        readonly string GET_OTHER_VALUE = "SELECT SUM(Amount) FROM OTHERS WHERE PID ={0} AND GOALID ={1} ";
 
         readonly string GET_SS_VALUE = "SELECT SUM(CURRENTVALUE) AS SSVALUE FROM [SukanyaSamrudhi] WHERE PID = {0} AND GOALID = {1}";
 

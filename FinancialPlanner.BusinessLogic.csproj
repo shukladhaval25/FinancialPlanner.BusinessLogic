@@ -93,6 +93,7 @@
     <Compile Include="Clients\ClientSpouseService.cs" />
     <Compile Include="Clients\CRMGroupService.cs" />
     <Compile Include="Clients\EmploymentService.cs" />
+    <Compile Include="Clients\FamilyMemberBankService.cs" />
     <Compile Include="Clients\FamilyMemberService.cs" />
     <Compile Include="Clients\FestivalsService.cs" />
     <Compile Include="Compnay\CompanyService.cs" />
