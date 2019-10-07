@@ -1,4 +1,5 @@
-﻿using FinancialPlanner.Common;
+﻿using FinancialPlanner.BusinessLogic.ApplicationMaster;
+using FinancialPlanner.Common;
 using FinancialPlanner.Common.Model;
 using System;
 using System.Collections.Generic;
@@ -19,10 +20,10 @@ namespace FinancialPlanner.BusinessLogic.Clients
         private const string SELECT_ALL_BY_ACCOUNTHOLDER_ID_AND_ID = "SELECT FMB.*,U.USERNAME AS UPDATEDBYUSERNAME FROM FAMILYMEMBERBANK FMB," +
             "USERS U WHERE FMB.UPDATEDBY = U.ID and FMB.AccountHolderId = {0} AND FMB.ID = {1}";
 
-        private const string INSERT_FAMILYMEMBER_BANK = "INSERT INTO FAMILYMEMBERBANK VALUES ({0},'{1}','{2}','{3}','{4}','{5}','{6}',{7},'{8}',{9})";
+        private const string INSERT_FAMILYMEMBER_BANK = "INSERT INTO FAMILYMEMBERBANK VALUES ({0},{1},'{2}','{3}','{4}',{5},'{6}',{7})";
 
-        private const string UPDATE_FAMILYMEMBER_BANK = "UPDATE FAMILYMEMBERBANK SET BANKNAME ='{0}', ACCOUNTNO = '{1}', ACCOUNTTYPE ='{2}', ADDRESS ='{3}', " +
-            "CONTACTNO ='{4}',UPDATEDON ='{5}',UPDATEDBY ={6} WHERE ID ={7}";
+        private const string UPDATE_FAMILYMEMBER_BANK = "UPDATE FAMILYMEMBERBANK SET BankId ={0}, ACCOUNTNO = '{1}', ACCOUNTTYPE ='{2}', "+
+            "UPDATEDON ='{3}',UPDATEDBY ={4} WHERE ID ={5}";
 
         private const string DELETE_FAMILYMEMBER_BANK = "DELETE FROM FAMILYMEMBERBANK WHERE ID ={0}";
    
@@ -85,13 +86,13 @@ namespace FinancialPlanner.BusinessLogic.Clients
             {
                 //string clientName = DataBase.DBService.ExecuteCommandScalar(string.Format(GET_CLIENT_NAME_QUERY, familyMember.Cid));
                 DataBase.DBService.ExecuteCommand(string.Format(INSERT_FAMILYMEMBER_BANK,
-                   familyMemberBank.AccountHolderId, familyMemberBank.BankName, familyMemberBank.AccountNo,
-                   familyMemberBank.AccountType, familyMemberBank.BranchAddress, familyMemberBank.BranchContantNo,
+                   familyMemberBank.AccountHolderId, familyMemberBank.BankId, familyMemberBank.AccountNo,
+                   familyMemberBank.AccountType, 
                    familyMemberBank.CreatedOn.ToString("yyyy-MM-dd hh:mm:ss"), familyMemberBank.CreatedBy,
                    familyMemberBank.UpdatedOn.ToString("yyyy-MM-dd hh:mm:ss"), familyMemberBank.UpdatedBy));
 
                 Activity.ActivitiesService.Add(ActivityType.CreateFamilyMember, EntryStatus.Success,
-                         Source.Server, familyMemberBank.UpdatedByUserName, familyMemberBank.BankName, familyMemberBank.MachineName);
+                         Source.Server, familyMemberBank.UpdatedByUserName, familyMemberBank.Bank.Name, familyMemberBank.MachineName);
             }
             catch (Exception ex)
             {
@@ -109,7 +110,7 @@ namespace FinancialPlanner.BusinessLogic.Clients
             {
                 DataBase.DBService.ExecuteCommand(string.Format(DELETE_FAMILYMEMBER_BANK, familyMemberBank.Id));
                 Activity.ActivitiesService.Add(ActivityType.DeleteFamilyMember, EntryStatus.Success,
-                         Source.Server, familyMemberBank.UpdatedByUserName, familyMemberBank.BankName, familyMemberBank.MachineName);
+                         Source.Server, familyMemberBank.UpdatedByUserName, familyMemberBank.Bank.Name, familyMemberBank.MachineName);
             }
             catch (Exception ex)
             {
@@ -125,18 +126,20 @@ namespace FinancialPlanner.BusinessLogic.Clients
         {
             try
             {
-                DataBase.DBService.ExecuteCommand(string.Format(UPDATE_FAMILYMEMBER_BANK,
-                   familyMemberBank.BankName, familyMemberBank.AccountNo,
-                   familyMemberBank.AccountType, familyMemberBank.BranchAddress,
-                   familyMemberBank.BranchContantNo,
+                DataBase.DBService.BeginTransaction();
+                DataBase.DBService.ExecuteCommandString(string.Format(UPDATE_FAMILYMEMBER_BANK,
+                   familyMemberBank.BankId, familyMemberBank.AccountNo,
+                   familyMemberBank.AccountType,
                    familyMemberBank.UpdatedOn.ToString("yyyy-MM-dd hh:mm:ss"),
-                   familyMemberBank.UpdatedBy, familyMemberBank.Id));
+                   familyMemberBank.UpdatedBy, familyMemberBank.Id),true);
 
                 Activity.ActivitiesService.Add(ActivityType.UpdateFamilyMember, EntryStatus.Success,
-                         Source.Server, familyMemberBank.UpdatedByUserName, familyMemberBank.BankName, familyMemberBank.MachineName);
+                         Source.Server, familyMemberBank.UpdatedByUserName, familyMemberBank.Bank.Name, familyMemberBank.MachineName);
+                DataBase.DBService.CommitTransaction();
             }
             catch (Exception ex)
             {
+                DataBase.DBService.RollbackTransaction();
                 StackTrace st = new StackTrace();
                 StackFrame sf = st.GetFrame(0);
                 MethodBase currentMethodName = sf.GetMethod();
@@ -151,11 +154,10 @@ namespace FinancialPlanner.BusinessLogic.Clients
             FamilyMemberBank familymemberBank = new FamilyMemberBank();
             familymemberBank.Id = dr.Field<int>("ID");
             familymemberBank.AccountHolderId = dr.Field<int>("AccountHolderId");
-            familymemberBank.BankName = dr.Field<string>("BankName");
-            familymemberBank.BranchAddress = dr.Field<string>("Address");
-            familymemberBank.BranchContantNo = dr.Field<string>("ContactNo");
+            familymemberBank.BankId = dr.Field<int>("BankId");
             familymemberBank.AccountNo = dr.Field<string>("AccountNo");
             familymemberBank.AccountType = dr.Field<string>("AccountType");
+            familymemberBank.Bank = new BankService().Get(familymemberBank.BankId);
             return familymemberBank;
         }
 

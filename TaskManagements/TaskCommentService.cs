@@ -28,6 +28,9 @@ namespace FinancialPlanner.BusinessLogic.TaskManagements
         private readonly string INSERT_COMMENTS = "INSERT INTO TASKCOMMENT (" +
             "[TaskId],[CommentedBy],[comment],[IsEdited]) VALUES ({0},{1},'{2}','{3}')";
 
+        private const string UPDATE_COMMENT = "UPDATE TASKCOMMENT SET comment = '{0}',IsEdited = 'True' " +
+            "where TaskComment.Id = {1}";
+
         public IList<TaskComment> GetTaskComments(int taskId)
         {
             try
@@ -93,9 +96,34 @@ namespace FinancialPlanner.BusinessLogic.TaskManagements
                 DataBase.DBService.BeginTransaction();
                 DataBase.DBService.ExecuteCommandString(string.Format(INSERT_COMMENTS,
                       taskComment.TaskId,taskComment.CommantedBy,taskComment.Comment,
-                      taskComment.IsEditable),true);
+                      taskComment.IsEdited),true);
 
                // Activity.ActivitiesService.Add(ActivityType.CreateTaskProject, EntryStatus.Success,
+                //         Source.Server, project.UpdatedByUserName, project.Name, project.MachineName);
+                DataBase.DBService.CommitTransaction();
+            }
+            catch (Exception ex)
+            {
+                DataBase.DBService.RollbackTransaction();
+                StackTrace st = new StackTrace();
+                StackFrame sf = st.GetFrame(0);
+                MethodBase currentMethodName = sf.GetMethod();
+                LogDebug(currentMethodName.Name, ex);
+                throw ex;
+            }
+        }
+        public void UpdateTaskComment (TaskComment taskComment)
+        {
+            try
+            {
+                string clientName = DataBase.DBService.ExecuteCommandScalar("SELECT COUNT(*) FROM TASKCOMMENT");
+
+                DataBase.DBService.BeginTransaction();
+                DataBase.DBService.ExecuteCommandString(string.Format(UPDATE_COMMENT,
+                    taskComment.Comment,
+                    taskComment.Id), true);
+
+                // Activity.ActivitiesService.Add(ActivityType.CreateTaskProject, EntryStatus.Success,
                 //         Source.Server, project.UpdatedByUserName, project.Name, project.MachineName);
                 DataBase.DBService.CommitTransaction();
             }
@@ -119,7 +147,7 @@ namespace FinancialPlanner.BusinessLogic.TaskManagements
             taskComment.CommentedByName = dr.Field<string>("CommentedByName");
             taskComment.Comment = dr.Field<string>("Comment");
             taskComment.CommentedOn = dr.Field<DateTime>("CommentedOn");
-            taskComment.IsEditable = dr.Field<bool>("IsEdited");
+            taskComment.IsEdited = dr.Field<bool>("IsEdited");
             return taskComment;
         }
 
