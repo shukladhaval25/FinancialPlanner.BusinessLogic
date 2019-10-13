@@ -27,6 +27,12 @@ namespace FinancialPlanner.BusinessLogic.TaskManagements
                 case "SIP Old":
                     transactionTypeService = new SIPServiceImpl();
                     break;
+                case "Switch":
+                    transactionTypeService = new SwitchTransaactionServiceImpl();
+                    break;
+                case "STP":
+                    transactionTypeService = new STPTransactionServiceImpl();
+                    break;
                 default:
                     transactionTypeService = null;
                     break;

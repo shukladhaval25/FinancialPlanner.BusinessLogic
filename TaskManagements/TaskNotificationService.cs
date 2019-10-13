@@ -11,7 +11,7 @@ namespace FinancialPlanner.BusinessLogic.TaskManagements
 {
     public class TaskNotificationService
     {
-        private readonly string SELECT_COUNT_NOTIFICATION_BY_NOFITYID = "SELECT COUNT(*) FROM TASKNOTIFICATION WHERE MotifyTo = {0}";
+        private readonly string SELECT_COUNT_NOTIFICATION_BY_NOFITYID = "SELECT COUNT(*) FROM TASKNOTIFICATION WHERE NotifyTo = {0}";
 
         public int GetNotification(int notifyTo)
         {

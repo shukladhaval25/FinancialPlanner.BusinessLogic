@@ -27,7 +27,7 @@ namespace FinancialPlanner.BusinessLogic.TaskManagements
                          "TaskCard ON Users.ID = TaskCard.Owner INNER JOIN " +
                          "TaskNotification ON TaskCard.ID = TaskNotification.TaskId INNER JOIN " +
                          "TaskProject ON TaskCard.ProjectId = TaskProject.ID " +
-                         "WHERE (TaskNotification.MotifyTo = {0})";
+                         "WHERE (TaskNotification.NotifyTo = {0})";
 
         //private readonly string SELECT_ALL_BY_TASK_STATUS = "SELECT * FROM [TaskCard] WHERE TASKSTATUS = {0}";
         //private readonly string SELECT_ALL_BY_PROJECT_ID = "SELECT * FROM [TaskCard] WHERE PROJECTID = {0}";
@@ -70,7 +70,7 @@ namespace FinancialPlanner.BusinessLogic.TaskManagements
             "ACTUALCOMPLETEDON ='{12}',DUEDATE = '{13}' WHERE ID ={14}";
 
         private readonly string UPDATE_TASKID = "UPDATE TASKCARD SET TASKID ='{0}' WHERE ID ={1}";
-        private readonly string DELETE_NOTIFIED_TASK_BY_USER = "DELETE FROM TASKNOTIFICATION WHERE MotifyTo ={0}";
+        private readonly string DELETE_NOTIFIED_TASK_BY_USER = "DELETE FROM TASKNOTIFICATION WHERE NotifyTo ={0}";
 
 
         public IList<TaskCard> GetNotified(int userId)
@@ -294,6 +294,26 @@ namespace FinancialPlanner.BusinessLogic.TaskManagements
             {               
                 DataBase.DBService.ExecuteCommand(SELECT_ALL);
                 DataBase.DBService.BeginTransaction();
+                Logger.LogInfo("SQL:" + string.Format(INSERT_TASK,
+                    taskcard.TaskId,
+                    taskcard.ProjectId,
+                    taskcard.TransactionType,
+                    (int)taskcard.Type,
+                    taskcard.CustomerId,
+                    taskcard.Title,
+                    taskcard.Description,
+                    (int)taskcard.Priority,
+                    (int)taskcard.TaskStatus,
+                    taskcard.Owner,
+                    taskcard.AssignTo,
+                    taskcard.CompletedPercentage,
+                    taskcard.CreatedOn,
+                    taskcard.CreatedBy,
+                    taskcard.UpdatedOn,
+                    taskcard.UpdatedBy,
+                    taskcard.DueDate,
+                    taskcard.DueDate));
+
                 DataBase.DBService.ExecuteCommandString(string.Format(INSERT_TASK,
                     taskcard.TaskId,
                     taskcard.ProjectId,
