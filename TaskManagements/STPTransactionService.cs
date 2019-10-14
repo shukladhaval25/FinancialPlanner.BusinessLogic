@@ -14,10 +14,10 @@ namespace FinancialPlanner.BusinessLogic.TaskManagements
 {
     class STPTransactionServiceImpl : ITransactionTypeService
     {
-        private const string INSERT_SWITCH = "INSERT INTO STP VALUES ({0},{1},{2},'{3}',{4},'{5}',{6}," +
+        private const string INSERT_STP = "INSERT INTO STP VALUES ({0},{1},{2},'{3}',{4},'{5}',{6}," +
           "'{7}',{8},'{9}',{10},{11},'{12}','{13}','{14}')";
 
-        private const string UPDATE_SWITCH = "UPDATE STP SET ARN = {0}," +
+        private const string UPDATE_STP = "UPDATE STP SET ARN = {0}," +
             "CID = {1},MEMBERNAME ='{2}', AMC ={3},FOLIONUMBER ='{4}'," +
             "FROMSCHEMEID = {5},[FROMOPTION] = '{6}',TOSCHEMDID = {7}, TOOPTION = '{8}', " +
             "AMOUNT = {9},DURATION = {10},FREQUENCY ='{11}',MODEOFEXECUTION ='{12}'," +
@@ -85,7 +85,7 @@ namespace FinancialPlanner.BusinessLogic.TaskManagements
         public void SaveTransaction(TaskCard taskCard, int id)
         {
             stp = new FinancialPlanner.Common.JSONSerialization().DeserializeFromString<STP>(taskCard.TaskTransactionType.ToString());
-            DataBase.DBService.ExecuteCommandString(string.Format(INSERT_SWITCH,
+            DataBase.DBService.ExecuteCommandString(string.Format(INSERT_STP,
                    id,
                    stp.Arn,
                    stp.Cid,
@@ -106,7 +106,7 @@ namespace FinancialPlanner.BusinessLogic.TaskManagements
         public void UpdateTransaction(TaskCard taskCard)
         {
             stp = new FinancialPlanner.Common.JSONSerialization().DeserializeFromString<STP>(taskCard.TaskTransactionType.ToString());
-            DataBase.DBService.ExecuteCommandString(string.Format(UPDATE_SWITCH,
+            DataBase.DBService.ExecuteCommandString(string.Format(UPDATE_STP,
                    stp.Arn,
                    stp.Cid,
                    stp.MemberName,
