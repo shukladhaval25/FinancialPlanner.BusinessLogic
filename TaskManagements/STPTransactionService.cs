@@ -1,11 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using FinancialPlanner.Common;
 using FinancialPlanner.Common.Model.TaskManagement;
 using FinancialPlanner.Common.Model.TaskManagement.MFTransactions;
@@ -19,7 +15,7 @@ namespace FinancialPlanner.BusinessLogic.TaskManagements
 
         private const string UPDATE_STP = "UPDATE STP SET ARN = {0}," +
             "CID = {1},MEMBERNAME ='{2}', AMC ={3},FOLIONUMBER ='{4}'," +
-            "FROMSCHEMEID = {5},[FROMOPTION] = '{6}',TOSCHEMDID = {7}, TOOPTION = '{8}', " +
+            "FROMSCHEMEID = {5},[FROMOPTION] = '{6}',TOSCHEMEID = {7}, TOOPTION = '{8}', " +
             "AMOUNT = {9},DURATION = {10},FREQUENCY ='{11}',MODEOFEXECUTION ='{12}'," +
             "REMARK = '{13}' WHERE TASKID = {14}";
 

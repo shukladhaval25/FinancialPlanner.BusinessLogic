@@ -19,7 +19,7 @@ namespace FinancialPlanner.BusinessLogic.TaskManagements
 
         private const string UPDATE_SWITCH = "UPDATE SWITCH SET ARN = {0}," +
             "CID = {1},MEMBERNAME ='{2}', AMC ={3},FOLIONUMBER ='{4}'," +
-            "FROMSCHEMEID = {5},[FROMOPTION] = '{6}',TOSCHEMDID = {7}, TOOPTION = '{8}', " + 
+            "FROMSCHEMEID = {5},[FROMOPTION] = '{6}',TOSCHEMEID = {7}, TOOPTION = '{8}', " + 
             "AMOUNT = {9},TRANSACTIONDATE = '{10}',MODEOFEXECUTION ='{11}'," +
             "REMARK = '{12}' WHERE TASKID = {13}";
 
