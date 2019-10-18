@@ -39,6 +39,9 @@ namespace FinancialPlanner.BusinessLogic.TaskManagements
                 case "STP Cancellation":
                     transactionTypeService = new STPCancellationCancellationTransactionServiceImpl();
                     break;
+                case "SIP Cancellation":
+                    transactionTypeService = new SIPCancellationTransactionServiceImpl();
+                    break;
                 default:
                     transactionTypeService = null;
                     break;

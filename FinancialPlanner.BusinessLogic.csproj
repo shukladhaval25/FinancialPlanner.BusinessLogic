@@ -145,6 +145,7 @@
     <Compile Include="TaskManagements\AdditionalPurchaseServiceImpl.cs" />
     <Compile Include="TaskManagements\FreshPurchaseTransactionServiceImpl.cs" />
     <Compile Include="TaskManagements\ITransactionTypeService.cs" />
+    <Compile Include="TaskManagements\SIPCancellationTransactionServiceImpl.cs" />
     <Compile Include="TaskManagements\SIPServiceImpl.cs" />
     <Compile Include="TaskManagements\STPCancellationTransactionServiceImpl.cs" />
     <Compile Include="TaskManagements\STPTransactionService.cs" />
