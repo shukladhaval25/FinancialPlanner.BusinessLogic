@@ -83,18 +83,33 @@ namespace FinancialPlanner.BusinessLogic.ApplicationMaster
             {
                 string clientName = DataBase.DBService.ExecuteCommandScalar(string.Format(GET_CLIENT_NAME_QUERY, 0));
 
+                if ((bank.Pincode) == null)
+                {
+                    DataBase.DBService.ExecuteCommand(string.Format(INSERT_QUERY,
+                        bank.Name,
+                        bank.Branch,
+                        bank.Address,
+                        bank.City,
+                        bank.State,
+                        "NULL",
+                        bank.IFSC,
+                        bank.MICR,
+                        bank.CreatedOn.ToString("yyyy-MM-dd hh:mm:ss"), bank.CreatedBy,
+                        bank.UpdatedOn.ToString("yyyy-MM-dd hh:mm:ss"), bank.UpdatedBy));
+                }
+                else { 
                 DataBase.DBService.ExecuteCommand(string.Format(INSERT_QUERY,
                    bank.Name,
                    bank.Branch,
                    bank.Address,
                    bank.City,
                    bank.State,
-                   bank.Pincode,
+                   (bank.Pincode),
                    bank.IFSC,
                    bank.MICR,
                    bank.CreatedOn.ToString("yyyy-MM-dd hh:mm:ss"), bank.CreatedBy,
                    bank.UpdatedOn.ToString("yyyy-MM-dd hh:mm:ss"), bank.UpdatedBy));
-
+                }
                 //Activity.ActivitiesService.Add(ActivityType.CreateBank, EntryStatus.Success,
                 //         Source.Server, bank.UpdatedByUserName, bank.Name, bank.MachineName);
             }

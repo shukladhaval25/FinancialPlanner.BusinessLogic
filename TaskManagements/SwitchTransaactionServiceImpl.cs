@@ -96,7 +96,7 @@ namespace FinancialPlanner.BusinessLogic.TaskManagements
                    switchOpt.FromSchemeId,
                    switchOpt.FromOptions,
                    switchOpt.Amount,
-                   switchOpt.TransactionDate,
+                   switchOpt.TransactionDate.ToString("yyyy-MM-dd hh:mm:ss"),
                    switchOpt.ModeOfExecution,
                    switchOpt.Remark), true);
         }
@@ -115,7 +115,7 @@ namespace FinancialPlanner.BusinessLogic.TaskManagements
                    switchOpt.FromSchemeId,
                    switchOpt.FromOptions,
                    switchOpt.Amount,
-                   switchOpt.TransactionDate,
+                   switchOpt.TransactionDate.ToString("yyyy-MM-dd hh:mm:ss"),
                    switchOpt.ModeOfExecution,
                    switchOpt.Remark,
                    taskCard.Id), true);

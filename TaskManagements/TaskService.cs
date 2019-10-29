@@ -314,6 +314,27 @@ namespace FinancialPlanner.BusinessLogic.TaskManagements
                     taskcard.DueDate,
                     taskcard.DueDate));
 
+                //'{0}',{ 1},'{2}',{ 3},{ 4},'{5}','{6}',{ 7},{ 8},{ 9},{ 10},{ 11},'{12}',{ 13},'{14}',{ 15},'{16}','{17}'
+                //DataBase.DBService.ExecuteCommandString("Insert into TASKCARD values ('" + taskcard.TaskId + "'," +
+                //    taskcard.ProjectId + ",'" +
+                //    taskcard.TransactionType + "'," +
+                //    (int)taskcard.Type + "," +
+                //    taskcard.CustomerId + ",'" +
+                //    taskcard.Title + "','" +
+                //    taskcard.Description + "'," +
+                //    (int)taskcard.Priority + "," +
+                //    (int)taskcard.TaskStatus + "," +
+                //    taskcard.Owner + "," +
+                //    taskcard.AssignTo + "," +
+                //    taskcard.CompletedPercentage + ",'" +
+                //    taskcard.CreatedOn + "'," +
+                //    taskcard.CreatedBy + ",'" +
+                //    taskcard.UpdatedOn + "'," +
+                //    taskcard.UpdatedBy + ",'" +
+                //    taskcard.DueDate + "','" +
+                //    taskcard.DueDate + "')",true);
+
+
                 DataBase.DBService.ExecuteCommandString(string.Format(INSERT_TASK,
                     taskcard.TaskId,
                     taskcard.ProjectId,
@@ -327,12 +348,12 @@ namespace FinancialPlanner.BusinessLogic.TaskManagements
                     taskcard.Owner,
                     taskcard.AssignTo,
                     taskcard.CompletedPercentage,
-                    taskcard.CreatedOn,
+                    taskcard.CreatedOn.ToString("yyyy-MM-dd hh:mm:ss"),
                     taskcard.CreatedBy,
-                    taskcard.UpdatedOn,
+                    taskcard.UpdatedOn.ToString("yyyy-MM-dd hh:mm:ss"),
                     taskcard.UpdatedBy,
-                    taskcard.DueDate,
-                    taskcard.DueDate), true);
+                    taskcard.DueDate.ToString("yyyy-MM-dd hh:mm:ss"),
+                    taskcard.DueDate.ToString("yyyy-MM-dd hh:mm:ss")), true);
 
                 int id = getTaskID(taskcard);
 
@@ -363,7 +384,7 @@ namespace FinancialPlanner.BusinessLogic.TaskManagements
                  taskcard.ProjectId,
                  taskcard.Title,
                  taskcard.CustomerId,
-                 taskcard.CreatedOn,
+                 taskcard.CreatedOn.ToString("yyyy-MM-dd hh:mm:ss"),
                  taskcard.AssignTo,
                  taskcard.Owner,
                  taskcard.TransactionType,

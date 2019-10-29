@@ -84,6 +84,7 @@
     <Compile Include="ApplicationMaster\ClientRatingService.cs" />
     <Compile Include="ApplicationMaster\AreaService.cs" />
     <Compile Include="ApplicationMaster\OrganisationTypeService.cs" />
+    <Compile Include="ApplicationMaster\SchemeCategoryService.cs" />
     <Compile Include="ApplicationMaster\SchemeService.cs" />
     <Compile Include="ApplictionConfiguration\ApplicationConfiService.cs" />
     <Compile Include="Clients\BankAccountService.cs" />
@@ -125,6 +126,7 @@
     <Compile Include="LifeInsurance\LifeInsuranceService.cs" />
     <Compile Include="PlanOption\CashFlowService.cs" />
     <Compile Include="PlanOption\CurrentStatusToGoalService.cs" />
+    <Compile Include="PlanOption\InvestmentRecommendationService.cs" />
     <Compile Include="PlanOption\PlanOptionService.cs" />
     <Compile Include="Plans\AssumptionMasterService.cs" />
     <Compile Include="Plans\DocumentService.cs" />

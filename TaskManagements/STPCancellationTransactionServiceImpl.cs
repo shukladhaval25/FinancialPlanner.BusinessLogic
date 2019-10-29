@@ -95,7 +95,7 @@ namespace FinancialPlanner.BusinessLogic.TaskManagements
                    stpCancellation.FromOptions,
                    stpCancellation.Amount,
                    stpCancellation.StpDate,
-                   stpCancellation.TransactionDate,
+                   stpCancellation.TransactionDate.ToString("yyyy-MM-dd hh:mm:ss"),
                    stpCancellation.ModeOfExecution,
                    stpCancellation.Remark), true);
         }
@@ -115,7 +115,7 @@ namespace FinancialPlanner.BusinessLogic.TaskManagements
                    stpCancellation.FromOptions,
                    stpCancellation.Amount,
                    stpCancellation.StpDate,
-                   stpCancellation.TransactionDate,
+                   stpCancellation.TransactionDate.ToString("yyyy-MM-dd hh:mm:ss"),
                    stpCancellation.ModeOfExecution,
                    stpCancellation.Remark,
                    taskCard.Id), true);

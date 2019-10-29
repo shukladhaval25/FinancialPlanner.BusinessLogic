@@ -197,6 +197,10 @@ namespace FinancialPlanner.BusinessLogic.Activity
         private static readonly string ADD_AREA = "{0} area added successfully";
         private static readonly string DELETE_AREA = "{0} area deleted successfully";
 
+        private static readonly string ADD_SCHEMECATEGORY = "{0} scheme category added successfully";
+        private static readonly string DELETE_SCHEMECATEGORY = "{0} scheme category deleted successfully";
+
+
         private static readonly string ADD_ORGANISATIONTYPE ="{0} organisation type added successfully";
         private static readonly string UPDATE_ORGANISATIONTYPE ="{0} organisation type updated successfully";
         private static readonly string DELETE_ORGANISATIONTYPE ="{0} organisation type deleted successfully";
@@ -519,6 +523,10 @@ namespace FinancialPlanner.BusinessLogic.Activity
                 //Area
                 _lstActivityDescription.Add(new KeyValuePair<ActivityType, string>(ActivityType.CreateArea, ADD_AREA));
                 _lstActivityDescription.Add(new KeyValuePair<ActivityType, string>(ActivityType.DeleteArea, DELETE_AREA));
+
+                //SchemeCategory
+                _lstActivityDescription.Add(new KeyValuePair<ActivityType, string>(ActivityType.CreateSchemeCategory, ADD_SCHEMECATEGORY));
+                _lstActivityDescription.Add(new KeyValuePair<ActivityType, string>(ActivityType.DeleteSchemeCategory, DELETE_SCHEMECATEGORY));
 
                 //Client Rating
                 _lstActivityDescription.Add(new KeyValuePair<ActivityType, string>(ActivityType.CreateClientRating, ADD_CLIENT_RATING));

@@ -102,7 +102,7 @@ namespace FinancialPlanner.BusinessLogic.TaskManagements
                    freshPurchase.Scheme,
                    freshPurchase.Options,
                    freshPurchase.Amount,
-                   freshPurchase.TransactionDate,
+                   freshPurchase.TransactionDate.ToString("yyyy-MM-dd hh:mm:ss"),
                    freshPurchase.ModeOfExecution,
                    freshPurchase.Remark), true);
         }
@@ -124,7 +124,7 @@ namespace FinancialPlanner.BusinessLogic.TaskManagements
                    freshPurchase.Scheme,
                    freshPurchase.Options,
                    freshPurchase.Amount,
-                   freshPurchase.TransactionDate,
+                   freshPurchase.TransactionDate.ToString("yyyy-MM-dd hh:mm:ss"),
                    freshPurchase.ModeOfExecution,
                    freshPurchase.Remark,
                    taskCard.Id), true);

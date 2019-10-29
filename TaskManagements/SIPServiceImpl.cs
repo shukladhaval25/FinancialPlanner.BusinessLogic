@@ -78,9 +78,9 @@ namespace FinancialPlanner.BusinessLogic.TaskManagements
                    sip.Amount,
                    sip.AccounType,
                    sip.SIPDayOn,
-                   sip.TransactionDate,
-                   sip.SIPStartDate,
-                   sip.SIPEndDate,
+                   sip.TransactionDate.ToString("yyyy-MM-dd hh:mm:ss"),
+                   sip.SIPStartDate.ToString("yyyy-MM-dd hh:mm:ss"),
+                   sip.SIPEndDate.ToString("yyyy-MM-dd hh:mm:ss"),
                    sip.ModeOfExecution,
                    sip.Remark), true);
         }
@@ -126,10 +126,10 @@ namespace FinancialPlanner.BusinessLogic.TaskManagements
                    sip.SchemeId,
                    sip.Option,
                    sip.Amount,
-                   sip.TransactionDate,
+                   sip.TransactionDate.ToString("yyyy-MM-dd hh:mm:ss"),
                    sip.SIPDayOn,                   
-                   sip.SIPStartDate,
-                   sip.SIPEndDate,
+                   sip.SIPStartDate.ToString("yyyy-MM-dd hh:mm:ss"),
+                   sip.SIPEndDate.ToString("yyyy-MM-dd hh:mm:ss"),
                    sip.ModeOfExecution,
                    sip.Remark,
                    taskCard.Id), true);
