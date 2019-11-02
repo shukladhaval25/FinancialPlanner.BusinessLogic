@@ -232,6 +232,10 @@ namespace FinancialPlanner.BusinessLogic.Activity
         private static readonly string UPDATE_AMC_ACTION = "AMC ''{0}'' edited sucessfully";
         private static readonly string DELETE_AMC_ACTION = "AMC ''{0}'' deleted sucessfully";
 
+        public static readonly string ADD_INVESTMENT_RECOMMENDATION = "Investment recommendation ''{0}'' added sucessfully";
+        private static readonly string UPDATE_INVESTMENT_RECOMMENDATION = "Investment recommendation ''{0}'' edited sucessfully";
+        private static readonly string DELETE_INVESTMENT_RECOMMENDATION = "Investment recommendation ''{0}'' deleted sucessfully";
+
         public static IList<Activities> Get(string userName)
         {
             IList<Activities> lstActivities = new List<Activities>();
@@ -566,6 +570,13 @@ namespace FinancialPlanner.BusinessLogic.Activity
                 _lstActivityDescription.Add(new KeyValuePair<ActivityType, string>(ActivityType.CreateAMC, ADD_AMC_ACTION));
                 _lstActivityDescription.Add(new KeyValuePair<ActivityType, string>(ActivityType.UpdateAMC, UPDATE_AMC_ACTION));
                 _lstActivityDescription.Add(new KeyValuePair<ActivityType, string>(ActivityType.DeleteAMC, DELETE_AMC_ACTION));
+
+                //Investment Recomendation
+                
+                _lstActivityDescription.Add(new KeyValuePair<ActivityType, string>(ActivityType.CreateInvestmentRecommendation, ADD_INVESTMENT_RECOMMENDATION));
+                _lstActivityDescription.Add(new KeyValuePair<ActivityType, string>(ActivityType.DeleteInvestmentRecommendation, UPDATE_INVESTMENT_RECOMMENDATION));
+                _lstActivityDescription.Add(new KeyValuePair<ActivityType, string>(ActivityType.UpdateInvestmentRecommendation, DELETE_INVESTMENT_RECOMMENDATION));
+
             }
         }
 

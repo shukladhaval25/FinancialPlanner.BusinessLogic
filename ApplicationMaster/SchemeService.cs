@@ -24,9 +24,9 @@ namespace FinancialPlanner.BusinessLogic.ApplicationMaster
             
            // "SELECT C1.*,U.USERNAME AS UPDATEDBYUSERNAME FROM Scheme C1, USERS U WHERE C1.UPDATEDBY = U.ID";
 
-        private const string INSERT_QUERY = "INSERT INTO Scheme VALUES ({0},'{1}','{2}',{3},'{4}',{5},{6})";
+        private const string INSERT_QUERY = "INSERT INTO Scheme VALUES ({0},'{1}','{2}',{3},'{4}',{5},{6},'{7}')";
         private const string UPDATE_QUERY = "UPDATE Scheme SET NAME ='{0}',[UpdatedOn] = '{1}', [UpdatedBy] = {2}, " +
-            "AMCId = {3},categoryId = {5} WHERE ID = {4}";
+            "AMCId = {3},categoryId = {5},ChequeInFavourOff ='{6}' WHERE ID = {4}";
 
         private const string DELETE_BY_ID = "DELETE FROM Scheme WHERE ID ='{0}'";
 
@@ -113,7 +113,8 @@ namespace FinancialPlanner.BusinessLogic.ApplicationMaster
                    Scheme.Name,
                    Scheme.CreatedOn.ToString("yyyy-MM-dd hh:mm:ss"), Scheme.CreatedBy,
                    Scheme.UpdatedOn.ToString("yyyy-MM-dd hh:mm:ss"), Scheme.UpdatedBy,
-                   Scheme.CategoryId));
+                   Scheme.CategoryId,
+                   Scheme.ChequeInFavourOff));
 
                 Activity.ActivitiesService.Add(ActivityType.CreateScheme, EntryStatus.Success,
                          Source.Server, Scheme.UpdatedByUserName, Scheme.Name, Scheme.MachineName);
@@ -139,7 +140,8 @@ namespace FinancialPlanner.BusinessLogic.ApplicationMaster
                    Scheme.UpdatedOn.ToString("yyyy-MM-dd hh:mm:ss"), Scheme.UpdatedBy,
                    Scheme.AmcId,
                    Scheme.Id,
-                   Scheme.CategoryId));
+                   Scheme.CategoryId,
+                   Scheme.ChequeInFavourOff));
 
                 Activity.ActivitiesService.Add(ActivityType.UpdateScheme, EntryStatus.Success,
                          Source.Server, Scheme.UpdatedByUserName, Scheme.Name, Scheme.MachineName);
@@ -195,6 +197,7 @@ namespace FinancialPlanner.BusinessLogic.ApplicationMaster
             Scheme.CreatedOn = dr.Field<DateTime>("CreatedOn");
             Scheme.UpdatedByUserName = dr.Field<string>("UpdatedByUserName");
             Scheme.CategoryId = (dr["CategoryId"] == DBNull.Value) ? 0 : dr.Field<int>("CategoryId");
+            Scheme.ChequeInFavourOff = dr.Field<string>("ChequeInFavourOff");
             return Scheme;
         }
     }

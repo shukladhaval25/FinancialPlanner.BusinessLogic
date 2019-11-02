@@ -15,6 +15,7 @@ namespace FinancialPlanner.BusinessLogic.ApplicationMaster
     public class SchemeCategoryService
     {
         private const string SELECT_ALL =  "SELECT C1.*,U.USERNAME AS UPDATEDBYUSERNAME FROM SchemeCategory C1, USERS U WHERE C1.UPDATEDBY = U.ID";
+        private const string SELECT_BY_ID = "SELECT C1.*,U.USERNAME AS UPDATEDBYUSERNAME FROM SchemeCategory C1, USERS U WHERE C1.UPDATEDBY = U.ID AND C1.ID = {0}";
         private const string INSERT_QUERY = "INSERT INTO SchemeCategory VALUES ('{0}','{1}',{2},'{3}',{4})";
 
         private const string DELETE_BY_ID = "DELETE FROM SchemeCategory WHERE NAME ='{0}'";
@@ -33,6 +34,31 @@ namespace FinancialPlanner.BusinessLogic.ApplicationMaster
                 }
                 Logger.LogInfo("Get: Scheme category process completed.");
                 return schemeCategories;
+            }
+            catch (Exception ex)
+            {
+                StackTrace st = new StackTrace();
+                StackFrame sf = st.GetFrame(0);
+                MethodBase currentMethodName = sf.GetMethod();
+                LogDebug(currentMethodName.Name, ex);
+                return null;
+            }
+        }
+
+        public SchemeCategory Get(int id)
+        {
+            try
+            {
+                Logger.LogInfo("Get: Scheme category process start");
+                SchemeCategory schemeCategory = new SchemeCategory();
+
+                DataTable dtAppConfig = DataBase.DBService.ExecuteCommand(string.Format(SELECT_BY_ID,id));
+                foreach (DataRow dr in dtAppConfig.Rows)
+                {
+                    schemeCategory = convertToSchemeCategory(dr);
+                }
+                Logger.LogInfo("Get: Scheme category process completed.");
+                return schemeCategory;
             }
             catch (Exception ex)
             {
