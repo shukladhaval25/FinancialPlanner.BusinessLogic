@@ -2,10 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using FinancialPlanner.Common;
 using FinancialPlanner.Common.Model;
 
@@ -20,7 +17,7 @@ namespace FinancialPlanner.BusinessLogic.Plans
             "LumsumInvestmentRecomendation.ChequeInFavourOff, LumsumInvestmentRecomendation.CreatedOn, " +
             "LumsumInvestmentRecomendation.CreatedBy, LumsumInvestmentRecomendation.UpdatedOn, " +
             "LumsumInvestmentRecomendation.UpdatedBy, " +
-            "Scheme.Name AS SchemeName, SchemeCategory.Name AS Category, Users.UserName " +
+            "Scheme.Name AS SchemeName,Scheme.Type, SchemeCategory.Name AS Category, Users.UserName " +
             "FROM SchemeCategory INNER JOIN " +
             "Scheme ON SchemeCategory.Id = Scheme.CategoryId INNER JOIN " +
             "LumsumInvestmentRecomendation INNER JOIN " +
@@ -30,6 +27,7 @@ namespace FinancialPlanner.BusinessLogic.Plans
         const string INSERT_LUMSUM = "INSERT INTO[dbo].[LumsumInvestmentRecomendation] " +
             "([PId],[SchemeId],[Amount],[ChequeInFavourOff],[FirstHolder],[SecondHolder],[CreatedOn],[CreatedBy],[UpdatedOn],[UpdatedBy]) " +
             "VALUES ({0},{1},{2},'{3}','{4}','{5}','{6}',{7},'{8}',{9})";
+        const string DELETE_QUERY = "DELETE FROM LUMSUMINVESTMENTRECOMENDATION WHERE PID = {0} AND SCHEMEID = {1} AND AMOUNT ={2}";
 
         public IList<LumsumInvestmentRecomendation> GetAll(int plannerId)
         {
@@ -59,8 +57,6 @@ namespace FinancialPlanner.BusinessLogic.Plans
         {
             try
             {
-                //string clientName = DataBase.DBService.ExecuteCommandScalar(string.Format(GET_CLIENT_NAME_QUERY, lumsumInvestmentRecomendation.Pid));
-
                 DataBase.DBService.ExecuteCommand(string.Format(INSERT_LUMSUM,
                    lumsumInvestmentRecomendation.Pid, 
                    lumsumInvestmentRecomendation.SchemeId,
@@ -86,6 +82,29 @@ namespace FinancialPlanner.BusinessLogic.Plans
             }
         }
 
+        public void Delete(LumsumInvestmentRecomendation lumsumInvestmentRecomendation)
+        {
+            try
+            {
+                string clientName = DataBase.DBService.ExecuteCommandScalar(string.Format(GET_CLIENT_NAME_QUERY, lumsumInvestmentRecomendation.Pid));
+
+                DataBase.DBService.ExecuteCommand(string.Format(DELETE_QUERY,
+                  lumsumInvestmentRecomendation.Pid,lumsumInvestmentRecomendation.SchemeId,lumsumInvestmentRecomendation.Amount));
+                
+                Activity.ActivitiesService.Add(ActivityType.DeleteInvestmentRecommendation, EntryStatus.Success,
+                         Source.Server, lumsumInvestmentRecomendation.UpdatedByUserName, lumsumInvestmentRecomendation.SchemeName,
+                         lumsumInvestmentRecomendation.MachineName);
+            }
+            catch (Exception ex)
+            {
+                StackTrace st = new StackTrace();
+                StackFrame sf = st.GetFrame(0);
+                MethodBase currentMethodName = sf.GetMethod();
+                LogDebug(currentMethodName.Name, ex);
+                throw ex;
+            }
+        }
+
         private LumsumInvestmentRecomendation convertToLumsumInvestmentRecomendationObject(DataRow dr)
         {
             LumsumInvestmentRecomendation lumsumInvestmentRecomendation = new LumsumInvestmentRecomendation();
@@ -97,6 +116,7 @@ namespace FinancialPlanner.BusinessLogic.Plans
             lumsumInvestmentRecomendation.ChequeInFavourOff = dr.Field<string>("ChequeInfavourOff");
             lumsumInvestmentRecomendation.FirstHolder = dr.Field<string>("FirstHolder");
             lumsumInvestmentRecomendation.SecondHolder = dr.Field<string>("SecondHolder");
+            lumsumInvestmentRecomendation.Type = dr.Field<string>("Type");
             return lumsumInvestmentRecomendation;
         }
 

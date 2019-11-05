@@ -128,6 +128,8 @@
     <Compile Include="PlanOption\CurrentStatusToGoalService.cs" />
     <Compile Include="PlanOption\InvestmentRecommendationService.cs" />
     <Compile Include="PlanOption\PlanOptionService.cs" />
+    <Compile Include="PlanOption\SIPTypeInvestmentRecomendationService.cs" />
+    <Compile Include="PlanOption\STPInvestmentRecomendationService.cs" />
     <Compile Include="Plans\AssumptionMasterService.cs" />
     <Compile Include="Plans\DocumentService.cs" />
     <Compile Include="Plans\ExpensesSesrvice.cs" />
