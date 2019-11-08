@@ -148,6 +148,11 @@
     <Compile Include="ProspectClients\ProspectClientConversationService.cs" />
     <Compile Include="ProspectClients\ProspectClientService.cs" />
     <Compile Include="TaskManagements\AdditionalPurchaseServiceImpl.cs" />
+    <Compile Include="TaskManagements\BankChangeRequestService.cs" />
+    <Compile Include="TaskManagements\AddressChangeServiceImpl.cs" />
+    <Compile Include="TaskManagements\TransmissionAfterDeathServiceImpl.cs" />
+    <Compile Include="TaskManagements\PANCardUpdateServiceImpl.cs" />
+    <Compile Include="TaskManagements\ContactUpdateServiceImpl.cs" />
     <Compile Include="TaskManagements\FreshPurchaseTransactionServiceImpl.cs" />
     <Compile Include="TaskManagements\ITransactionTypeService.cs" />
     <Compile Include="TaskManagements\SIPCancellationTransactionServiceImpl.cs" />

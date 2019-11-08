@@ -42,6 +42,21 @@ namespace FinancialPlanner.BusinessLogic.TaskManagements
                 case "SIP Cancellation":
                     transactionTypeService = new SIPCancellationTransactionServiceImpl();
                     break;
+                case "Bank Change Request":
+                    transactionTypeService = new BankChangeRequestService();
+                    break;
+                case "Contact Update":
+                    transactionTypeService = new ContactUpdateServiceImpl();
+                    break;
+                case "PAN Card Update":
+                    transactionTypeService = new PANCardUpdateServiceImpl();
+                    break;
+                case "Address Change":
+                    transactionTypeService = new AddressChangeServiceImpl();
+                    break;
+                case "Transmission After Death":
+                    transactionTypeService = new TransmissionAfterDeathServiceImpl();
+                    break;
                 default:
                     transactionTypeService = null;
                     break;

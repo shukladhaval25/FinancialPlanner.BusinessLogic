@@ -15,10 +15,11 @@ namespace FinancialPlanner.BusinessLogic.Clients
         private const string SELECT_ALL_BY_CLIENT_ID = "SELECT C1.*,U.USERNAME AS UPDATEDBYUSERNAME FROM BankAccount C1, USERS U WHERE C1.UPDATEDBY = U.ID and C1.CID = {0}";
         private const string SELECT_ALL_BY_CLIENT_ID_AND_ID = "SELECT C1.*,U.USERNAME AS UPDATEDBYUSERNAME FROM BankAccount C1, USERS U WHERE C1.UPDATEDBY = U.ID and C1.ID = {0} AND C1.CID = {1}";
 
-        private const string INSERT_QUERY = "INSERT INTO BankAccount VALUES ({0},{1},'{2}','{3}','{4}','{5}','{6}','{7}','{8}',{9},'{10}',{11},'{12}',{13})";
+        private const string INSERT_QUERY = "INSERT INTO BankAccount VALUES ({0},{1},'{2}','{3}','{4}','{5}','{6}','{7}','{8}',{9},'{10}',{11},'{12}',{13},{14})";
         private const string UPDATE_QUERY = "UPDATE BankAccount SET ACCOUNTHOLDERID ={0}, BANKNAME = '{1}'," +
             "ACCOUNTNO ='{2}',ACCOUNTTYPE ='{3}',ADDRESS ='{4}',CONTACTNO ='{5}', ISJOINACCOUNT = '{6}'," +
-            "JOINHOLDERNAME = '{7}',MINREQUIREBALANCE = {8}, UPDATEDON ='{9}',UPDATEDBY ={10} WHERE CID ={11} AND ID ={12}";
+            "JOINHOLDERNAME = '{7}',MINREQUIREBALANCE = {8}, UPDATEDON ='{9}',UPDATEDBY ={10}," +
+            "BANKID = {13} WHERE CID ={11} AND ID ={12}";
 
         private const string DELETE_BY_ID = "DELETE FROM BankAccount WHERE ID ={0}";
 
@@ -86,7 +87,8 @@ namespace FinancialPlanner.BusinessLogic.Clients
                    BankAccount.IsJoinAccount, BankAccount.JoinHolderName,
                    BankAccount.MinRequireBalance,
                    BankAccount.CreatedOn.ToString("yyyy-MM-dd hh:mm:ss"), BankAccount.CreatedBy,
-                   BankAccount.UpdatedOn.ToString("yyyy-MM-dd hh:mm:ss"), BankAccount.UpdatedBy));
+                   BankAccount.UpdatedOn.ToString("yyyy-MM-dd hh:mm:ss"), BankAccount.UpdatedBy,
+                   BankAccount.BankId));
 
                 Activity.ActivitiesService.Add(ActivityType.CreateBankAccount, EntryStatus.Success,
                          Source.Server, BankAccount.UpdatedByUserName, BankAccount.AccountNo, BankAccount.MachineName);
@@ -111,7 +113,7 @@ namespace FinancialPlanner.BusinessLogic.Clients
                    BankAccount.IsJoinAccount,BankAccount.JoinHolderName,
                    BankAccount.MinRequireBalance,
                    BankAccount.UpdatedOn.ToString("yyyy-MM-dd hh:mm:ss"),
-                   BankAccount.UpdatedBy, BankAccount.Cid, BankAccount.Id));
+                   BankAccount.UpdatedBy, BankAccount.Cid, BankAccount.Id,BankAccount.BankId));
 
                 Activity.ActivitiesService.Add(ActivityType.UpdateBankAccount, EntryStatus.Success,
                          Source.Server, BankAccount.UpdatedByUserName, BankAccount.AccountNo, BankAccount.MachineName);
@@ -167,6 +169,7 @@ namespace FinancialPlanner.BusinessLogic.Clients
             BankAccount.IsJoinAccount = dr.Field<bool>("IsJoinAccount");
             BankAccount.JoinHolderName = dr.Field<string>("JoinHolderName");
             BankAccount.MinRequireBalance = double.Parse(dr["MinRequireBalance"].ToString());
+            BankAccount.BankId = dr.Field<int>("BankId");
             return BankAccount;
         }
     }

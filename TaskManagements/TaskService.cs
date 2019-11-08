@@ -146,10 +146,10 @@ namespace FinancialPlanner.BusinessLogic.TaskManagements
                     taskCard.Owner,
                     taskCard.AssignTo,
                     taskCard.CompletedPercentage,                    
-                    taskCard.UpdatedOn,
+                    taskCard.UpdatedOn.ToString("yyyy-MM-dd hh:mm:ss"),
                     taskCard.UpdatedBy,
-                    taskCard.DueDate,
-                    taskCard.DueDate,taskCard.Id), true);
+                    taskCard.DueDate.ToString("yyyy-MM-dd hh:mm:ss"),
+                    taskCard.DueDate.ToString("yyyy-MM-dd hh:mm:ss"), taskCard.Id), true);
 
                 if (taskCard.ProjectId == 1)
                 {
@@ -307,12 +307,12 @@ namespace FinancialPlanner.BusinessLogic.TaskManagements
                     taskcard.Owner,
                     taskcard.AssignTo,
                     taskcard.CompletedPercentage,
-                    taskcard.CreatedOn,
+                    taskcard.CreatedOn.ToString("yyyy-MM-dd hh:mm:ss"),
                     taskcard.CreatedBy,
-                    taskcard.UpdatedOn,
+                    taskcard.UpdatedOn.ToString("yyyy-MM-dd hh:mm:ss"),
                     taskcard.UpdatedBy,
-                    taskcard.DueDate,
-                    taskcard.DueDate));
+                    taskcard.DueDate.ToString("yyyy-MM-dd hh:mm:ss"),
+                    taskcard.DueDate.ToString("yyyy-MM-dd hh:mm:ss")));
 
                 //'{0}',{ 1},'{2}',{ 3},{ 4},'{5}','{6}',{ 7},{ 8},{ 9},{ 10},{ 11},'{12}',{ 13},'{14}',{ 15},'{16}','{17}'
                 //DataBase.DBService.ExecuteCommandString("Insert into TASKCARD values ('" + taskcard.TaskId + "'," +
