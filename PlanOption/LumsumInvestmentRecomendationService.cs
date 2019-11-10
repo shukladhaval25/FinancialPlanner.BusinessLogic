@@ -17,12 +17,14 @@ namespace FinancialPlanner.BusinessLogic.Plans
             "LumsumInvestmentRecomendation.ChequeInFavourOff, LumsumInvestmentRecomendation.CreatedOn, " +
             "LumsumInvestmentRecomendation.CreatedBy, LumsumInvestmentRecomendation.UpdatedOn, " +
             "LumsumInvestmentRecomendation.UpdatedBy, " +
-            "Scheme.Name AS SchemeName,Scheme.Type, SchemeCategory.Name AS Category, Users.UserName " +
+            "Scheme.Name AS SchemeName,Scheme.Type, SchemeCategory.Name AS Category, Users.UserName, " +
+            "AMC.Name AS AMC " +
             "FROM SchemeCategory INNER JOIN " +
             "Scheme ON SchemeCategory.Id = Scheme.CategoryId INNER JOIN " +
             "LumsumInvestmentRecomendation INNER JOIN " +
-            "Users ON LumsumInvestmentRecomendation.UpdatedBy = Users.ID " +
-            "ON Scheme.Id = LumsumInvestmentRecomendation.SchemeId WHERE (LumsumInvestmentRecomendation.PId = {0})";
+            "Users ON LumsumInvestmentRecomendation.UpdatedBy = Users.ID ON Scheme.Id = LumsumInvestmentRecomendation.SchemeId INNER JOIN " +
+            "AMC ON Scheme.AMCId = AMC.Id " +
+            "WHERE (LumsumInvestmentRecomendation.PId = {0})";
 
         const string INSERT_LUMSUM = "INSERT INTO[dbo].[LumsumInvestmentRecomendation] " +
             "([PId],[SchemeId],[Amount],[ChequeInFavourOff],[FirstHolder],[SecondHolder],[CreatedOn],[CreatedBy],[UpdatedOn],[UpdatedBy]) " +
@@ -117,6 +119,7 @@ namespace FinancialPlanner.BusinessLogic.Plans
             lumsumInvestmentRecomendation.FirstHolder = dr.Field<string>("FirstHolder");
             lumsumInvestmentRecomendation.SecondHolder = dr.Field<string>("SecondHolder");
             lumsumInvestmentRecomendation.Type = dr.Field<string>("Type");
+            lumsumInvestmentRecomendation.AMC = dr.Field<string>("AMC");
             return lumsumInvestmentRecomendation;
         }
 

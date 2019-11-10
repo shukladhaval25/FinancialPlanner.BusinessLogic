@@ -23,7 +23,7 @@ namespace FinancialPlanner.BusinessLogic.Clients
         private const string SELECT_ID = "SELECT C1.*,U.USERNAME AS UPDATEDBYUSERNAME FROM CLIENT C1, USERS U WHERE C1.UPDATEDBY = U.ID and C1.ID = {0} AND C1.ISDELETED = 0";
         private const string SELECT_WITH_OTHER_VALUES = "SELECT C1.*, U.USERNAME AS UPDATEDBYUSERNAME FROM CLIENT C1, USERS U WHERE C1.UPDATEDBY = U.ID and " +
             "C1.NAME = '{0}' AND C1.PAN ='{1}'  AND C1.ISDELETED = 0";
-
+        
         private const string UPDATE_QUERY = "UPDATE CLIENT SET  NAME = '{0}'," +
                 "FATHERNAME = '{1}', MOTHERNAME = '{2}',GENDER ='{3}',DOB ='{4}',PAN ='{5}', AADHAR = '{6}'," +
                 "PLACEOFBIRTH ='{7}',Married ='{8}',MARRIAGEANNIVERSARY ='{9}', Occupation = '{10}'," +
@@ -31,6 +31,14 @@ namespace FinancialPlanner.BusinessLogic.Clients
                 "RATING ='{15}', CLIENTTYPE ='{16}',RESISTATUS ='{17}'  WHERE ID= {18}";
         private const string DELETE_QUERY = "UPDATE CLIENT SET ISDELETED = 1, " +
             "UPDATEDON = '{0}', UPDATEDBY = {1} WHERE ID = {2}";
+
+        #region "Client ARN"
+        private const string SELECT_ARN = "SELECT ClientARN.*, ARN.ARNNumber, ARN.Name FROM ClientARN INNER JOIN" +
+                         " ARN ON ClientARN.ARNId = ARN.Id where clientARN.CId = {0}";
+        private const string UPDATE_ARN = "UPDATE [ClientARN] SET[CId] = {0}, [ARNId] = {1} WHERE CId = {0}";
+        private const string INSERT_ARN = "INSERT INTO [dbo].[ClientARN] ([CId],[ARNId]) VALUES ({0},{1})";
+        private const string DELETE_ARN = "DELETE FROM CLIENTARN WHERE CID = {0}";
+        #endregion
 
         public IList<Client> Get()
         {
@@ -260,5 +268,82 @@ namespace FinancialPlanner.BusinessLogic.Clients
             }
             return null;
         }
+
+        #region "Client ARN"
+
+        public ClientARN GetARN(int cid)
+        {
+            ClientARN clientARN = new ClientARN();
+
+            DataTable dtAppConfig = DataBase.DBService.ExecuteCommand(string.Format(SELECT_ARN, cid));
+            foreach (DataRow dr in dtAppConfig.Rows)
+            {
+                clientARN = convertToClientARNObject(dr);
+            }
+            return clientARN;
+        }
+
+        private ClientARN convertToClientARNObject(DataRow dr)
+        {
+            ClientARN clientARN = new ClientARN();
+            clientARN.Id = dr.Field<int>("Id");
+            clientARN.Cid = dr.Field<int>("CId");
+            clientARN.ARNId = dr.Field<int>("ARNId");
+            clientARN.ARNName = dr.Field<string>("Name");
+            clientARN.ArnNumber = dr.Field<string>("ARNNumber");
+            return clientARN;
+        }
+
+        public void UpdateARN(ClientARN clientARN)
+        {
+            try
+            {
+                DataBase.DBService.ExecuteCommandString(string.Format(UPDATE_ARN,
+                            clientARN.Cid, clientARN.ARNId));
+            }
+            catch (Exception ex)
+            {
+                StackTrace st = new StackTrace();
+                StackFrame sf = st.GetFrame(0);
+                MethodBase currentMethodName = sf.GetMethod();
+                LogDebug(currentMethodName.Name, ex);
+                throw ex;
+            }
+        }
+
+        public void InsertARN(ClientARN clientARN)
+        {
+            try
+            {
+                DataBase.DBService.ExecuteCommandString(string.Format(INSERT_ARN,
+                            clientARN.Cid, clientARN.ARNId));
+            }
+            catch (Exception ex)
+            {
+                StackTrace st = new StackTrace();
+                StackFrame sf = st.GetFrame(0);
+                MethodBase currentMethodName = sf.GetMethod();
+                LogDebug(currentMethodName.Name, ex);
+                throw ex;
+            }
+        }
+
+        public void DeleteARN(ClientARN clientARN)
+        {
+            try
+            {
+                DataBase.DBService.ExecuteCommandString(string.Format(DELETE_ARN,
+                            clientARN.Cid));
+            }
+            catch (Exception ex)
+            {
+                StackTrace st = new StackTrace();
+                StackFrame sf = st.GetFrame(0);
+                MethodBase currentMethodName = sf.GetMethod();
+                LogDebug(currentMethodName.Name, ex);
+                throw ex;
+            }
+        }
+        #endregion
     }
 }
