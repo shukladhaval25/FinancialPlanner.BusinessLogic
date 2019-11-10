@@ -57,6 +57,9 @@ namespace FinancialPlanner.BusinessLogic.TaskManagements
                 case "Transmission After Death":
                     transactionTypeService = new TransmissionAfterDeathServiceImpl();
                     break;
+                case "Signature Change":
+                    transactionTypeService = new SignatureChangeServiceImpl();
+                    break;
                 default:
                     transactionTypeService = null;
                     break;
