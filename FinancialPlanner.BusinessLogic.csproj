@@ -150,6 +150,7 @@
     <Compile Include="TaskManagements\AdditionalPurchaseServiceImpl.cs" />
     <Compile Include="TaskManagements\BankChangeRequestService.cs" />
     <Compile Include="TaskManagements\AddressChangeServiceImpl.cs" />
+    <Compile Include="TaskManagements\SIPBankChangeServiceImpl.cs" />
     <Compile Include="TaskManagements\SignatureChangeServiceImpl.cs" />
     <Compile Include="TaskManagements\TransmissionAfterDeathServiceImpl.cs" />
     <Compile Include="TaskManagements\PANCardUpdateServiceImpl.cs" />

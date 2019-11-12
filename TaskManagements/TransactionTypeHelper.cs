@@ -60,6 +60,9 @@ namespace FinancialPlanner.BusinessLogic.TaskManagements
                 case "Signature Change":
                     transactionTypeService = new SignatureChangeServiceImpl();
                     break;
+                case "SIP Bank Change":
+                    transactionTypeService = new SIPBankChangeServiceImpl();
+                    break;
                 default:
                     transactionTypeService = null;
                     break;
