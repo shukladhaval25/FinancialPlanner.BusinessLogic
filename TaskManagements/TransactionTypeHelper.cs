@@ -63,6 +63,12 @@ namespace FinancialPlanner.BusinessLogic.TaskManagements
                 case "SIP Bank Change":
                     transactionTypeService = new SIPBankChangeServiceImpl();
                     break;
+                case "Minor To Major":
+                    transactionTypeService = new MinorToMajorServiceImpl();
+                    break;
+                case "Change of Name":
+                    transactionTypeService = new ChangeOfNameServiceImpl();
+                    break;
                 default:
                     transactionTypeService = null;
                     break;
