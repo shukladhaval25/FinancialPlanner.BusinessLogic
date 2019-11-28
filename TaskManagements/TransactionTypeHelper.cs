@@ -69,6 +69,9 @@ namespace FinancialPlanner.BusinessLogic.TaskManagements
                 case "Change of Name":
                     transactionTypeService = new ChangeOfNameServiceImpl();
                     break;
+                case "Nomination":
+                    transactionTypeService = new NominationServiceImpl();
+                    break;
                 default:
                     transactionTypeService = null;
                     break;

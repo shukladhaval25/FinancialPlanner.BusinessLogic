@@ -149,11 +149,13 @@
     <Compile Include="ProspectClients\ProspectClientService.cs" />
     <Compile Include="TaskManagements\AdditionalPurchaseServiceImpl.cs" />
     <Compile Include="TaskManagements\ChangeOfNameServiceImpl.cs" />
+    <Compile Include="TaskManagements\NominationServiceImpl.cs" />
     <Compile Include="TaskManagements\MinorToMajorServiceImpl.cs" />
     <Compile Include="TaskManagements\BankChangeRequestService.cs" />
     <Compile Include="TaskManagements\AddressChangeServiceImpl.cs" />
     <Compile Include="TaskManagements\SIPBankChangeServiceImpl.cs" />
     <Compile Include="TaskManagements\SignatureChangeServiceImpl.cs" />
+    <Compile Include="TaskManagements\TaskHistoryService.cs" />
     <Compile Include="TaskManagements\TransmissionAfterDeathServiceImpl.cs" />
     <Compile Include="TaskManagements\PANCardUpdateServiceImpl.cs" />
     <Compile Include="TaskManagements\ContactUpdateServiceImpl.cs" />

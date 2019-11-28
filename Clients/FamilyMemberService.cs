@@ -18,8 +18,8 @@ namespace FinancialPlanner.BusinessLogic.Clients
         private const string SELECT_ALL_BY_CLIENT_ID_AND_ID = "SELECT C1.*,U.USERNAME AS UPDATEDBYUSERNAME FROM CLIENTFAMILYMEMBER C1, USERS U WHERE C1.UPDATEDBY = U.ID and C1.ID = {0} AND C1.CID = {1}";
 
         private const string INSERT_QUERY = "INSERT INTO CLIENTFAMILYMEMBER VALUES " + 
-            "({0},'{1}','{2}','{3}','{4}','{5}','{6}','{7}',{8},'{9}',{10},'{11}','{12}','{13}')";
-        private const string UPDATE_QUERY = "UPDATE CLIENTFAMILYMEMBER SET NAME ='{0}',RELATIONSHIP ='{1}',DOB ='{2}'," +
+            "({0},'{1}','{2}',{3},'{4}','{5}','{6}','{7}',{8},'{9}',{10},'{11}','{12}','{13}')";
+        private const string UPDATE_QUERY = "UPDATE CLIENTFAMILYMEMBER SET NAME ='{0}',RELATIONSHIP ='{1}',DOB = {2}," +
             "ISDEPENDENT ='{3}',CHILDRENCLASS ='{4}',Description='{5}',UPDATEDON ='{6}', " + 
             "UPDATEDBY ={7}, PAN ='{10}',AADHAR ='{11}',OCCUPATION='{12}' WHERE CID ={8} AND ID ={9}";
 
@@ -84,7 +84,8 @@ namespace FinancialPlanner.BusinessLogic.Clients
 
                 DataBase.DBService.ExecuteCommand(string.Format(INSERT_QUERY,
                    familyMember.Cid,familyMember.Name, familyMember.Relationship,
-                   familyMember.DOB.ToString("yyyy-MM-dd"), familyMember.IsDependent, familyMember.ChildrenClass,
+                   familyMember.DOB.HasValue ? "'" + familyMember.DOB.Value.ToString("yyyy-MM-dd") + "'" : "null",
+                   familyMember.IsDependent, familyMember.ChildrenClass,
                    familyMember.Description,
                    familyMember.CreatedOn.ToString("yyyy-MM-dd hh:mm:ss"), familyMember.CreatedBy,
                    familyMember.UpdatedOn.ToString("yyyy-MM-dd hh:mm:ss"), familyMember.UpdatedBy,
@@ -108,7 +109,8 @@ namespace FinancialPlanner.BusinessLogic.Clients
             {
                 DataBase.DBService.ExecuteCommand(string.Format(UPDATE_QUERY,
                    familyMember.Name, familyMember.Relationship,
-                   familyMember.DOB.ToString("yyyy-MM-dd"), familyMember.IsDependent,
+                   familyMember.DOB.HasValue ? "'" + familyMember.DOB.Value.ToString("yyyy-MM-dd") + "'" : "null", 
+                   familyMember.IsDependent,
                    familyMember.ChildrenClass, familyMember.Description,
                    familyMember.UpdatedOn.ToString("yyyy-MM-dd hh:mm:ss"), 
                    familyMember.UpdatedBy,familyMember.Cid,familyMember.Id,
@@ -162,7 +164,7 @@ namespace FinancialPlanner.BusinessLogic.Clients
             familymember.Cid = dr.Field<int>("CID");
             familymember.Name = dr.Field<string>("Name");
             familymember.Relationship = dr.Field<string>("Relationship");
-            familymember.DOB = dr.Field<DateTime>("DOB");
+            familymember.DOB = dr.Field<DateTime?>("DOB");
             familymember.IsDependent = dr.Field<bool>("IsDependent");
             familymember.ChildrenClass = dr.Field<string>("ChildrenClass");
             familymember.Description = dr.Field<string>("Description");

@@ -19,10 +19,10 @@ namespace FinancialPlanner.BusinessLogic.ApplicationMaster
         private const string SELECT_BANK_BY_ID = "SELECT C1.*,U.USERNAME AS UPDATEDBYUSERNAME FROM Bank C1, USERS U WHERE C1.UPDATEDBY = U.ID AND C1.ID = {0}";
 
         private const string INSERT_QUERY = "INSERT INTO Bank VALUES ('{0}','{1}','{2}','{3}','{4}',{5},'{6}'," + 
-            "'{7}','{8}',{9},'{10}',{11})";
+            "'{7}','{8}',{9},'{10}',{11},'{12}')";
         private const string UPDATE_QUERY = "UPDATE Bank SET NAME ='{0}',Branch = '{1}', "+
             "[Address] = '{2}', [City] = '{3}',[State] ='{4}', [Pincode] = {5}, IFSC ='{6}', MICR ='{7}'," +
-            "[UpdatedOn] ='{8}', [UpdatedBy] = {9} WHERE ID = {10}";
+            "[UpdatedOn] ='{8}', [UpdatedBy] = {9},[Country] ='{11}' WHERE ID = {10}";
 
         private const string DELETE_BY_ID = "DELETE FROM Bank WHERE ID ='{0}'";
 
@@ -95,7 +95,8 @@ namespace FinancialPlanner.BusinessLogic.ApplicationMaster
                         bank.IFSC,
                         bank.MICR,
                         bank.CreatedOn.ToString("yyyy-MM-dd hh:mm:ss"), bank.CreatedBy,
-                        bank.UpdatedOn.ToString("yyyy-MM-dd hh:mm:ss"), bank.UpdatedBy));
+                        bank.UpdatedOn.ToString("yyyy-MM-dd hh:mm:ss"), bank.UpdatedBy,
+                        bank.Country));
                 }
                 else { 
                 DataBase.DBService.ExecuteCommand(string.Format(INSERT_QUERY,
@@ -108,7 +109,8 @@ namespace FinancialPlanner.BusinessLogic.ApplicationMaster
                    bank.IFSC,
                    bank.MICR,
                    bank.CreatedOn.ToString("yyyy-MM-dd hh:mm:ss"), bank.CreatedBy,
-                   bank.UpdatedOn.ToString("yyyy-MM-dd hh:mm:ss"), bank.UpdatedBy));
+                   bank.UpdatedOn.ToString("yyyy-MM-dd hh:mm:ss"), bank.UpdatedBy,
+                   bank.Country));
                 }
                 //Activity.ActivitiesService.Add(ActivityType.CreateBank, EntryStatus.Success,
                 //         Source.Server, bank.UpdatedByUserName, bank.Name, bank.MachineName);
@@ -135,11 +137,12 @@ namespace FinancialPlanner.BusinessLogic.ApplicationMaster
                    bank.Address,
                    bank.City,
                    bank.State,
-                   bank.Pincode,
+                   bank.Pincode.HasValue ? bank.Pincode :  0,
                    bank.IFSC,
                    bank.MICR,
                    bank.UpdatedOn.ToString("yyyy-MM-dd hh:mm:ss"), bank.UpdatedBy,
-                   bank.Id));
+                   bank.Id,
+                   bank.Country));
 
                 //Activity.ActivitiesService.Add(ActivityType.UpdateBank, EntryStatus.Success,
                 //         Source.Server, bank.UpdatedByUserName, bank.Name, bank.MachineName);
@@ -199,6 +202,7 @@ namespace FinancialPlanner.BusinessLogic.ApplicationMaster
             bank.CreatedBy = dr.Field<int>("CreatedBy");
             bank.CreatedOn = dr.Field<DateTime>("CreatedOn");
             bank.UpdatedByUserName = dr.Field<string>("UpdatedByUserName");
+            bank.Country = dr.Field<string>("Country");
             return bank;
         }
     }
