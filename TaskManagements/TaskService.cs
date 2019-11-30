@@ -54,12 +54,14 @@ namespace FinancialPlanner.BusinessLogic.TaskManagements
             "FROM Users INNER JOIN TaskCard ON Users.ID = TaskCard.Owner INNER JOIN " +
             "TaskProject ON TaskCard.ProjectId = TaskProject.ID WHERE (TaskCard.AssignTo = {0}) AND "+
             "(TaskCard.TaskStatus <> 4 and TaskCard.TaskStatus<> 5)";
-           
+
         private const string SELECT_BY_OVERDUE_TASKSTATUS = "SELECT * FROM [TaskCard] WHERE DUEDATE < {0} AND " +
             "(TaskCard.TaskStatus <> 1 or TaskCard.TaskStatus<> 2 or TaskCard.TaskStatus<> 3)";
 
         private const string SELECT_ID_BY_TASKDETAILS = "SELECT ID FROM TASKCARD WHERE PROJECTID = {0} AND TITLE ='{1}' AND  " +
             "CID ={2} AND CREATEDON ='{3}' AND  ASSIGNTO ={4} AND OWNER = {5} AND TransactionType ='{6}' AND CREATEDBY ={7}";
+
+        
 
         private readonly string INSERT_TASK = "INSERT INTO TASKCARD " +
             " VALUES ('{0}',{1},'{2}',{3},{4},'{5}','{6}',{7},{8},{9},{10},{11},'{12}',{13},'{14}',{15},'{16}','{17}')";
@@ -71,6 +73,33 @@ namespace FinancialPlanner.BusinessLogic.TaskManagements
 
         private readonly string UPDATE_TASKID = "UPDATE TASKCARD SET TASKID ='{0}' WHERE ID ={1}";
         private readonly string DELETE_NOTIFIED_TASK_BY_USER = "DELETE FROM TASKNOTIFICATION WHERE NotifyTo ={0}";
+
+        private readonly string USER_PERFORMANCE_YEARLY_ON_TASK = "SELECT A.AssignTo,Count(A.Id) as CompletedTaskCount," +
+                    "(SELECT ISNULL(Count(B.Id) ,0) AS OVERDUECOUNT FROM " +
+                    "TaskCard B where (B.ActualCompletedOn > B.DueDate) AND(B.ASSIGNTO = {0}) AND " +
+                    "(B.ActualCompletedOn BETWEEN DATEADD(YEAR,-1, GETDATE()) AND GETDATE()) AND " +
+                    "B.TaskStatus NOT IN (3,4,5) AND " +
+                    "(format(A.ActualCompletedOn,'MMM.yyyy') = format(B.ActualCompletedOn,'MMM.yyyy')) " +
+                    "group by AssignTo, format(B.ActualCompletedOn,'MMM.yyyy')) AS OverDueTaskCount, " +
+                "format(A.ActualCompletedOn, 'MMM.yyyy') AS PERIOD FROM TaskCard A " +
+                "where (A.ActualCompletedOn <= A.DueDate) AND(A.ASSIGNTO = {0}) AND " +
+                "A.TaskStatus NOT IN (3,4,5) AND " +
+                "(ACTUALCOMPLETEDON BETWEEN DATEADD(YEAR,-1, GETDATE()) AND GETDATE()) " +
+                "group by AssignTo, format(ActualCompletedOn,'MMM.yyyy')";
+
+        private readonly string COMPANY_PERFORMANCE_YEARLY_ON_TASK = "SELECT 0 as AssignTo,Count(A.Id) as CompletedTaskCount," +
+                    "(SELECT ISNULL(Count(B.Id) ,0) AS OVERDUECOUNT FROM " +
+                    "TaskCard B where (B.ActualCompletedOn > B.DueDate) AND " +
+                    "(B.ActualCompletedOn BETWEEN DATEADD(YEAR,-1, GETDATE()) AND GETDATE()) AND " +
+                    "B.TaskStatus NOT IN (3,4,5) AND " +
+                    "(format(A.ActualCompletedOn,'MMM.yyyy') = format(B.ActualCompletedOn,'MMM.yyyy')) " +
+                    "group by format(B.ActualCompletedOn,'MMM.yyyy')) AS OverDueTaskCount, " +
+                "format(A.ActualCompletedOn, 'MMM.yyyy') AS PERIOD FROM TaskCard A " +
+                "where(A.ActualCompletedOn <= A.DueDate) AND " +
+                "A.TaskStatus NOT IN (3,4,5) AND " +
+                "(ACTUALCOMPLETEDON BETWEEN DATEADD(YEAR,-1, GETDATE()) AND GETDATE()) " +
+                "group by format(ActualCompletedOn,'MMM.yyyy')";
+
 
 
         public IList<TaskCard> GetNotified(int userId)
@@ -265,7 +294,7 @@ namespace FinancialPlanner.BusinessLogic.TaskManagements
         {
             try
             {
-                Logger.LogInfo("Get: Task Card process start");
+                Logger.LogInfo("Get: Overdue task card process start");
                 IList<TaskCard> taskcards =
                     new List<TaskCard>();
 
@@ -275,7 +304,7 @@ namespace FinancialPlanner.BusinessLogic.TaskManagements
                     TaskCard task = convertToTaskCard(dr);
                     taskcards.Add(task);
                 }
-                Logger.LogInfo("Get: Task Card process completed.");
+                Logger.LogInfo("Get: Overdue task card process completed.");
                 return taskcards;
             }
             catch (Exception ex)
@@ -286,6 +315,71 @@ namespace FinancialPlanner.BusinessLogic.TaskManagements
                 LogDebug(currentMethodName.Name, ex);
                 return null;
             }
+        }
+
+
+        public IList<UserPerformanceOnTask> GetUserPerformanceForYear(int userId)
+        {
+            try
+            {
+                Logger.LogInfo("Get: User performance yearly process start");
+                IList<UserPerformanceOnTask> taskcards =
+                    new List<UserPerformanceOnTask>();
+
+                DataTable dtAppConfig = DataBase.DBService.ExecuteCommand(string.Format(USER_PERFORMANCE_YEARLY_ON_TASK, userId));
+                foreach (DataRow dr in dtAppConfig.Rows)
+                {
+                    UserPerformanceOnTask task = convertToUserPerformaceData(dr);
+                    taskcards.Add(task);
+                }
+                Logger.LogInfo("Get: User performance yearly process completed.");
+                return taskcards;
+            }
+            catch (Exception ex)
+            {
+                StackTrace st = new StackTrace();
+                StackFrame sf = st.GetFrame(0);
+                MethodBase currentMethodName = sf.GetMethod();
+                LogDebug(currentMethodName.Name, ex);
+                return null;
+            }
+        }
+
+        public IList<UserPerformanceOnTask> GetCompanyTaskPerformanceForYear()
+        {
+            try
+            {
+                Logger.LogInfo("Get: User performance yearly process start");
+                IList<UserPerformanceOnTask> taskcards =
+                    new List<UserPerformanceOnTask>();
+
+                DataTable dtAppConfig = DataBase.DBService.ExecuteCommand(COMPANY_PERFORMANCE_YEARLY_ON_TASK);
+                foreach (DataRow dr in dtAppConfig.Rows)
+                {
+                    UserPerformanceOnTask task = convertToUserPerformaceData(dr);
+                    taskcards.Add(task);
+                }
+                Logger.LogInfo("Get: User performance yearly process completed.");
+                return taskcards;
+            }
+            catch (Exception ex)
+            {
+                StackTrace st = new StackTrace();
+                StackFrame sf = st.GetFrame(0);
+                MethodBase currentMethodName = sf.GetMethod();
+                LogDebug(currentMethodName.Name, ex);
+                return null;
+            }
+        }
+
+        private UserPerformanceOnTask convertToUserPerformaceData(DataRow dr)
+        {
+            UserPerformanceOnTask userPerformanceOnTask = new UserPerformanceOnTask();
+            userPerformanceOnTask.UserId = dr.Field<int>("AssignTo");
+            userPerformanceOnTask.Period = dr.Field<string>("Period");
+            userPerformanceOnTask.CompletedTaskCount = dr["CompletedTaskCount"] == DBNull.Value ? 0 : dr.Field<int>("CompletedTaskCount");
+            userPerformanceOnTask.OverDueTaskCount = dr["OverDueTaskCount"] == DBNull.Value ? 0 : dr.Field<int>("OverDueTaskCount");
+            return userPerformanceOnTask;
         }
 
         public int Add(TaskCard taskcard)
@@ -313,28 +407,7 @@ namespace FinancialPlanner.BusinessLogic.TaskManagements
                     taskcard.UpdatedBy,
                     taskcard.DueDate.ToString("yyyy-MM-dd hh:mm:ss"),
                     taskcard.DueDate.ToString("yyyy-MM-dd hh:mm:ss")));
-
-                //'{0}',{ 1},'{2}',{ 3},{ 4},'{5}','{6}',{ 7},{ 8},{ 9},{ 10},{ 11},'{12}',{ 13},'{14}',{ 15},'{16}','{17}'
-                //DataBase.DBService.ExecuteCommandString("Insert into TASKCARD values ('" + taskcard.TaskId + "'," +
-                //    taskcard.ProjectId + ",'" +
-                //    taskcard.TransactionType + "'," +
-                //    (int)taskcard.Type + "," +
-                //    taskcard.CustomerId + ",'" +
-                //    taskcard.Title + "','" +
-                //    taskcard.Description + "'," +
-                //    (int)taskcard.Priority + "," +
-                //    (int)taskcard.TaskStatus + "," +
-                //    taskcard.Owner + "," +
-                //    taskcard.AssignTo + "," +
-                //    taskcard.CompletedPercentage + ",'" +
-                //    taskcard.CreatedOn + "'," +
-                //    taskcard.CreatedBy + ",'" +
-                //    taskcard.UpdatedOn + "'," +
-                //    taskcard.UpdatedBy + ",'" +
-                //    taskcard.DueDate + "','" +
-                //    taskcard.DueDate + "')",true);
-
-
+              
                 DataBase.DBService.ExecuteCommandString(string.Format(INSERT_TASK,
                     taskcard.TaskId,
                     taskcard.ProjectId,
