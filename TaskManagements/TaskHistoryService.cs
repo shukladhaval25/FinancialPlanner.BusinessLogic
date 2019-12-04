@@ -14,7 +14,7 @@ namespace FinancialPlanner.BusinessLogic.TaskManagements
     public class TaskHistoryService
     {
         private readonly string SELECT_TASK_HISTORY = "SELECT TH.*, U.UserName FROM[FinancialPlanner].[dbo].[TaskHistory] TH, " +
-            "Users U WHERE TH.UPDATEDBY = U.ID AND TH.TaskId = {0}";
+            "Users U WHERE TH.UPDATEDBY = U.ID AND TH.TaskId = {0} order by UpdatedOn desc";
 
         public object GetAll(int taskId)
         {

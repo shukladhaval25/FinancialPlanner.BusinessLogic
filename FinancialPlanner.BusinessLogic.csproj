@@ -124,6 +124,8 @@
     <Compile Include="Email\EmailService.cs" />
     <Compile Include="LifeInsurance\GeneralInsuranceService.cs" />
     <Compile Include="LifeInsurance\LifeInsuranceService.cs" />
+    <Compile Include="Permissions\FormsService.cs" />
+    <Compile Include="Permissions\RolePermissionService.cs" />
     <Compile Include="PlanOption\CashFlowService.cs" />
     <Compile Include="PlanOption\CurrentStatusToGoalService.cs" />
     <Compile Include="PlanOption\InvestmentRecommendationService.cs" />
