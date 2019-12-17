@@ -20,11 +20,15 @@ namespace FinancialPlanner.BusinessLogic.Permissions
 
         private const string SELECT_ROLE = "SELECT * FROM ROLE";
 
+        private const string SELECT_ROLE_BY_ID = "SELECT * FROM ROLE WHERE ID = {0}";
+
         private const string SELECT_ROLE_BY_NAME = "SELECT ID FROM ROLE WHERE NAME = '{0}'";
 
         private const string INSERT_ROLE = "INSERT INTO[dbo].[Role]" +
            "([Name],[IsCustomRole],[CreatedOn],[CreatedBy],[UpdatedOn],[UpdatedBy]) " +
            "VALUES ('{0}','{1}','{2}',{3},'{4}',{5})";
+
+        
 
         private const string INSERT_ROLE_PERMISSION = "INSERT INTO [dbo].[RolePermission] " +
             "([RoleId],[FormId],[View],[Add],[Update],[Delete]) " +
@@ -142,6 +146,30 @@ namespace FinancialPlanner.BusinessLogic.Permissions
             }            
         }
 
+        public Role Get(int roleId)
+        {
+            try
+            {
+                Logger.LogInfo("Get: Role permission process start");
+                Role role = new Role();
+
+                DataTable dtGoals =  DataBase.DBService.ExecuteCommand(String.Format(SELECT_ROLE_BY_ID,roleId));
+                foreach (DataRow dr in dtGoals.Rows)
+                {
+                    role = convertToRole(dr);
+                }
+                Logger.LogInfo("Get: Role permission process completed.");
+                return role;
+            }
+            catch (Exception ex)
+            {
+                StackTrace st = new StackTrace();
+                StackFrame sf = st.GetFrame(0);
+                MethodBase currentMethodName = sf.GetMethod();
+                LogDebug(currentMethodName.Name, ex);
+                return null;
+            }
+        }
         public async Task<IList<Role>> GetAll()
         {
             try
@@ -152,7 +180,7 @@ namespace FinancialPlanner.BusinessLogic.Permissions
                 DataTable dtGoals = await Task.Run(()=> DataBase.DBService.ExecuteCommand(SELECT_ROLE));
                 foreach (DataRow dr in dtGoals.Rows)
                 {
-                    Role role = await convertToRole(dr);
+                    Role role = convertToRole(dr);
                     roles.Add(role);
                 }
                 Logger.LogInfo("Get: Role permission process completed.");
@@ -168,21 +196,21 @@ namespace FinancialPlanner.BusinessLogic.Permissions
             }
         }
 
-        private async Task<Role> convertToRole(DataRow dr)
+        private Role convertToRole(DataRow dr)
         {
             Role role = new Role();
             role.Id = dr.Field<int>("Id");
             role.Name = dr.Field<string>("Name");
             role.IsCustomRole = dr.Field<bool>("IsCustomRole");
-            role.Permissions = await (Task.Run(()=> getRolePermission(role.Id)));
+            role.Permissions =  getRolePermission(role.Id);
             return role;
         }
 
-        private async Task<List<RolePermission>> getRolePermission(int id)
+        private List<RolePermission> getRolePermission(int id)
         {
             List<RolePermission> rolePermissions = new List<RolePermission>();
 
-            DataTable dtGoals = await Task.Run(() => DataBase.DBService.ExecuteCommand(String.Format(SELECT_ROLE_PERMISSION,id)));
+            DataTable dtGoals = DataBase.DBService.ExecuteCommand(String.Format(SELECT_ROLE_PERMISSION,id));
             foreach (DataRow dr in dtGoals.Rows)
             {
                 RolePermission rolePermission = convertToRolePermissionObject(dr);

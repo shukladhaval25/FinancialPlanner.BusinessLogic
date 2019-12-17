@@ -13,8 +13,8 @@ namespace FinancialPlanner.BusinessLogic.Plans
         private const string INSERT_QUERY = "INSERT INTO PLANNER VALUES (" +
             "{0},'{1}','{2}','{3}','{4}','{5}',{6},'{7}',{8},{9},{10},'{11}','{12}','{13}')";
 
-        private const string SELECT_BY_CLIENTID = "SELECT P1.*,U.USERNAME AS UPDATEDBYUSERNAME FROM PLANNER P1, USERS U WHERE P1.UPDATEDBY = U.ID and P1.CLIENTID = {0} AND ISDELETED = 'FALSE'";
-        private const string SELECT_ID = "SELECT P1.*,U.USERNAME AS UPDATEDBYUSERNAME FROM PLANNER P1, USERS U WHERE P1.UPDATEDBY = U.ID and P1.ID = {0} AND ISDELETED = 'FALSE'";
+        private const string SELECT_BY_CLIENTID = "SELECT P1.*,U.USERNAME AS UPDATEDBYUSERNAME FROM PLANNER P1, USERS U WHERE P1.UPDATEDBY = U.ID and P1.CLIENTID = {0} AND P1.ISDELETED = 'FALSE'";
+        private const string SELECT_ID = "SELECT P1.*,U.USERNAME AS UPDATEDBYUSERNAME FROM PLANNER P1, USERS U WHERE P1.UPDATEDBY = U.ID and P1.ID = {0} AND P1.ISDELETED = 'FALSE'";
 
         private const string UPDATE_QUERY = "UPDATE PLANNER SET " +
             "[Name] = '{0}', [StartDate] ='{1}', [EndDate] ='{2}',[IsActive]='{3}',[CreatedOn] ='{4}'," +

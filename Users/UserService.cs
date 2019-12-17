@@ -11,15 +11,15 @@ namespace FinancialPlanner.BusinessLogic.Users
 {
     public class UserService
     {
-        private const string INSERT_QUERY = "INSERT INTO USERS VALUES ({0},'{1}','{2}','{3}','{4}','{5}',{6},'{7}',{8})";
-        private const string SELECT_ALL = "SELECT U1.*,U.USERNAME AS UPDATEDBYUSERNAME FROM USERS U1, USERS U WHERE U1.UPDATEDBY = U.ID";
-        private const string SELECT_ID = "SELECT U1.*,U.USERNAME AS UPDATEDBYUSERNAME FROM USERS U1, USERS U WHERE U1.UPDATEDBY = U.ID and U1.ID = {0}";
+        private const string INSERT_QUERY = "INSERT INTO USERS VALUES ({0},'{1}','{2}','{3}','{4}','{5}',{6},'{7}',{8},{9},'{10}')";
+        private const string SELECT_ALL = "SELECT U1.*,U.USERNAME AS UPDATEDBYUSERNAME FROM USERS U1, USERS U WHERE U1.ISDELETED = 0 AND U1.UPDATEDBY = U.ID";
+        private const string SELECT_ID = "SELECT U1.*,U.USERNAME AS UPDATEDBYUSERNAME FROM USERS U1, USERS U WHERE U1.ISDELETED = 0 AND U1.UPDATEDBY = U.ID and U1.ID = {0}";
 
-        private const string SELECT_BY_NAME = "SELECT U1.*,U.USERNAME AS UPDATEDBYUSERNAME FROM USERS U1, USERS U WHERE U1.UPDATEDBY = U.ID and U1.USERNAME = '{0}'";
+        private const string SELECT_BY_NAME = "SELECT U1.*,U.USERNAME AS UPDATEDBYUSERNAME FROM USERS U1, USERS U WHERE U1.ISDELETED = 0 AND U1.UPDATEDBY = U.ID and U1.USERNAME = '{0}'";
         private const string SELECT_MAX_ID = "SELECT MAX(ID) FROM USERS";
         private const string UPDATE_QUERY = "UPDATE USERS SET FIRSTNAME = '{0}'," +
-                "LASTNAME = '{1}', PASSWORD = '{2}',UPDATEDON ='{3}',UPDATEDBY = {4} WHERE ID= {5}";
-        private const string DELETE_QUERY = "DELETE FROM USERS WHERE ID = {0}";
+                "LASTNAME = '{1}', PASSWORD = '{2}',UPDATEDON ='{3}',UPDATEDBY = {4},ROLEID = {6} WHERE ID= {5}";
+        private const string DELETE_QUERY = "UPDATE USERS SET ISDELETED = '{1}' WHERE ID = {0}";
 
         public IList<User> Get()
         {
@@ -47,6 +47,8 @@ namespace FinancialPlanner.BusinessLogic.Users
             user.UpdatedOn = dr.Field<DateTime>("UpdatedOn");
             user.UpdatedBy = dr.Field<int>("UpdatedBy");
             user.UpdatedByUserName = dr.Field<string>("UpdatedByUserName");
+            if (dr["RoleId"] != DBNull.Value)
+                user.RoleId = dr.Field<int>("RoleId");
             return user;
         }
 
@@ -101,7 +103,9 @@ namespace FinancialPlanner.BusinessLogic.Users
                 int maxValue = int.Parse(value) + 1;
                 DataBase.DBService.ExecuteCommand(string.Format(INSERT_QUERY,
                     maxValue, user.UserName, user.FirstName, user.LastName, user.Password,
-                    user.CreatedOn.ToString("yyyy-MM-dd hh:mm:ss"), user.CreatedBy, user.UpdatedOn.ToString("yyyy-MM-dd hh:mm:ss"), user.UpdatedBy));
+                    user.CreatedOn.ToString("yyyy-MM-dd hh:mm:ss"), user.CreatedBy, 
+                    user.UpdatedOn.ToString("yyyy-MM-dd hh:mm:ss"), user.UpdatedBy,
+                    user.RoleId,user.IsDeleted));
                 Activity.ActivitiesService.Add(ActivityType.CreateUser, EntryStatus.Success,
                          Source.Server, user.UpdatedByUserName, user.UserName, user.MachineName);
             }
@@ -115,14 +119,15 @@ namespace FinancialPlanner.BusinessLogic.Users
         public void Update(User user)
         {
             DataBase.DBService.ExecuteCommandString(string.Format(UPDATE_QUERY,
-                user.FirstName, user.LastName,user.Password, user.UpdatedOn.ToString("yyyy-MM-dd hh:mm:ss"), user.UpdatedBy, user.Id));
+                user.FirstName, user.LastName,user.Password, user.UpdatedOn.ToString("yyyy-MM-dd hh:mm:ss"), 
+                user.UpdatedBy, user.Id,user.RoleId));
             Activity.ActivitiesService.Add(ActivityType.UpdateUser, EntryStatus.Success,
                         Source.Server, user.UpdatedByUserName, user.UserName, user.MachineName);
         }
 
         public void Delete(User user)
         {
-            DataBase.DBService.ExecuteCommandString(string.Format(DELETE_QUERY, user.Id));
+            DataBase.DBService.ExecuteCommandString(string.Format(DELETE_QUERY, user.Id,true));
             Activity.ActivitiesService.Add(ActivityType.DeleteUser, EntryStatus.Success,
                         Source.Server, user.UpdatedByUserName, user.UserName, user.MachineName);
         }

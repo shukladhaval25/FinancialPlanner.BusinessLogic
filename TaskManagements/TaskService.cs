@@ -64,12 +64,12 @@ namespace FinancialPlanner.BusinessLogic.TaskManagements
         
 
         private readonly string INSERT_TASK = "INSERT INTO TASKCARD " +
-            " VALUES ('{0}',{1},'{2}',{3},{4},'{5}','{6}',{7},{8},{9},{10},{11},'{12}',{13},'{14}',{15},'{16}','{17}')";
+            " VALUES ('{0}',{1},'{2}',{3},{4},'{5}','{6}',{7},{8},{9},{10},{11},'{12}',{13},'{14}',{15},'{16}','{17}','{18}')";
 
         private readonly string UPDATE_TASK = "UPDATE TASKCARD SET TRANSACTIONTYPE = '{0}'," +
             "CARDTYPE ={1},CID = {2},TITLE ='{3}',DESCRIPTION = '{4}',PRIORITY = {5}, TASKSTATUS = {6}," +
             "OWNER = {7},ASSIGNTO = {8},COMPLETEDPERCENTAGE ={9}, UPDATEDON ='{10}',UPDATEDBY = {11}, " +
-            "ACTUALCOMPLETEDON ='{12}',DUEDATE = '{13}' WHERE ID ={14}";
+            "ACTUALCOMPLETEDON ='{12}',DUEDATE = '{13}',OTHERNAME ='{15}' WHERE ID ={14}";
 
         private readonly string UPDATE_TASKID = "UPDATE TASKCARD SET TASKID ='{0}' WHERE ID ={1}";
         private readonly string DELETE_NOTIFIED_TASK_BY_USER = "DELETE FROM TASKNOTIFICATION WHERE NotifyTo ={0}";
@@ -178,7 +178,8 @@ namespace FinancialPlanner.BusinessLogic.TaskManagements
                     taskCard.UpdatedOn.ToString("yyyy-MM-dd hh:mm:ss"),
                     taskCard.UpdatedBy,
                     taskCard.DueDate.ToString("yyyy-MM-dd hh:mm:ss"),
-                    taskCard.DueDate.ToString("yyyy-MM-dd hh:mm:ss"), taskCard.Id), true);
+                    taskCard.DueDate.ToString("yyyy-MM-dd hh:mm:ss"), taskCard.Id,
+                    taskCard.OtherName), true);
 
                 if (taskCard.ProjectId == 1)
                 {
@@ -406,7 +407,8 @@ namespace FinancialPlanner.BusinessLogic.TaskManagements
                     taskcard.UpdatedOn.ToString("yyyy-MM-dd hh:mm:ss"),
                     taskcard.UpdatedBy,
                     taskcard.DueDate.ToString("yyyy-MM-dd hh:mm:ss"),
-                    taskcard.DueDate.ToString("yyyy-MM-dd hh:mm:ss")));
+                    taskcard.DueDate.ToString("yyyy-MM-dd hh:mm:ss"),
+                    taskcard.OtherName));
               
                 DataBase.DBService.ExecuteCommandString(string.Format(INSERT_TASK,
                     taskcard.TaskId,
@@ -426,7 +428,8 @@ namespace FinancialPlanner.BusinessLogic.TaskManagements
                     taskcard.UpdatedOn.ToString("yyyy-MM-dd hh:mm:ss"),
                     taskcard.UpdatedBy,
                     taskcard.DueDate.ToString("yyyy-MM-dd hh:mm:ss"),
-                    taskcard.DueDate.ToString("yyyy-MM-dd hh:mm:ss")), true);
+                    taskcard.DueDate.ToString("yyyy-MM-dd hh:mm:ss"),
+                    taskcard.OtherName), true);
 
                 int id = getTaskID(taskcard);
 
@@ -503,6 +506,7 @@ namespace FinancialPlanner.BusinessLogic.TaskManagements
             taskCard.AssignToName = getAssignTo(dr.Field<int?>("AssignTo"));
             taskCard.CustomerName = getCustomerName(taskCard.CustomerId);
             taskCard.TaskTransactionType = getTransactionType(taskCard, taskCard.Id);
+            taskCard.OtherName = dr.Field<string>("OtherName");
             return taskCard;
         }
 

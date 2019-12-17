@@ -22,14 +22,14 @@ namespace FinancialPlanner.BusinessLogic.Users
             {
                 //Activity.ActivitiesService.Add(ActivityType.ServerLogin, EntryStatus.Success,
                 //    Source.Server, user.UserName, string.Empty, user.MachineName);
-                sendAutheticationFailEmail();
+                //sendAutheticationFailEmail();
                 return userData;
             }
             else
             {
                 Activity.ActivitiesService.Add(ActivityType.LoginFail, EntryStatus.Success,
                    Source.Server, user.UserName, string.Empty, user.MachineName);
-                sendAutheticationFailEmail();
+                //sendAutheticationFailEmail();
                 throw new Exception("Authentication Fail due to invalid credential");
             }
         }
