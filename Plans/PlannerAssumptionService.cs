@@ -14,7 +14,10 @@ namespace FinancialPlanner.BusinessLogic
         const string SELECT_BYID = "SELECT N1.*,U.USERNAME AS UPDATEDBYUSERNAME FROM PLANNERASSUMPTION N1, USERS U WHERE N1.UPDATEDBY = U.ID AND N1.ID = {0} AND N1.PID ={1}";
         const string SELECT_COUNT = "SELECT COUNT(*) FROM PLANNERASSUMPTION N1, USERS U WHERE N1.UPDATEDBY = U.ID AND N1.PID = {0}";
 
-        const string INSERT_QUERY = "INSERT INTO PLANNERASSUMPTION VALUES (" +
+        //const string INSERT_QUERY = "INSERT INTO PLANNERASSUMPTION VALUES (" +
+        //    "{0},{1},{2},{3},{4},{5},{6},{7},{8},{9},'{10}','{11}',{12},'{13}',{14},'{15}',{16},{17},{18},{19},{20})";
+
+        const string INSERT_QUERY = "INSERT INTO [dbo].[PlannerAssumption] ([PID],[ClientRetirementAge],[SpouseRetirementAge],[ClientLifeExpectancy],[SpouseLifeExpectancy],[PreRetirementInflactionRate],[PostRetirementInflactionRate],[EquityReturnRate],[DebtReturnRate],[OtherReturnRate],[Description],[CreatedOn],[CreatedBy],[UpdatedOn],[UpdatedBy],[ConsiderClientAgeForRetirment],[ClientIncomeRise],[SpouseIncomeRise],[OngoingExpRise],[PostRetirementInvestmentReturnRate]) VALUES (" +
             "{0},{1},{2},{3},{4},{5},{6},{7},{8},{9},'{10}','{11}',{12},'{13}',{14},'{15}',{16},{17},{18},{19})";
 
         const string UPDATE_QUERY = "UPDATE PLANNERASSUMPTION SET " +
@@ -109,7 +112,6 @@ namespace FinancialPlanner.BusinessLogic
                       PlannerAssumption.IsClientRetirmentAgeIsPrimary,
                       PlannerAssumption.ClientIncomeRise, PlannerAssumption.SpouseIncomeRise,
                       PlannerAssumption.OngoingExpRise,
-                      PlannerAssumption.Id,
                       PlannerAssumption.PostRetirementInvestmentReturnRate), true);
                 }
                 Activity.ActivitiesService.Add(ActivityType.UpdatePlannerAssumption, EntryStatus.Success,

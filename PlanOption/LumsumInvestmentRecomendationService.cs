@@ -16,7 +16,7 @@ namespace FinancialPlanner.BusinessLogic.Plans
             "LumsumInvestmentRecomendation.FirstHolder, LumsumInvestmentRecomendation.SecondHolder, " +
             "LumsumInvestmentRecomendation.ChequeInFavourOff, LumsumInvestmentRecomendation.CreatedOn, " +
             "LumsumInvestmentRecomendation.CreatedBy, LumsumInvestmentRecomendation.UpdatedOn, " +
-            "LumsumInvestmentRecomendation.UpdatedBy, " +
+            "LumsumInvestmentRecomendation.UpdatedBy, LumsumInvestmentRecomendation.ThirdHolder, " +
             "Scheme.Name AS SchemeName,Scheme.Type, SchemeCategory.Name AS Category, Users.UserName, " +
             "AMC.Name AS AMC " +
             "FROM SchemeCategory INNER JOIN " +
@@ -27,8 +27,8 @@ namespace FinancialPlanner.BusinessLogic.Plans
             "WHERE (LumsumInvestmentRecomendation.PId = {0})";
 
         const string INSERT_LUMSUM = "INSERT INTO[dbo].[LumsumInvestmentRecomendation] " +
-            "([PId],[SchemeId],[Amount],[ChequeInFavourOff],[FirstHolder],[SecondHolder],[CreatedOn],[CreatedBy],[UpdatedOn],[UpdatedBy]) " +
-            "VALUES ({0},{1},{2},'{3}','{4}','{5}','{6}',{7},'{8}',{9})";
+            "([PId],[SchemeId],[Amount],[ChequeInFavourOff],[FirstHolder],[SecondHolder],[CreatedOn],[CreatedBy],[UpdatedOn],[UpdatedBy],[ThirdHolder]) " +
+            "VALUES ({0},{1},{2},'{3}','{4}','{5}','{6}',{7},'{8}',{9},'{10}')";
         const string DELETE_QUERY = "DELETE FROM LUMSUMINVESTMENTRECOMENDATION WHERE PID = {0} AND SCHEMEID = {1} AND AMOUNT ={2}";
 
         public IList<LumsumInvestmentRecomendation> GetAll(int plannerId)
@@ -69,7 +69,8 @@ namespace FinancialPlanner.BusinessLogic.Plans
                    lumsumInvestmentRecomendation.CreatedOn.ToString("yyyy-MM-dd hh:mm:ss"), 
                    lumsumInvestmentRecomendation.CreatedBy,
                    lumsumInvestmentRecomendation.UpdatedOn.ToString("yyyy-MM-dd hh:mm:ss"), 
-                   lumsumInvestmentRecomendation.UpdatedBy));
+                   lumsumInvestmentRecomendation.UpdatedBy,
+                   lumsumInvestmentRecomendation.ThirdHolder));
 
                 Activity.ActivitiesService.Add(ActivityType.CreateInvestmentRecommendation, EntryStatus.Success,
                          Source.Server, lumsumInvestmentRecomendation.UpdatedByUserName, lumsumInvestmentRecomendation.SchemeName, lumsumInvestmentRecomendation.MachineName);
@@ -118,6 +119,7 @@ namespace FinancialPlanner.BusinessLogic.Plans
             lumsumInvestmentRecomendation.ChequeInFavourOff = dr.Field<string>("ChequeInfavourOff");
             lumsumInvestmentRecomendation.FirstHolder = dr.Field<string>("FirstHolder");
             lumsumInvestmentRecomendation.SecondHolder = dr.Field<string>("SecondHolder");
+            lumsumInvestmentRecomendation.ThirdHolder = dr.Field<string>("ThirdHolder");
             lumsumInvestmentRecomendation.Type = dr.Field<string>("Type");
             lumsumInvestmentRecomendation.AMC = dr.Field<string>("AMC");
             return lumsumInvestmentRecomendation;
