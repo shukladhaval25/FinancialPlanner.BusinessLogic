@@ -28,7 +28,7 @@ namespace FinancialPlanner.BusinessLogic.CurrentStatus
             "[NAV] ={2}, UNITS ={3},EquityRatio = {4},GoldRatio ={5},DebtRatio = {6}," +
             "SIP ={7},FreeUnits ={8},REDUMPTIONAMOUNT ={9},GoalId ={10}, " +
             "[UpdatedOn] = '{11}', [UpdatedBy] ={12},FOLIONO = '{13}',FIRSTHOLDER = '{14}', SECONDHOLDER ='{15}', " +
-            "NOMINEE = '{16}',INVESTMENTRETURNRATE = {17} " +
+            "NOMINEE = '{16}',INVESTMENTRETURNRATE = {17},TOTALVALUE = {19} " +
             "WHERE ID = {18} ";
 
         const string DELETE_MutualFund = "DELETE FROM MutualFund WHERE ID = {0}";
@@ -142,7 +142,7 @@ namespace FinancialPlanner.BusinessLogic.CurrentStatus
                       mutualFund.UpdatedBy,mutualFund.FolioNo,
                       mutualFund.FirstHolder,mutualFund.SecondHolder,mutualFund.Nominee,
                       mutualFund.InvestmentReturnRate,
-                      mutualFund.Id), true);
+                      mutualFund.Id,mutualFund.CurrentValue), true);
 
                 Activity.ActivitiesService.Add(ActivityType.UpdateMutualFund, EntryStatus.Success,
                          Source.Server, mutualFund.UpdatedByUserName, "MutualFund", mutualFund.MachineName);

@@ -14,10 +14,10 @@ namespace FinancialPlanner.BusinessLogic.Plans
         const string SELECT_ALL = "SELECT N1.*,U.USERNAME AS UPDATEDBYUSERNAME FROM NONFINANCIALASSET N1, USERS U WHERE N1.UPDATEDBY = U.ID AND N1.PID = {0}";
         const string SELECT_BY_ID = "SELECT N1.*,U.USERNAME AS UPDATEDBYUSERNAME FROM NONFINANCIALASSET N1, USERS U WHERE N1.UPDATEDBY = U.ID AND N1.PID = {0} AND N1.ID = {1}";
         const string INSERT_QUERY = "INSERT INTO NONFINANCIALASSET VALUES ({0},'{1}'," +
-            "{2},{3},{4},'{5}',{6},{7},{8},'{9}','{10}','{11}',{12},'{13}',{14},{15})";
+            "{2},{3},{4},'{5}',{6},{7},{8},'{9}','{10}','{11}',{12},'{13}',{14},{15},'{16}')";
         const string UPDATE_QUERY ="UPDATE NONFINANCIALASSET SET NAME ='{0}',CURRENTVALUE ={1},PRIMARYSHARE ={2},SECONDARYSHARE ={3}," +
             "OTHERHOLDERNAME ='{4}',OTHERHOLDERSHARE ={5},MAPPEDGOALID = {6},ASSETMAPPINGSHARE ={7},ASSETREALISATIONYEAR ='{8}'," +
-            "DESCRIPTION ='{9}', UPDATEDON = '{10}', UPDATEDBY={11},GROWTHPERCENTAGE ={12} WHERE ID ={13}";
+            "DESCRIPTION ='{9}', UPDATEDON = '{10}', UPDATEDBY={11},GROWTHPERCENTAGE ={12},ELIGIBLEFORINSURANCECOVER ='{14}' WHERE ID ={13}";
         const string DELETE_QUERY = "DELETE NONFINANCIALASSET WHERE ID ={0}";
 
         public IList<NonFinancialAsset> GetAll(int plannerId)
@@ -81,11 +81,15 @@ namespace FinancialPlanner.BusinessLogic.Plans
                    nonFinancialAsset.Pid, nonFinancialAsset.Name, nonFinancialAsset.CurrentValue,
                    nonFinancialAsset.PrimaryholderShare,nonFinancialAsset.SecondaryHolderShare,
                    nonFinancialAsset.OtherHolderName,nonFinancialAsset.OtherHolderShare,
-                   nonFinancialAsset.MappedGoalId,nonFinancialAsset.AssetMappingShare,nonFinancialAsset.AssetRealisationYear,
+                   nonFinancialAsset.MappedGoalId,nonFinancialAsset.AssetMappingShare,
+                   nonFinancialAsset.AssetRealisationYear,
                    nonFinancialAsset.Description,
-                   nonFinancialAsset.CreatedOn.ToString("yyyy-MM-dd hh:mm:ss"), nonFinancialAsset.CreatedBy,
-                   nonFinancialAsset.UpdatedOn.ToString("yyyy-MM-dd hh:mm:ss"), nonFinancialAsset.UpdatedBy,
-                   nonFinancialAsset.GrowthPercentage));
+                   nonFinancialAsset.CreatedOn.ToString("yyyy-MM-dd hh:mm:ss"),
+                   nonFinancialAsset.CreatedBy,
+                   nonFinancialAsset.UpdatedOn.ToString("yyyy-MM-dd hh:mm:ss"),
+                   nonFinancialAsset.UpdatedBy,
+                   nonFinancialAsset.GrowthPercentage,
+                   nonFinancialAsset.EligibleForInsuranceCover ));
 
                 Activity.ActivitiesService.Add(ActivityType.CreateNonFinancialAsset, EntryStatus.Success,
                          Source.Server, nonFinancialAsset.UpdatedByUserName, clientName, nonFinancialAsset.MachineName);
@@ -114,7 +118,7 @@ namespace FinancialPlanner.BusinessLogic.Plans
                    nonFinancialAsset.Description,
                    nonFinancialAsset.UpdatedOn.ToString("yyyy-MM-dd hh:mm:ss"), nonFinancialAsset.UpdatedBy,
                    nonFinancialAsset.GrowthPercentage,
-                   nonFinancialAsset.Id));
+                   nonFinancialAsset.Id,nonFinancialAsset.EligibleForInsuranceCover));
 
                 Activity.ActivitiesService.Add(ActivityType.UpdateNonFinancialAsset, EntryStatus.Success,
                          Source.Server, nonFinancialAsset.UpdatedByUserName, clientName, nonFinancialAsset.MachineName);
@@ -161,6 +165,7 @@ namespace FinancialPlanner.BusinessLogic.Plans
             nonFinancialAsset.AssetRealisationYear = dr.Field<string>("AssetRealisationYear");
             nonFinancialAsset.Description = dr.Field<string>("Description");
             nonFinancialAsset.GrowthPercentage = dr.Field<decimal>("GrowthPercentage");
+            nonFinancialAsset.EligibleForInsuranceCover = dr.Field<bool>("EligibleForInsuranceCover");
             return nonFinancialAsset;
         }
 

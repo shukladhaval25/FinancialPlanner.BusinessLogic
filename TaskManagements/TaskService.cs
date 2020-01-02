@@ -16,6 +16,12 @@ namespace FinancialPlanner.BusinessLogic.TaskManagements
 {
     public class TaskService
     {
+
+        private readonly string SELECT_ALL_TASKS =
+           "SELECT TaskCard.*,TaskProject.Name as ProjectName,Users.UserName AS OwnerName FROM TaskCard " +
+           "INNER JOIN TaskProject ON " +
+           "TaskCard.ProjectId = TaskProject.ID INNER JOIN Users ON TaskCard.Owner = Users.ID";
+
         private readonly string SELECT_ALL =
             "SELECT TaskCard.*,TaskProject.Name as ProjectName,Users.UserName AS OwnerName FROM TaskCard " +
             "INNER JOIN TaskProject ON " +
@@ -245,6 +251,33 @@ namespace FinancialPlanner.BusinessLogic.TaskManagements
                     new List<TaskCard>();
 
                 DataTable dtAppConfig = DataBase.DBService.ExecuteCommand(SELECT_ALL);
+                foreach (DataRow dr in dtAppConfig.Rows)
+                {
+                    TaskCard task = convertToTaskCard(dr);
+                    taskcards.Add(task);
+                }
+                Logger.LogInfo("Get: Task Card process completed.");
+                return taskcards;
+            }
+            catch (Exception ex)
+            {
+                StackTrace st = new StackTrace();
+                StackFrame sf = st.GetFrame(0);
+                MethodBase currentMethodName = sf.GetMethod();
+                LogDebug(currentMethodName.Name, ex);
+                return null;
+            }
+        }
+
+        public IList<TaskCard> GetAllTasks()
+        {
+            try
+            {
+                Logger.LogInfo("Get: Task Card process start");
+                IList<TaskCard> taskcards =
+                    new List<TaskCard>();
+
+                DataTable dtAppConfig = DataBase.DBService.ExecuteCommand(SELECT_ALL_TASKS);
                 foreach (DataRow dr in dtAppConfig.Rows)
                 {
                     TaskCard task = convertToTaskCard(dr);
