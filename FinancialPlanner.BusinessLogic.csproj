@@ -98,6 +98,7 @@
     <Compile Include="Clients\FamilyMemberBankService.cs" />
     <Compile Include="Clients\FamilyMemberService.cs" />
     <Compile Include="Clients\FestivalsService.cs" />
+    <Compile Include="CommonService.cs" />
     <Compile Include="Compnay\CompanyService.cs" />
     <Compile Include="CurrentStatus\BondsService.cs" />
     <Compile Include="CurrentStatus\CurrentStatusInstrumentService.cs" />
