@@ -98,6 +98,7 @@
     <Compile Include="Clients\FamilyMemberBankService.cs" />
     <Compile Include="Clients\FamilyMemberService.cs" />
     <Compile Include="Clients\FestivalsService.cs" />
+    <Compile Include="Clients\SessionsService.cs" />
     <Compile Include="CommonService.cs" />
     <Compile Include="Compnay\CompanyService.cs" />
     <Compile Include="CurrentStatus\BondsService.cs" />
@@ -131,8 +132,10 @@
     <Compile Include="PlanOption\CurrentStatusToGoalService.cs" />
     <Compile Include="PlanOption\InvestmentRecommendationService.cs" />
     <Compile Include="PlanOption\PlanOptionService.cs" />
+    <Compile Include="PlanOption\QuarterlyReviewTemplateService.cs" />
     <Compile Include="PlanOption\SIPTypeInvestmentRecomendationService.cs" />
     <Compile Include="PlanOption\STPInvestmentRecomendationService.cs" />
+    <Compile Include="PlanOption\SwitchInvestmentRecommendationService.cs" />
     <Compile Include="Plans\AssumptionMasterService.cs" />
     <Compile Include="Plans\DocumentService.cs" />
     <Compile Include="Plans\ExpensesSesrvice.cs" />

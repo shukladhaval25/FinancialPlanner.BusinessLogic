@@ -11,12 +11,7 @@ namespace FinancialPlanner.BusinessLogic.PlanOption
     public class STPInvestmentRecomendationService
     {
         private const string GET_CLIENT_NAME_QUERY = "SELECT C.NAME FROM CLIENT C, PLANNER P  WHERE P.CLIENTID = C.ID AND P.ID = {0}";
-        //const string SELECT_ALL = "SELECT STPInvestmentRecomendation.*, Scheme.Name AS FromName " +
-        //    "FROM Scheme INNER JOIN STPInvestmentRecomendation ON " + 
-        //    "Scheme.Id = STPInvestmentRecomendation.FromSchemeId AND Scheme.Id = STPInvestmentRecomendation.ToSchemeId " + 
-        //    "INNER JOIN Users ON STPInvestmentRecomendation.UpdatedBy = Users.ID " + 
-        //    "WHERE (STPInvestmentRecomendation.PId = {0})";
-
+       
         const string SELECT_ALL = "SELECT STPInvestmentRecomendation.*, Scheme.Name AS FromSchemeName FROM Scheme INNER JOIN " +
                          "STPInvestmentRecomendation ON Scheme.Id = STPInvestmentRecomendation.FromSchemeId AND " +
                          "(Scheme.Id = STPInvestmentRecomendation.ToSchemeId OR " +

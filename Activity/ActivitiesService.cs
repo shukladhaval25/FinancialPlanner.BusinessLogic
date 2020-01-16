@@ -235,6 +235,7 @@ namespace FinancialPlanner.BusinessLogic.Activity
         public static readonly string ADD_INVESTMENT_RECOMMENDATION = "Investment recommendation ''{0}'' added sucessfully";
         private static readonly string UPDATE_INVESTMENT_RECOMMENDATION = "Investment recommendation ''{0}'' edited sucessfully";
         private static readonly string DELETE_INVESTMENT_RECOMMENDATION = "Investment recommendation ''{0}'' deleted sucessfully";
+        private static readonly string UPDATE_QUARTERLY_REVIEW_TEMPLATE ="Update quarterly review template sucessfully";
 
         public static IList<Activities> Get(string userName)
         {
@@ -577,6 +578,10 @@ namespace FinancialPlanner.BusinessLogic.Activity
                 _lstActivityDescription.Add(new KeyValuePair<ActivityType, string>(ActivityType.DeleteInvestmentRecommendation, UPDATE_INVESTMENT_RECOMMENDATION));
                 _lstActivityDescription.Add(new KeyValuePair<ActivityType, string>(ActivityType.UpdateInvestmentRecommendation, DELETE_INVESTMENT_RECOMMENDATION));
 
+
+                //Quarterly Review Template
+                _lstActivityDescription.Add(new KeyValuePair<ActivityType, string>
+                    (ActivityType.UpdateQuarterlyReviewTemplate, UPDATE_QUARTERLY_REVIEW_TEMPLATE));
             }
         }
 
