@@ -36,6 +36,49 @@ namespace FinancialPlanner.BusinessLogic.LifeInsurance
             "[AttachmentPath] = '{31}', [UpdatedOn] = '{32}', [UpdatedBy] ={33},[Agent] ='{34}' " +
             "WHERE ID = {35} AND PID = {36}";
 
+        const string SELECT_PREMIUM_DATE = "SELECT LifeInsurance.Applicant, Client.Name, LifeInsurance.Company, LifeInsurance.PolicyName, LifeInsurance.PolicyNo, LifeInsurance.NextPremDate,LifeInsurance.Premium FROM LifeInsurance INNER JOIN Planner ON LifeInsurance.PID = Planner.ID INNER JOIN Client ON Planner.ClientId = Client.ID AND Planner.ClientId = Client.ID AND Planner.ClientId = Client.ID AND Planner.ClientId = Client.ID AND Planner.ClientId = Client.ID AND Planner.ClientId = Client.ID AND Planner.ClientId = Client.ID AND Planner.ClientId = Client.ID AND Planner.ClientId = Client.ID AND Planner.ClientId = Client.ID AND Planner.ClientId = Client.ID AND Planner.ClientId = Client.ID AND Planner.ClientId = Client.ID AND Planner.ClientId = Client.ID AND Planner.ClientId = Client.ID AND Planner.ClientId = Client.ID AND Planner.ClientId = Client.ID AND Planner.ClientId = Client.ID AND Planner.ClientId = Client.ID AND Planner.ClientId = Client.ID AND Planner.ClientId = Client.ID AND Planner.ClientId = Client.ID AND Planner.ClientId = Client.ID AND Planner.ClientId = Client.ID WHERE (LifeInsurance.NextPremDate BETWEEN '{0}' AND '{1}')";
+
+        public IList<LicPremiumReminder> GetByPremiumdate(DateTime fromDate, DateTime toDate)
+        {
+            try
+            {
+                Logger.LogInfo("Get: Life insurance premium date process start");
+                IList<LicPremiumReminder> lstLifeInsurance =  new List<LicPremiumReminder>();
+
+                DataTable dtAppConfig = DataBase.DBService.ExecuteCommand(string.Format(SELECT_PREMIUM_DATE, fromDate.ToString("yyyy-MM-dd"),toDate.ToString("yyyy-MM-dd")));
+
+                foreach (DataRow dr in dtAppConfig.Rows)
+                {
+                    LicPremiumReminder lifeInsurance = convertToLicPremiumReminder(dr);
+                    lstLifeInsurance.Add(lifeInsurance);
+                }
+                Logger.LogInfo("Get: Life insurance premium process completed.");
+                return lstLifeInsurance;
+            }
+            catch (Exception ex)
+            {
+                StackTrace st = new StackTrace();
+                StackFrame sf = st.GetFrame(0);
+                MethodBase currentMethodName = sf.GetMethod();
+                LogDebug(currentMethodName.Name, ex);
+                return null;
+            }
+        }
+
+        private LicPremiumReminder convertToLicPremiumReminder(DataRow dr)
+        {
+            LicPremiumReminder licPremiumReminder = new LicPremiumReminder();
+            licPremiumReminder.Applicant = dr.Field<string>("Applicant");
+            licPremiumReminder.ClientName = dr.Field<string>("Name");
+            licPremiumReminder.Company = dr.Field<string>("Company");
+            licPremiumReminder.PolicyName = dr.Field<string>("PolicyName");
+            licPremiumReminder.PolicyNo = dr.Field<string>("PolicyNo");
+            licPremiumReminder.PremiumDate = dr.Field<DateTime>("NextPremDate");
+            licPremiumReminder.PremiumAmount = Double.Parse(dr["Premium"].ToString()); //Double.Parse(dr["Balance"].ToString());
+
+            return licPremiumReminder;
+        }
+
         const string DELETE_LIFE_INSURNACE = "DELETE FROM LIFEINSURANCE WHERE ID = {0} AND PID {1}";
 
         public IList<Common.Model.CurrentStatus.LifeInsurance> GetAll(int plannerId)
