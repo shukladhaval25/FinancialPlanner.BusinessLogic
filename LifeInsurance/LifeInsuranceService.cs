@@ -24,6 +24,9 @@ namespace FinancialPlanner.BusinessLogic.LifeInsurance
             "{25},{26},'{27}',{28}," +
             "'{29}',{30},'{31}','{32}'," +
             "'{33}','{34}',{35},'{36}',{37})";
+
+       
+
         const string UPDATE_LIFE_INSURANCE = "UPDATE LIFEINSURANCE SET " +
             "[Applicant] = '{0}', [Branch] ='{1}', [DateOfIssue] ='{2}',[MaturityDate] = '{3}', "+
             "[Company] = '{4}',[PolicyName] = '{5}',[PolicyNo] ='{6}',[Premium] = {7}," +
@@ -36,8 +39,10 @@ namespace FinancialPlanner.BusinessLogic.LifeInsurance
             "[AttachmentPath] = '{31}', [UpdatedOn] = '{32}', [UpdatedBy] ={33},[Agent] ='{34}' " +
             "WHERE ID = {35} AND PID = {36}";
 
-        const string SELECT_PREMIUM_DATE = "SELECT LifeInsurance.Applicant, Client.Name, LifeInsurance.Company, LifeInsurance.PolicyName, LifeInsurance.PolicyNo, LifeInsurance.NextPremDate,LifeInsurance.Premium FROM LifeInsurance INNER JOIN Planner ON LifeInsurance.PID = Planner.ID INNER JOIN Client ON Planner.ClientId = Client.ID AND Planner.ClientId = Client.ID AND Planner.ClientId = Client.ID AND Planner.ClientId = Client.ID AND Planner.ClientId = Client.ID AND Planner.ClientId = Client.ID AND Planner.ClientId = Client.ID AND Planner.ClientId = Client.ID AND Planner.ClientId = Client.ID AND Planner.ClientId = Client.ID AND Planner.ClientId = Client.ID AND Planner.ClientId = Client.ID AND Planner.ClientId = Client.ID AND Planner.ClientId = Client.ID AND Planner.ClientId = Client.ID AND Planner.ClientId = Client.ID AND Planner.ClientId = Client.ID AND Planner.ClientId = Client.ID AND Planner.ClientId = Client.ID AND Planner.ClientId = Client.ID AND Planner.ClientId = Client.ID AND Planner.ClientId = Client.ID AND Planner.ClientId = Client.ID AND Planner.ClientId = Client.ID WHERE (LifeInsurance.NextPremDate BETWEEN '{0}' AND '{1}')";
+        const string SELECT_PREMIUM_DATE = "SELECT LifeInsurance.Applicant, Client.Name, LifeInsurance.Company, LifeInsurance.PolicyName, LifeInsurance.PolicyNo, CONVERT(varchar, LifeInsurance.NextPremDate, 103)  As NextPremDate,LifeInsurance.Premium FROM LifeInsurance INNER JOIN Planner ON LifeInsurance.PID = Planner.ID INNER JOIN Client ON Planner.ClientId = Client.ID  WHERE (LifeInsurance.NextPremDate BETWEEN '{0}' AND '{1}')";
 
+        const string SELECT_MATURITY_DATE = "SELECT LifeInsurance.Applicant, Client.Name, LifeInsurance.Company, LifeInsurance.PolicyName, LifeInsurance.PolicyNo, CONVERT(varchar, LifeInsurance.MaturityDate, 103)  As NextPremDate,LifeInsurance.ExpectedMaturityValue As Premium FROM LifeInsurance INNER JOIN Planner ON LifeInsurance.PID = Planner.ID INNER JOIN Client ON Planner.ClientId = Client.ID WHERE (LifeInsurance.MaturityDate BETWEEN '{0}' AND '{1}')";
+        
         public IList<LicPremiumReminder> GetByPremiumdate(DateTime fromDate, DateTime toDate)
         {
             try
@@ -65,6 +70,33 @@ namespace FinancialPlanner.BusinessLogic.LifeInsurance
             }
         }
 
+        public IList<LicPremiumReminder> GetLICPolicyMaturity(DateTime fromDate, DateTime toDate)
+        {
+            try
+            {
+                Logger.LogInfo("Get: Life insurance premium date process start");
+                IList<LicPremiumReminder> lstLifeInsurance =  new List<LicPremiumReminder>();
+
+                DataTable dtAppConfig = DataBase.DBService.ExecuteCommand(string.Format(SELECT_MATURITY_DATE, fromDate.ToString("yyyy-MM-dd"),toDate.ToString("yyyy-MM-dd")));
+
+                foreach (DataRow dr in dtAppConfig.Rows)
+                {
+                    LicPremiumReminder lifeInsurance = convertToLicPremiumReminder(dr);
+                    lstLifeInsurance.Add(lifeInsurance);
+                }
+                Logger.LogInfo("Get: Life insurance premium process completed.");
+                return lstLifeInsurance;
+            }
+            catch (Exception ex)
+            {
+                StackTrace st = new StackTrace();
+                StackFrame sf = st.GetFrame(0);
+                MethodBase currentMethodName = sf.GetMethod();
+                LogDebug(currentMethodName.Name, ex);
+                return null;
+            }
+        }
+
         private LicPremiumReminder convertToLicPremiumReminder(DataRow dr)
         {
             LicPremiumReminder licPremiumReminder = new LicPremiumReminder();
@@ -73,7 +105,7 @@ namespace FinancialPlanner.BusinessLogic.LifeInsurance
             licPremiumReminder.Company = dr.Field<string>("Company");
             licPremiumReminder.PolicyName = dr.Field<string>("PolicyName");
             licPremiumReminder.PolicyNo = dr.Field<string>("PolicyNo");
-            licPremiumReminder.PremiumDate = dr.Field<DateTime>("NextPremDate");
+            licPremiumReminder.PremiumDate = DateTime.Parse( dr.Field<string>("NextPremDate"));
             licPremiumReminder.PremiumAmount = Double.Parse(dr["Premium"].ToString()); //Double.Parse(dr["Balance"].ToString());
 
             return licPremiumReminder;
