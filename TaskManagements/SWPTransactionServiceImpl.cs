@@ -19,9 +19,9 @@ namespace FinancialPlanner.BusinessLogic.TaskManagements
 
         private const string UPDATE_SWP = "UPDATE SWP SET ARN = {0}," +
             "CID = {1},MEMBERNAME ='{2}', AMC ={3},FOLIONUMBER ='{4}'," +
-            "TOSCHEMEID = {7}, TOOPTION = '{8}', " +
-            "AMOUNT = {9},DURATION = {10},FREQUENCY ='{11}',MODEOFEXECUTION ='{12}'," +
-            "REMARK = '{13}' WHERE TASKID = {14}";
+            "SCHEMEID = {5}, [OPTION] = '{6}', " +
+            "AMOUNT = {7},DURATION = {8},FREQUENCY ='{9}',MODEOFEXECUTION ='{10}'," +
+            "REMARK = '{11}' WHERE TASKID = {12}";
 
         private const string SELECT_BY_ID = "SELECT * FROM SWP WHERE TASKID ={0}";
         SWP swp;
