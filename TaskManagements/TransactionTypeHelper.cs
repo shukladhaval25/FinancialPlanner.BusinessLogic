@@ -21,6 +21,7 @@ namespace FinancialPlanner.BusinessLogic.TaskManagements
             {
                 case "Fresh Purchase":
                 case "Additional Purchase":
+                case "Redemption":
                     transactionTypeService = new FreshPurchaseTransactionServiceImpl();
                     break;
                 case "SIP Fresh":

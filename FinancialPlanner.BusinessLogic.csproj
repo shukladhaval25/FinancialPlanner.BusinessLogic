@@ -162,6 +162,7 @@
     <Compile Include="TaskManagements\SIPBankChangeServiceImpl.cs" />
     <Compile Include="TaskManagements\SignatureChangeServiceImpl.cs" />
     <Compile Include="TaskManagements\TaskHistoryService.cs" />
+    <Compile Include="TaskManagements\TaskReminderService.cs" />
     <Compile Include="TaskManagements\TransmissionAfterDeathServiceImpl.cs" />
     <Compile Include="TaskManagements\PANCardUpdateServiceImpl.cs" />
     <Compile Include="TaskManagements\ContactUpdateServiceImpl.cs" />
