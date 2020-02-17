@@ -59,7 +59,7 @@ namespace FinancialPlanner.BusinessLogic.PlanOption
             {
                 DataBase.DBService.BeginTransaction();
 
-                DataBase.DBService.ExecuteCommandString(string.Format(DELETE_INVESTMENTRECOMMENDATIONRATIO, investmentRecommendationRatio.Pid));
+                DataBase.DBService.ExecuteCommandString(string.Format(DELETE_INVESTMENTRECOMMENDATIONRATIO, investmentRecommendationRatio.Pid),true);
 
                 DataBase.DBService.ExecuteCommandString(string.Format(INSERT_INVESTMENTRATIO,
                       investmentRecommendationRatio.Pid, investmentRecommendationRatio.EquityRatio,
@@ -67,11 +67,12 @@ namespace FinancialPlanner.BusinessLogic.PlanOption
                       investmentRecommendationRatio.CreatedOn.ToString("yyyy-MM-dd hh:mm:ss"),
                       investmentRecommendationRatio.CreatedBy,
                       investmentRecommendationRatio.UpdatedOn.ToString("yyyy-MM-dd hh:mm:ss"),
-                      investmentRecommendationRatio.UpdatedBy));
+                      investmentRecommendationRatio.UpdatedBy),true);
+                DataBase.DBService.CommitTransaction();
 
                 Activity.ActivitiesService.Add(ActivityType.CreateInvestmentRecommendation, EntryStatus.Success,
                          Source.Server, investmentRecommendationRatio.UpdatedByUserName, "Investment Ratio", investmentRecommendationRatio.MachineName);
-                DataBase.DBService.CommitTransaction();
+                
             }
             catch (Exception ex)
             {
