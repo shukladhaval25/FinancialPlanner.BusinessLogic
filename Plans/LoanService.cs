@@ -86,7 +86,7 @@ namespace FinancialPlanner.BusinessLogic.Plans
                    loan.Description,
                    loan.CreatedOn.ToString("yyyy-MM-dd hh:mm:ss"), loan.CreatedBy,
                    loan.UpdatedOn.ToString("yyyy-MM-dd hh:mm:ss"), loan.UpdatedBy,
-                   loan.LoanStartDate));
+                   loan.LoanStartDate.ToString("yyyy-MM-dd hh:mm:ss")));
 
                 Activity.ActivitiesService.Add(ActivityType.CreateLoan, EntryStatus.Success,
                          Source.Server, loan.UpdatedByUserName, clientName, loan.MachineName);
@@ -112,7 +112,7 @@ namespace FinancialPlanner.BusinessLogic.Plans
                    loan.TermLeftInMonths, loan.NoEmisPayableUntilYear,
                    loan.Description,
                    loan.UpdatedOn.ToString("yyyy-MM-dd hh:mm:ss"),
-                   loan.UpdatedBy, loan.LoanStartDate, loan.Id));
+                   loan.UpdatedBy, loan.LoanStartDate.ToString("yyyy-MM-dd hh:mm:ss"), loan.Id));
 
                 Activity.ActivitiesService.Add(ActivityType.UpdateLoan, EntryStatus.Success,
                          Source.Server, loan.UpdatedByUserName, clientName, loan.MachineName);
