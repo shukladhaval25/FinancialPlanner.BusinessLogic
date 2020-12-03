@@ -1,0 +1,56 @@
+<head>
+    <title>Login V3</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</head>
+<body>
+    <div class="headertitle">
+            <div class="centertitle">Welcome to Financial Planner</div>
+    </div>
+    <div [hidden]="displayAlert" class="alert alert-warning alert-dismissible">
+        <button type="button" class="close" (click)="onAlertClose()" data-dismiss="alert">&times;</button>
+        <strong>Warning!</strong> This alert box could indicate a warning that might need attention.
+    </div>
+    <div id="logindiv">
+        <div class="container-login100 " style="position: absolute;top:20%;left:20%">
+           <!-- <form class="login100-form validate-form"> -->
+                
+                <span class="login100-form-title p-b-34 p-t-27">                
+                </span>
+                Username
+                <div class="wrap-input100 validate-input" data-validate="Enter username" style="width: 100%;">
+                    <!--<input class="input100" type="text" name="username"  [(ngModel)]="username" placeholder="Username"> -->
+                    <input [value] = "" (input)="updateUserName($event.target.value)" 
+                      type="text" placeholder="Username" width="550"/> 
+                    <span class="focus-input100" data-placeholder="&#xf207;"></span>
+                </div>
+                Password
+                <div class="wrap-input100 validate-input" data-validate="Enter password">
+                <!-- <input class="input100" type="password" name="pass" placeholder="Password"> -->
+                <input [value] = "" (input)="updatePassword($event.target.value)"  type="password" placeholder="Password" style="widows:550px;"/> 
+                <span class="focus-input100" data-placeholder="&#xf191;"></span>
+                </div>
+                <div class="contact100-form-checkbox">
+                <input class="input-checkbox100" id="ckb1" type="checkbox" name="remember-me">
+                <label class="label-checkbox100" for="ckb1">
+                    Remember me
+                </label>
+                </div>
+                <div class="container-login100-form-btn">
+                <button (click)="onLogin()" class="login100-form-btn">
+                    Login
+                </button>
+
+                <a class="txt1" href="#">
+                    Forgot Password?
+                </a>
+                </div>
+           <!--</form> --> 
+        </div>
+    </div>
+</body>
+

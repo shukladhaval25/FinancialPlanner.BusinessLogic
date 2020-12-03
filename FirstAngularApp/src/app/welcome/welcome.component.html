@@ -1,0 +1,21 @@
+<div class="page-container">  
+    <div class="sidebar">
+        <div class="list-items">
+            <a (click)="onClientSearchClick()" class="list-item">
+                <i class="material-icons">account_circle</i>
+                Clients
+            </a>
+            <a (click)= "onTaskClick()" class="list-item">
+                <i class="material-icons">assignment</i>
+                Tasks
+            </a>
+            <a class="list-item">
+                <i class="material-icons">bookmark_border</i>
+                Master Items
+            </a>
+        </div>
+    </div>
+    <div class="page-container-container">
+        <router-outlet></router-outlet>
+    </div>    
+</div>
