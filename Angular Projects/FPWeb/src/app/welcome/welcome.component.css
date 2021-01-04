@@ -10,6 +10,23 @@
     padding:50px;
 }
 
+/* .userinfomation-container{
+    display: inline-flex;
+    align-items: center;
+    margin-top: 10px;
+    margin-left: 10px;
+    height:7%;
+    background: rgba(73, 69, 69, 0.226);
+    width: 85%;
+    color: rgba(255,255,255,0.9);
+    position: relative;
+    padding: 10px 10px;   
+    font-size: 18px;
+    cursor: auto;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    border: 1px solid #ccc;
+    border-radius: 10%;
+} */
 .sidebar{
     height: 100%;
     width:270px;
@@ -125,3 +142,4 @@
     .sidenav {padding-top: 15px;}
     .sidenav a {font-size: 18px;}
   }
+

@@ -1,0 +1,63 @@
+<!-- <head>     
+</head>
+<body> -->
+  <div class="page-container">
+    <app-welcome style="height: auto;"></app-welcome>      
+    <div class="page-container-container">          
+        <h2>welcome to client control</h2>
+        <div class="clientlist-container">
+          <table class="clienttable-container" style="border-style: solid;">
+            <tr class="clienttablerowheader-container" >
+                <th>Id</th>
+                <th>Name</th>
+                <th>Aadhar</th>
+                <th>PAN</th>
+            </tr>
+            <tr *ngFor="let com of clients">              
+                <td>
+                    <a (click)="onShowClientInformation(com)"  style="cursor:pointer;">                     
+                      {{com.ID}}
+                    </a>                  
+                </td>   
+                <td>
+                  <a (click)="onShowClientInformation(com)"  style="cursor:pointer;">     
+                    {{com.Name}}
+                  </a>                  
+                </td>
+                <td>
+                  <a (click)="onShowClientInformation(com)" style="cursor:pointer;">     
+                      {{com.Aadhar}}
+                  </a>
+                </td>
+                <td>
+                  <a (click)="onShowClientInformation(com)" style="cursor:pointer;"> 
+                    {{com.PAN}}
+                  </a>
+                </td>              
+            </tr>
+        </table>
+        </div>
+        <!-- <div class="bs-component" ng-controller="listdata">
+          <table class="table table-striped table-hover">
+              <thead>
+                  <tr>
+                      <th>Id</th>
+                      <th>First Name</th>
+                      <th>Last Name</th>
+                      <th>Hobby</th>
+                  </tr>
+              </thead>
+              <tbody>
+                  <tr *ng-repeat="cln in client">
+                      <td>{{cln.Id}}</td>
+                      <td>{{cln.Name}}</td>
+                      <td>{{cln.Aadhar}}</td>
+                      <td>{{cln.PAN}}</td>
+                  </tr>
+              </tbody>
+          </table>
+        </div> -->
+    </div> 
+  </div>
+<!-- </body>          -->
+    

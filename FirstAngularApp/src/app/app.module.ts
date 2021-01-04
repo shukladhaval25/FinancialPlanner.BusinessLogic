@@ -8,6 +8,9 @@ import { WelcomeComponent } from './welcome/welcome.component';
 import { ClientsearchComponent } from './clientsearch/clientsearch.component';
 import { TaskComponent } from './task/task.component';
 
+import {HttpClientModule} from '@angular/common/http';
+import { ClientService} from './services/client.service'
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -18,9 +21,10 @@ import { TaskComponent } from './task/task.component';
   ],
   imports: [
     BrowserModule,
-    AppRoutingModule
+    AppRoutingModule,
+    HttpClientModule
   ],
-  providers: [],
+  providers: [ClientService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

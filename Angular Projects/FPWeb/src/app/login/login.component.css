@@ -1,0 +1,45 @@
+/*.centered {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+  */
+
+ 
+  .headertitle{
+    width: 100%;
+    height: 150px;
+    background: steelblue;
+    position: absolute;
+    padding-top: 50px;
+    /* padding-left:300px;  */
+    font-size: 40px;
+    text-align: center;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+  }
+  
+  #logindiv {
+      position: absolute;
+      top: 55%;
+      left: 50%; 
+      width:30em;
+      height:18em;
+      margin-top: -9em; /*set to a negative number 1/2 of your height*/
+      margin-left: -15em; /*set to a negative number 1/2 of your width*/
+      border: 1px solid #ccc;
+      border-radius: 10%;
+      background-color:rgba(255, 255, 255, 0.8);
+  }
+  
+  .footerTitle{
+      width: 100%;
+      height: 50px;
+      background: steelblue;
+      position: fixed;
+       top: 90%;
+      font-size: 12px;
+      text-align:right;
+      font-family: Verdana, Geneva, Tahoma, sans-serif;
+  }
+  

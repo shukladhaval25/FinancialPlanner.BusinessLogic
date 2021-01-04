@@ -1,0 +1,22 @@
+.page-container{
+  display: flex;
+  height: 100%;
+  background: rgb(35,42,58);
+  padding: 0px;
+  margin: 0px;
+}
+
+.clientlist-container{
+  position: absolute;
+  padding-left:15%;  
+}
+.clienttable-container{
+  border: 1px;
+  background: cornsilk;
+  background-color: seashell;
+  padding-inline:5px;  
+}
+.clienttablerowheader-container{
+  background-color: rgb(198, 248, 248);
+
+}

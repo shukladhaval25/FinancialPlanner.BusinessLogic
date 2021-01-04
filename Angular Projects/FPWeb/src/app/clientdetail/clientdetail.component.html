@@ -1,0 +1,16 @@
+<div class="page-container">
+    <app-welcome style="height: auto;"></app-welcome> 
+    
+    <div class="clientInformation"> 
+        <h3>Client Information</h3>      
+        {{singleClient.ID}} <br>
+        {{singleClient.Name}} <br>
+        {{singleClient.Aadhar}} <br>
+        {{singleClient.PAN}}
+        <div>
+            <a (click)="onBackFromClientInformation()" style="cursor:pointer;"> 
+                Back
+            </a>
+        </div>
+    </div>
+</div>

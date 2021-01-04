@@ -1,0 +1,17 @@
+.userinfomation-container{
+    display: inline-flex;
+    align-items: center;
+    margin-top: 10px;
+    margin-left: 10px;
+    height:7%;
+    background: rgba(163, 176, 180, 0.226);
+    width: 85%;
+    color: rgba(255,255,255,0.9);
+    position: relative;
+    padding: 10px 10px;   
+    font-size: 18px;
+    cursor: auto;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    border: 1px solid #ccc;
+    border-radius: 10%;
+}

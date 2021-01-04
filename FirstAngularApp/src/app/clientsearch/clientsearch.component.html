@@ -1,1 +1,33 @@
 <p>clientsearch works!</p>
+<h2>Get clients from Api</h2>
+
+<table>
+    <tr>
+        <th>Id</th>
+        <th>Name</th>
+        <th>Aadhar</th>
+        <th>PAN</th>
+    </tr>
+    <tr *ngFor="let com of clients">
+         <td>{{com.ID}}</td>   
+        <td>{{com.Name}}</td>
+        <td>{{com.Aadhar}}</td>
+        <td>{{com.PAN}}</td>
+    </tr>
+</table>
+<!-- 
+<ul>
+    <li *ngFor="let emp of users">
+      <p>
+        {{ emp.employee_name }} • {{ emp.employee_salary }} • Created {{ emp.id }} 
+        {{ emp.FirstName}} •  {{ emp.LastName}}
+      </p>
+    </li>
+
+     <li *ngFor="let cln of users"></li>>
+        <p>
+           {{ cln.FirstName }} 
+        </p>
+    </li>  
+   
+  </ul> -->

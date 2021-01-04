@@ -1,0 +1,12 @@
+.page-container{
+    display: flex;
+    height: 100%;
+    background: rgb(35,42,58);
+    padding: 0px;
+    margin: 0px;
+  }
+
+.clientInformation{
+    position: absolute;
+    padding-left:20%;  
+ }
