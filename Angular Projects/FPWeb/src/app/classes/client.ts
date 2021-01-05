@@ -10,6 +10,7 @@ export class client
     DOB:Date;
     Name:string;
     FatherName:string;
+    MotherName:string;
     Gender:string;
     ID: number;
     ImageData: string;

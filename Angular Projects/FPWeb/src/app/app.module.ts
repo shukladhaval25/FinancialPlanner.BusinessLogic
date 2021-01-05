@@ -11,6 +11,16 @@ import { ClientsComponent } from './clients/clients.component';
 import { LoggeedinuserComponent } from './loggeedinuser/loggeedinuser.component';
 import { ClientService } from 'src/services/client.service';
 import { ClientdetailComponent } from './clientdetail/clientdetail.component';
+import { TopNavComponent } from './top-nav/top-nav.component';
+
+// import { MatIconModule } from "@angular/material/icon";
+// import { MatListModule } from "@angular/material/list";
+// import { MatSidenavModule } from "@angular/material/sidenav";
+// import { MatToolbarModule } from "@angular/material/toolbar";
+// import { MatButtonModule } from "@angular/material/button";
+
+// import { FlexLayoutModule } from "@angular/flex-layout";
+// import { MenuListItemComponent } from "./menu-list-item/menu-list-item.component";
 
 @NgModule({
   declarations: [
@@ -19,7 +29,8 @@ import { ClientdetailComponent } from './clientdetail/clientdetail.component';
     LoginComponent,
     ClientsComponent,
     LoggeedinuserComponent,
-    ClientdetailComponent
+    ClientdetailComponent,
+    TopNavComponent
   ],
   imports: [
     BrowserModule,

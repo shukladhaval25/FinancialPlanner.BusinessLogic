@@ -1,16 +1,57 @@
 <div class="page-container">
     <app-welcome style="height: auto;"></app-welcome> 
-    
-    <div class="clientInformation"> 
-        <h3>Client Information</h3>      
-        {{singleClient.ID}} <br>
-        {{singleClient.Name}} <br>
-        {{singleClient.Aadhar}} <br>
-        {{singleClient.PAN}}
-        <div>
-            <a (click)="onBackFromClientInformation()" style="cursor:pointer;"> 
-                Back
-            </a>
+    <div >     
+        <div class="clientInformation"> 
+            <h3>Client Information</h3> 
+            <div class="clientinformationtable">
+            <table>
+                <tr>
+                    <td rowspan="4">
+                        <table>
+                            <tr style="height: 100px;">
+                                <td>
+                                    <img   style="width:auto;">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <button title="Browser">Browser</button>
+                                </td>
+                        </tr>
+                        </table>
+                    </td>
+                    <td>Client Id:</td>
+                    <td>{{singleClient.ID}}</td>                
+                </tr>
+                <tr>                
+                    <td>Name:</td>
+                    <td>
+                    <input (input)="updateclientName($event.target.value)" value={{singleClient.Name}}>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Adhar Card:</td>
+                    <td>
+                        <input (input)="updateAdharNumber($event.target.value)" value={{singleClient.Aadhar}}>
+                    </td>
+                </tr>
+                <tr>
+                    <td>PAN Number:</td>
+                    <td>
+                        <input  value= {{singleClient.PAN}}>
+                    </td>
+                </tr>
+            </table>     
+            </div>
+            <div>
+                <a (click)="onBackFromClientInformation()" style="cursor:pointer;color: aliceblue;"> 
+                    Back
+                </a>
+                <label>|</label>
+                <a (click)="onSaveClientInformation()" style="cursor:pointer;color: aliceblue;">
+                    Save
+                </a>
+            </div>
         </div>
     </div>
 </div>
