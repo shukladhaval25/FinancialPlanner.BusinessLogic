@@ -14,6 +14,7 @@ import { client } from '../classes/client';
 export class ClientdetailComponent implements OnInit {
   [x: string]: any;
 
+  p:number = 1;
 
   @Input() clientname : string;
   @Output() cdClientNameChange = new EventEmitter<string>();  

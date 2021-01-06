@@ -13,6 +13,11 @@ import { ClientService } from 'src/services/client.service';
 import { ClientdetailComponent } from './clientdetail/clientdetail.component';
 import { TopNavComponent } from './top-nav/top-nav.component';
 
+import {Ng2SearchPipeModule} from 'ng2-search-filter';
+import { FormsModule } from '@angular/forms';
+
+import {NgxPaginationModule} from 'ngx-pagination';
+
 // import { MatIconModule } from "@angular/material/icon";
 // import { MatListModule } from "@angular/material/list";
 // import { MatSidenavModule } from "@angular/material/sidenav";
@@ -35,7 +40,10 @@ import { TopNavComponent } from './top-nav/top-nav.component';
   imports: [
     BrowserModule,
     AppRoutingModule,
-    HttpClientModule
+    HttpClientModule,
+    Ng2SearchPipeModule,
+    FormsModule,
+    NgxPaginationModule
   ],
   providers: [AuthenticationService,ClientService],
   bootstrap: [AppComponent]

@@ -3,25 +3,15 @@
 <body> -->
 <div class="page-container">
     <app-welcome style="height: auto;"></app-welcome>      
-    <div class="page-container-container">     
-      <!-- <div ng-controller="myController">
-        <div ng-repeat="cln in clients">
-          <h2>{{cln.Name}}</h2>
-          <div>{{cln.Aadhar}}</div>
-        </div>
-      </div> -->
-      
-        <h2>welcome to client control</h2>
-        <div class="row">
-          <div class="col-md-2" style="color: bisque;">
-            Search:
-          </div>
-          <div class="col-md-10">
-            <input  type="text" class="search" data-ng-model="table"  style="width: 200px;"/>
-          </div>
-        </div>
-        <br/>
+    <div class="page-container-container">               
+        <h2>welcome to client control</h2>        
+        
         <div class="clientlist-container">
+          <div class="col-md-2" style="color: rgb(10, 10, 10);">
+            Search:
+            <input  type="text" placeholder="Search" [(ngModel)]="searchText"/>
+          </div>
+          <br>
           <table class="clienttable-container" style="border-style: solid;">
             <tr class="clienttablerowheader-container" >
                 <th>Id</th>
@@ -29,7 +19,7 @@
                 <th>Aadhar</th>
                 <th>PAN</th>
             </tr>           
-            <tr *ngFor="let com of clients">
+            <tr *ngFor="let com of clients | filter:searchText | paginate:{itemsPerPage:10,currentPage:p}">
                 <td>
                     <a (click)="onShowClientInformation(com)"  style="cursor:pointer;">                     
                       {{com.ID}}
@@ -51,7 +41,8 @@
                   </a>
                 </td>              
             </tr>
-        </table>
+          </table>
+          <pagination-controls (pageChange)="p = $event"></pagination-controls>
         </div>       
     </div> 
   </div>
