@@ -16,11 +16,18 @@ namespace FinancialPlanner.BusinessLogic.CurrentStatus
 
         readonly string GET_EQUITY_VALUE = "SELECT SUM(((TOTALVALUE) * EQUITYRATIO) /100) AS EQUITYMFSHARES," +
                     "SUM(((TOTALVALUE) * DEBTRATIO) / 100) AS DEBTMFSHARES," +
+                    "SUM(((TOTALVALUE) * GOLDRATIO) / 100) AS GOLDMFSHARES," +
                     "SUM(TOTALVALUE) AS TOTALVALUE FROM[MUTUALFUND] WHERE PID ={0} AND GOALID = {1}";
                     
         readonly string GET_EQUITY_NPS_VALUE = "SELECT ((NAV * UNITS) * EQUITYRATIO /100) AS EQUITYNPSSHARES," +
             "((NAV * UNITS) * DEBTRATIO /100) AS DEBTNPSSHARES," +
+            "((NAV * UNITS) * GOLDRATIO /100) AS GOLDNPSSHARES," +
             "(NAV * UNITS) AS TOTALVALUE FROM [NPS] WHERE PID ={0} AND GOALID = {1} ";
+
+        readonly string GET_EQUITY_ULIP_VALUE = "SELECT ((NAV * UNITS) * EQUITYRATIO /100) AS EQUITYULIPSHARES," +
+          "((NAV * UNITS) * DEBTRATIO /100) AS DEBTULIPSHARES," +
+          "((NAV * UNITS) * GOLDRATIO /100) AS GOLDULIPSHARES," +
+          "(NAV * UNITS) AS TOTALVALUE FROM [ULIP] WHERE PID ={0} AND GOALID = {1} ";
 
         #endregion
 
@@ -57,11 +64,18 @@ namespace FinancialPlanner.BusinessLogic.CurrentStatus
 
         readonly string GET_ALL_EQUITY_VALUE = "SELECT SUM((TOTALVALUE * EQUITYRATIO )/100) AS EQUITYMFSHARES," +
             "SUM((TOTALVALUE * DEBTRATIO) /100) AS DEBTMFSHARES," +
+            "SUM((TOTALVALUE * GOLDRATIO) /100) AS GOLDMFSHARES," +
             "SUM((TOTALVALUE)) AS TOTALVALUE FROM [MUTUALFUND] WHERE PID ={0} ";
 
         readonly string GET_ALL_EQUITY_NPS_VALUE = "SELECT ((NAV * UNITS) * EQUITYRATIO /100) AS EQUITYNPSSHARES," +
             "((NAV * UNITS) * DEBTRATIO /100) AS DEBTNPSSHARES," +
+            "((NAV * UNITS) * GOLDRATIO /100) AS GOLDNPSSHARES," +
             "(NAV * UNITS) AS TOTALVALUE FROM [NPS] WHERE PID ={0} ";
+
+        readonly string GET_ALL_EQUITY_ULIP_VALUE = "SELECT ((NAV * UNITS) * EQUITYRATIO /100) AS EQUITYULIPSHARES," +
+            "((NAV * UNITS) * DEBTRATIO /100) AS DEBTULIPSHARES," +
+            "((NAV * UNITS) * GOLDRATIO /100) AS GOLDULIPSHARES," +
+            "(NAV * UNITS) AS TOTALVALUE FROM [ULIP] WHERE PID ={0} ";
 
         readonly string GET_ALL_EQUITY_OTHERS_VALUE = "SELECT SUM(AMOUNT) AS EQUITYOTHERS FROM OTHERS WHERE TRANSACTIONTYPE ='Equity' and PID ={0}";
         #endregion
@@ -90,6 +104,12 @@ namespace FinancialPlanner.BusinessLogic.CurrentStatus
         readonly string GET_ALL_BONDS_VALUE = "SELECT SUM(CURRENTVALUE) AS BONDSVALUE FROM [BONDS] WHERE PID = {0}";
 
         #endregion
+
+
+        #region "Gold"
+        readonly string GET_ALL_OTHERS_GOLD_VALUE = "SELECT SUM(AMOUNT) AS OTHERSVALUE FROM [OTHERS] WHERE TRANSACTIONTYPE ='Gold' and PID = {0}";
+        #endregion
+
         #endregion
 
         public CurrentStatusCalculation Get(int plannerId, int goalId = 0)
@@ -108,28 +128,51 @@ namespace FinancialPlanner.BusinessLogic.CurrentStatus
             //MF
             double equityMFValue = 0;
             double debtMFValue = 0;
+            double goldMFValue = 0;
             DataTable dtMF =  DataBase.DBService.ExecuteCommand(string.Format(GET_EQUITY_VALUE,plannerId,goalId));
             if (dtMF != null && dtMF.Rows.Count > 0 )
             {
                 double.TryParse(dtMF.Rows[0]["EQUITYMFSHARES"].ToString(),out equityMFValue);
                 double.TryParse(dtMF.Rows[0]["DEBTMFSHARES"].ToString(), out debtMFValue);
+                double.TryParse(dtMF.Rows[0]["GOLDMFSHARES"].ToString(), out goldMFValue);
             }
             csCal.EquityMFvalue = equityMFValue;
             csCal.DebtMFValue = debtMFValue;
+            csCal.OthersGoldValue = csCal.OthersGoldValue + goldMFValue;
             #endregion
 
             #region "NPS"
             //NPS
             double equityNPSValue = 0;
             double debtNPSValue = 0;
+            double goldNPSValue = 0;
             DataTable dtNPS =  DataBase.DBService.ExecuteCommand(string.Format(GET_EQUITY_NPS_VALUE,plannerId,goalId));
             if (dtNPS != null && dtNPS.Rows.Count > 0 )
             {
                 double.TryParse(dtNPS.Rows[0]["EQUITYNPSSHARES"].ToString(), out equityNPSValue);
                 double.TryParse(dtNPS.Rows[0]["DEBTNPSSHARES"].ToString(), out debtNPSValue);
+                double.TryParse(dtNPS.Rows[0]["GOLDNPSSHARES"].ToString(), out goldNPSValue);
             }
             csCal.NpsEquityValue = equityNPSValue;
             csCal.NpsDebtValue = debtNPSValue;
+            csCal.OthersGoldValue = csCal.OthersGoldValue + goldNPSValue;
+            #endregion
+
+            #region "Ulip"
+            //NPS
+            double equityUlipValue = 0;
+            double debtUlipValue = 0;
+            double goldUlipValue = 0;
+            DataTable dtUlip = DataBase.DBService.ExecuteCommand(string.Format(GET_EQUITY_ULIP_VALUE, plannerId, goalId));
+            if (dtUlip != null && dtUlip.Rows.Count > 0)
+            {
+                double.TryParse(dtUlip.Rows[0]["EQUITYULIPSHARES"].ToString(), out equityUlipValue);
+                double.TryParse(dtUlip.Rows[0]["DEBTULIPSHARES"].ToString(), out debtUlipValue);
+                double.TryParse(dtUlip.Rows[0]["GOLDULIPSHARES"].ToString(), out goldUlipValue);
+            }
+            csCal.UlipEquityValue = equityUlipValue;
+            csCal.UlipDebtValue = debtUlipValue;
+            csCal.OthersGoldValue = csCal.OthersGoldValue + goldUlipValue;
             #endregion
 
             #region "DEBT"
@@ -215,6 +258,12 @@ namespace FinancialPlanner.BusinessLogic.CurrentStatus
 
             #endregion
 
+            #region "Others Gold"
+            double goldOthersValue = 0;
+            returnvalue = DataBase.DBService.ExecuteCommandScalar(string.Format(GET_ALL_OTHERS_GOLD_VALUE, plannerId));
+            double.TryParse(returnvalue, out goldOthersValue);
+            csCal.GoldValue = goldOthersValue;
+            #endregion
             return csCal;
         }
 
@@ -235,29 +284,54 @@ namespace FinancialPlanner.BusinessLogic.CurrentStatus
             //MF
             double equityMFValue = 0;
             double debtMFValue = 0;
+            double goldMFValue = 0;
             DataTable dtMF =  DataBase.DBService.ExecuteCommand(string.Format(GET_ALL_EQUITY_VALUE,plannerId));
             if (dtMF != null && dtMF.Rows.Count > 0)
             {
                 double.TryParse(dtMF.Rows[0]["EQUITYMFSHARES"].ToString(), out equityMFValue);
                 double.TryParse(dtMF.Rows[0]["DEBTMFSHARES"].ToString(), out debtMFValue);
+                double.TryParse(dtMF.Rows[0]["GOLDMFSHARES"].ToString(), out goldMFValue);
             }
             csCal.EquityMFvalue = equityMFValue;
             csCal.DebtMFValue = debtMFValue;
+            csCal.OthersGoldValue = csCal.OthersGoldValue + goldMFValue;
             #endregion
 
             #region "NPS"
             //NPS
             double equityNPSValue = 0;
             double debtNPSValue = 0;
+            double goldNPSValue = 0;
             DataTable dtNPS =  DataBase.DBService.ExecuteCommand(string.Format(GET_ALL_EQUITY_NPS_VALUE,plannerId));
             if (dtNPS != null && dtNPS.Rows.Count > 0)
             {
                 double.TryParse(dtNPS.Rows[0]["EQUITYNPSSHARES"].ToString(), out equityNPSValue);
                 double.TryParse(dtNPS.Rows[0]["DEBTNPSSHARES"].ToString(), out debtNPSValue);
+                double.TryParse(dtNPS.Rows[0]["GOLDNPSSHARES"].ToString(), out goldNPSValue);
             }
             csCal.NpsEquityValue = equityNPSValue;
             csCal.NpsDebtValue = debtNPSValue;
+            csCal.OthersGoldValue = csCal.OthersGoldValue + goldNPSValue;
             #endregion
+
+            #region "Ulip"
+            //NPS
+            double equityUlipValue = 0;
+            double debtUlipValue = 0;
+            double goldUlipValue = 0;
+
+            DataTable dtUlip = DataBase.DBService.ExecuteCommand(string.Format(GET_ALL_EQUITY_ULIP_VALUE, plannerId));
+            if (dtUlip != null && dtUlip.Rows.Count > 0)
+            {
+                double.TryParse(dtUlip.Rows[0]["EQUITYULIPSHARES"].ToString(), out equityUlipValue);
+                double.TryParse(dtUlip.Rows[0]["DEBTULIPSHARES"].ToString(), out debtUlipValue);
+                double.TryParse(dtUlip.Rows[0]["GOLDULIPSHARES"].ToString(), out goldUlipValue);
+            }
+            csCal.UlipEquityValue = equityUlipValue;
+            csCal.UlipDebtValue = debtUlipValue;
+            csCal.OthersGoldValue = csCal.OthersGoldValue + goldUlipValue;
+            #endregion
+
 
             #region "Others Equity"
             double equityOtherValue = 0;
@@ -350,6 +424,13 @@ namespace FinancialPlanner.BusinessLogic.CurrentStatus
             returnvalue = DataBase.DBService.ExecuteCommandScalar(string.Format(GET_ALL_BONDS_VALUE, plannerId));
             double.TryParse(returnvalue, out bondsValue);
             csCal.BondsValue = bondsValue;
+            #endregion
+
+            #region "Others Gold"
+            double goldOthersValue = 0;
+            returnvalue = DataBase.DBService.ExecuteCommandScalar(string.Format(GET_ALL_OTHERS_GOLD_VALUE, plannerId));
+            double.TryParse(returnvalue, out goldOthersValue);
+            csCal.GoldValue = goldOthersValue;
             #endregion
 
             #endregion

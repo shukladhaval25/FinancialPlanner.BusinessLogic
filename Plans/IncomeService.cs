@@ -31,10 +31,10 @@ namespace FinancialPlanner.BusinessLogic
         const string DELET_SALARY_DETAIL_QUERY = "DELETE FROM SALARYDETAIL WHERE INCOMEID = {0}";
 
 
-        const string INSERT_QUERY = "INSERT INTO INCOME VALUES ({0},'{1}','{2}',{3},{4},'{5}','{6}','{7}','{8}',{9},'{10}',{11},{12})";
+        const string INSERT_QUERY = "INSERT INTO INCOME VALUES ({0},'{1}','{2}',{3},{4},'{5}','{6}','{7}','{8}',{9},'{10}',{11},{12},{13},{14})";
         const string UPDATE_QUERY = "UPDATE INCOME SET SOURCE ='{0}',INCOMEBY = '{1}',AMOUNT ={2},EXPECTGROWTHINPERCENTAGE ={3}," +
             "STARTYEAR ='{4}',ENDYEAR ='{5}',DESCRIPTION = '{6}', UPDATEDON = '{7}'," +
-            "UPDATEDBY={8},IncomeTax = {9} WHERE ID ={10}";
+            "UPDATEDBY={8},IncomeTax = {9},EXPECTEDGROWTHTYPE ='{11}',EXPECTEDGROWTHINAMOUNT ={12} WHERE ID ={10}";
         const string DELET_QUERY = "DELETE FROM INCOME WHERE ID ={0}";
         public IList<Income> GetAll(int plannerId)
         {
@@ -105,7 +105,9 @@ namespace FinancialPlanner.BusinessLogic
                        income.Description,
                        income.CreatedOn.ToString("yyyy-MM-dd hh:mm:ss"), income.CreatedBy,
                        income.UpdatedOn.ToString("yyyy-MM-dd hh:mm:ss"), income.UpdatedBy,
-                       income.IncomeTax), true);
+                       income.IncomeTax,
+                       income.ExpectedGrowthType,
+                       income.ExpectedGrwothInAmount), true);
 
                     if (income.SalaryDetail != null)
                     {
@@ -123,7 +125,9 @@ namespace FinancialPlanner.BusinessLogic
                       income.Description,
                       income.CreatedOn.ToString("yyyy-MM-dd hh:mm:ss"), income.CreatedBy,
                       income.UpdatedOn.ToString("yyyy-MM-dd hh:mm:ss"), income.UpdatedBy,
-                      income.IncomeTax),true);
+                      income.IncomeTax,
+                      income.ExpectedGrowthType,
+                      income.ExpectedGrwothInAmount), true);
                 }
 
                 Activity.ActivitiesService.Add(ActivityType.CreateIncome, EntryStatus.Success,
@@ -175,7 +179,8 @@ namespace FinancialPlanner.BusinessLogic
                    income.StartYear, income.EndYear,
                    income.Description,
                    income.UpdatedOn.ToString("yyyy-MM-dd hh:mm:ss"),
-                   income.UpdatedBy, income.IncomeTax, income.Id), true);
+                   income.UpdatedBy, income.IncomeTax, income.Id,
+                   income.ExpectedGrowthType,income.ExpectedGrwothInAmount), true);
 
                 if (income.SalaryDetail != null)
                 {
@@ -255,6 +260,8 @@ namespace FinancialPlanner.BusinessLogic
             income.UpdatedOn = dr.Field<DateTime>("UpdatedOn");
             income.UpdatedBy = dr.Field<int>("UpdatedBy");
             income.IncomeTax = float.Parse(dr["IncomeTax"].ToString());
+            income.ExpectedGrowthType = dr.Field<string>("ExpectedGrowthType");
+            income.ExpectedGrwothInAmount = double.Parse(dr["ExpectedGrowthInAmount"].ToString());
             return income;
         }
 

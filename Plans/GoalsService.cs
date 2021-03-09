@@ -123,6 +123,19 @@ namespace FinancialPlanner.BusinessLogic
         {
             try
             {
+                if (isGoalPriorityAlreadyExist(goals))
+                    throw new Exception("Priority for goal is already exist. Please change priority and try again.");
+            }
+            catch (Exception ex)
+            {
+                StackTrace st = new StackTrace();
+                StackFrame sf = st.GetFrame(0);
+                MethodBase currentMethodName = sf.GetMethod();
+                LogDebug(currentMethodName.Name, ex);
+                throw ex;
+            }
+            try
+            { 
                 string clientName = DataBase.DBService.ExecuteCommandScalar(string.Format(GET_CLIENT_NAME_QUERY, goals.Pid));
 
                 if (isGoalRepeatAgain(goals))
@@ -146,6 +159,16 @@ namespace FinancialPlanner.BusinessLogic
             }
         }
 
+        private bool isGoalPriorityAlreadyExist(Goals goals)
+        {
+           string recordCount = DataBase.DBService.ExecuteCommandScalar(string.Format("select count(*) from goals where PID = {0} and priority = {1} and IsDeleted = 'False'", goals.Pid,goals.Priority));
+
+            if (recordCount.Equals("0"))
+                return false;
+            else
+                return true;
+        }
+
         private static bool isGoalRepeatAgain(Goals goals)
         {
             return goals.StartYear != "" && goals.EndYear != "" &&
@@ -163,7 +186,7 @@ namespace FinancialPlanner.BusinessLogic
             decimal inflationRate = goals.InflationRate;
             Goals yearWiseGoal = goals;
             DataBase.DBService.BeginTransaction();
-            for (int year = startYear; year < endYear;)
+            for (int year = startYear; year <= endYear;)
             {                
                 goals.StartYear = year.ToString();
                 goals.EndYear = "";

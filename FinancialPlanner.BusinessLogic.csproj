@@ -129,6 +129,7 @@
     <Compile Include="Permissions\FormsService.cs" />
     <Compile Include="Permissions\RolePermissionService.cs" />
     <Compile Include="PlanOption\CashFlowService.cs" />
+    <Compile Include="PlanOption\ContingencyFundSesrvice.cs" />
     <Compile Include="PlanOption\CurrentStatusToGoalService.cs" />
     <Compile Include="PlanOption\InvestmentRecommendationService.cs" />
     <Compile Include="PlanOption\PlanOptionService.cs" />

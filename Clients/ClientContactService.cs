@@ -22,6 +22,8 @@ namespace FinancialPlanner.BusinessLogic.Clients
         private const string INSERT_QUERY = "INSERT INTO CLIENTCONTACT VALUES ({0},'{1}','{2}','{3}','{4}','{5}','{6}','{7}'," +
             "'{8}','{9}','{10}','{11}','{12}',{13},'{14}',{15},'{16}','{17}','{18}')";
 
+        private const string GET_CLIENT_PRIMARY_CONTACT = "SELECT  Client.ID, Client.Name, ClientContact.PrimaryEmail, ClientContact.PrimaryMobileNo FROM Client INNER JOIN ClientContact ON Client.ID = ClientContact.CID AND Client.ID = ClientContact.CID AND Client.ID = ClientContact.CID AND Client.ID = ClientContact.CID AND Client.ID = ClientContact.CID AND Client.ID = ClientContact.CID";
+
         public ClientContact Get(int id)
         {
             ClientContact clientContact = new ClientContact();
@@ -58,7 +60,7 @@ namespace FinancialPlanner.BusinessLogic.Clients
             clientContact.Country = dr.Field<string>("Country");
             return clientContact;
         }
-
+       
         public void Update(ClientContact clientContact)
         {
             try
@@ -100,6 +102,29 @@ namespace FinancialPlanner.BusinessLogic.Clients
             {
                 Logger.LogDebug(ex.Message);
             }
+        }
+
+        public IList<ClientPrimaryContact> GetPrimaryContact()
+        {
+            IList<ClientPrimaryContact> lstClients = new List<ClientPrimaryContact>();
+
+            DataTable dtAppConfig = DataBase.DBService.ExecuteCommand(GET_CLIENT_PRIMARY_CONTACT);
+            foreach (DataRow dr in dtAppConfig.Rows)
+            {
+                ClientPrimaryContact client = convertToClientObject(dr);
+                lstClients.Add(client);
+            }
+            return lstClients;
+        }
+
+        private ClientPrimaryContact convertToClientObject(DataRow dr)
+        {
+            ClientPrimaryContact client = new ClientPrimaryContact();
+            client.Id = dr.Field<int>("ID");
+            client.Name = dr.Field<string>("Name");
+            client.PrimaryEmail = dr.Field<string>("PrimaryEmail");
+            client.PrimaryMobileNo = dr.Field<string>("PrimaryMobileNo");
+            return client;
         }
     }
 }
