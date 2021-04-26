@@ -132,6 +132,7 @@
     <Compile Include="PlanOption\ContingencyFundSesrvice.cs" />
     <Compile Include="PlanOption\CurrentStatusToGoalService.cs" />
     <Compile Include="PlanOption\InvestmentRecommendationService.cs" />
+    <Compile Include="PlanOption\NetWorthService.cs" />
     <Compile Include="PlanOption\PlanOptionService.cs" />
     <Compile Include="PlanOption\QuarterlyReviewTemplateService.cs" />
     <Compile Include="PlanOption\SIPTypeInvestmentRecomendationService.cs" />

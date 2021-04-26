@@ -31,7 +31,7 @@ namespace FinancialPlanner.BusinessLogic
         const string DELET_SALARY_DETAIL_QUERY = "DELETE FROM SALARYDETAIL WHERE INCOMEID = {0}";
 
 
-        const string INSERT_QUERY = "INSERT INTO INCOME VALUES ({0},'{1}','{2}',{3},{4},'{5}','{6}','{7}','{8}',{9},'{10}',{11},{12},{13},{14})";
+        const string INSERT_QUERY = "INSERT INTO INCOME VALUES ({0},'{1}','{2}',{3},{4},'{5}','{6}','{7}','{8}',{9},'{10}',{11},{12},'{13}',{14})";
         const string UPDATE_QUERY = "UPDATE INCOME SET SOURCE ='{0}',INCOMEBY = '{1}',AMOUNT ={2},EXPECTGROWTHINPERCENTAGE ={3}," +
             "STARTYEAR ='{4}',ENDYEAR ='{5}',DESCRIPTION = '{6}', UPDATEDON = '{7}'," +
             "UPDATEDBY={8},IncomeTax = {9},EXPECTEDGROWTHTYPE ='{11}',EXPECTEDGROWTHINAMOUNT ={12} WHERE ID ={10}";

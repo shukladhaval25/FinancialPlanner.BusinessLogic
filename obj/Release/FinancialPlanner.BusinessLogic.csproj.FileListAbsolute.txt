@@ -24,3 +24,17 @@ C:\Application Development\Financial Planner Project\FinancialPlanner.BusinessLo
 C:\Application Development\Financial Planner Project\FinancialPlanner.BusinessLogic\obj\Release\FinancialPlanner.BusinessLogic.csproj.CopyComplete
 C:\Application Development\Financial Planner Project\FinancialPlanner.BusinessLogic\obj\Release\FinancialPlanner.BusinessLogic.dll
 C:\Application Development\Financial Planner Project\FinancialPlanner.BusinessLogic\obj\Release\FinancialPlanner.BusinessLogic.pdb
+C:\Application Softwares\FinancialPlanner.BusinessLogic\bin\Release\FinancialPlanner.BusinessLogic.dll.config
+C:\Application Softwares\FinancialPlanner.BusinessLogic\bin\Release\FinancialPlanner.BusinessLogic.dll
+C:\Application Softwares\FinancialPlanner.BusinessLogic\bin\Release\FinancialPlanner.BusinessLogic.pdb
+C:\Application Softwares\FinancialPlanner.BusinessLogic\bin\Release\FinancialPlanner.Common.dll
+C:\Application Softwares\FinancialPlanner.BusinessLogic\bin\Release\log4net.dll
+C:\Application Softwares\FinancialPlanner.BusinessLogic\bin\Release\Newtonsoft.Json.dll
+C:\Application Softwares\FinancialPlanner.BusinessLogic\bin\Release\ChilkatDotNet4.dll
+C:\Application Softwares\FinancialPlanner.BusinessLogic\bin\Release\FinancialPlanner.Common.pdb
+C:\Application Softwares\FinancialPlanner.BusinessLogic\bin\Release\FinancialPlanner.Common.dll.config
+C:\Application Softwares\FinancialPlanner.BusinessLogic\obj\Release\FinancialPlanner.BusinessLogic.csprojAssemblyReference.cache
+C:\Application Softwares\FinancialPlanner.BusinessLogic\obj\Release\FinancialPlanner.BusinessLogic.csproj.CoreCompileInputs.cache
+C:\Application Softwares\FinancialPlanner.BusinessLogic\obj\Release\FinancialPlanner.BusinessLogic.csproj.CopyComplete
+C:\Application Softwares\FinancialPlanner.BusinessLogic\obj\Release\FinancialPlanner.BusinessLogic.dll
+C:\Application Softwares\FinancialPlanner.BusinessLogic\obj\Release\FinancialPlanner.BusinessLogic.pdb
