@@ -17,7 +17,7 @@ namespace FinancialPlanner.BusinessLogic.Plans
         const string SELECT_COUNT = "SELECT COUNT(*) FROM ASSUMPTIONMASTER";
 
         const string INSERT_QUERY = "INSERT INTO ASSUMPTIONMASTER VALUES (" +
-            "{0},{1},{2},{3},{4},{5},{6},{7},{8},{9},'{10}',{11},'{12}',{13},{14})";
+            "{0},{1},{2},{3},{4},{5},{6},{7},{8},{9},'{10}',{11},'{12}',{13},{14},{15})";
 
         const string UPDATE_QUERY = "UPDATE ASSUMPTIONMASTER SET " +
             "RetirementAge = {0}," +
@@ -31,7 +31,8 @@ namespace FinancialPlanner.BusinessLogic.Plans
             "OngoingExpRise ={8}," +
             "NonFinancialRateOfReturn = {9}," +
             "UPDATEDON = '{10}'," +
-            "UPDATEDBY={11},PostRetirementInvestmentReturnRate ={13} WHERE ID ={12}";
+            "UPDATEDBY={11},PostRetirementInvestmentReturnRate ={13}," +
+            "InsuranceReturnRate={14} WHERE ID ={12}";
 
         public AssumptionMaster GetAll()
         {
@@ -80,7 +81,8 @@ namespace FinancialPlanner.BusinessLogic.Plans
                        assumptionMaster.UpdatedOn.ToString("yyyy-MM-dd hh:mm:ss"),
                        assumptionMaster.UpdatedBy,                    
                        assumptionMaster.Id,
-                       assumptionMaster.PostRetirementInvestmentReturnRate), true);
+                       assumptionMaster.PostRetirementInvestmentReturnRate,
+                       assumptionMaster.InsuranceReturnRate), true);
                 }
                 else
                 {
@@ -100,7 +102,8 @@ namespace FinancialPlanner.BusinessLogic.Plans
                       assumptionMaster.UpdatedOn.ToString("yyyy-MM-dd hh:mm:ss"),
                       assumptionMaster.UpdatedBy,
                       assumptionMaster.Id,
-                      assumptionMaster.PostRetirementInvestmentReturnRate), true);
+                      assumptionMaster.PostRetirementInvestmentReturnRate,
+                      assumptionMaster.InsuranceReturnRate), true);
                 }
                 Activity.ActivitiesService.Add(ActivityType.UpdatePlannerAssumption, EntryStatus.Success,
                             Source.Server, assumptionMaster.UpdatedByUserName, "", assumptionMaster.MachineName);
@@ -134,6 +137,7 @@ namespace FinancialPlanner.BusinessLogic.Plans
             assumptionMaster.UpdatedOn = dr.Field<DateTime>("UpdatedOn");
             assumptionMaster.UpdatedBy = dr.Field<int>("UpdatedBy");
             assumptionMaster.PostRetirementInvestmentReturnRate = dr.Field<decimal>("PostRetirementInvestmentReturnRate");
+            assumptionMaster.InsuranceReturnRate = dr.Field<decimal>("InsuranceReturnRate");
             return assumptionMaster;
         }
 

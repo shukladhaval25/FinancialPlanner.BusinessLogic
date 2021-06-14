@@ -15,9 +15,8 @@ namespace FinancialPlanner.BusinessLogic.Clients
 {
     public class ClientService
     {
-        private const string INSERT_QUERY = "INSERT INTO CLIENT VALUES (" +
-            "'{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','{8}','{9}','{10}'," +
-            "'{11}','{12}',{13},'{14}',{15},'{16}',{17},'{18}','{19}','{20}')";
+        private const string INSERT_QUERY = "INSERT INTO CLIENT VALUES (" +           "'{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','{8}','{9}','{10}'," +
+            "'{11}','{12}',{13},'{14}',{15},'{16}',{17},'{18}','{19}','{20}',{21},'{22}')";
 
         private const string SELECT_ALL = "SELECT C1.*,U.USERNAME AS UPDATEDBYUSERNAME FROM CLIENT C1, USERS U WHERE C1.UPDATEDBY = U.ID AND C1.ISDELETED = 0";
         private const string SELECT_ID = "SELECT C1.*,U.USERNAME AS UPDATEDBYUSERNAME FROM CLIENT C1, USERS U WHERE C1.UPDATEDBY = U.ID and C1.ID = {0} AND C1.ISDELETED = 0";
@@ -28,7 +27,8 @@ namespace FinancialPlanner.BusinessLogic.Clients
                 "FATHERNAME = '{1}', MOTHERNAME = '{2}',GENDER ='{3}',DOB ='{4}',PAN ='{5}', AADHAR = '{6}'," +
                 "PLACEOFBIRTH ='{7}',Married ='{8}',MARRIAGEANNIVERSARY ='{9}', Occupation = '{10}'," +
                 "INCOMESLAB = '{11}', UPDATEDON = '{12}', UPDATEDBY = {13},IMAGEPATH = '{14}', " +
-                "RATING ='{15}', CLIENTTYPE ='{16}',RESISTATUS ='{17}'  WHERE ID= {18}";
+                "RATING ='{15}', CLIENTTYPE ='{16}',RESISTATUS ='{17}'," +
+            "ISACTIVE = {19},NOTE = '{20}' WHERE ID= {18}";
         private const string DELETE_QUERY = "UPDATE CLIENT SET ISDELETED = 1, " +
             "UPDATEDON = '{0}', UPDATEDBY = {1} WHERE ID = {2}";
 
@@ -101,7 +101,9 @@ namespace FinancialPlanner.BusinessLogic.Clients
             client.Rating = dr.Field<string>("Rating");
             client.ClientType = dr.Field<string>("ClientType");
             client.ResiStatus = dr.Field<string>("ResiStatus");
-            
+            client.IsActive = dr.Field<bool>("IsActive");
+            client.Note  = dr.Field<string>("Note");
+
             if (!string.IsNullOrEmpty(client.ImagePath))
             {
                 string actualImagePath = getImagePath(client);
@@ -148,7 +150,8 @@ namespace FinancialPlanner.BusinessLogic.Clients
                     ((client.MarriageAnniversary == null) ? null : client.MarriageAnniversary.Value.ToString("yyyy-MM-dd")),client.Occupation,client.IncomeSlab,
                     client.CreatedOn.ToString("yyyy-MM-dd hh:mm:ss"), client.CreatedBy, 
                     client.UpdatedOn.ToString("yyyy-MM-dd hh:mm:ss"), client.UpdatedBy,
-                    imagePath,0,client.Rating,client.ClientType,client.ResiStatus),true);
+                    imagePath,0,client.Rating,client.ClientType,client.ResiStatus,
+                    (client.IsActive) ? 1 : 0,client.Note),true);
 
 
                 Activity.ActivitiesService.Add(ActivityType.CreateClient, EntryStatus.Success,
@@ -202,7 +205,8 @@ namespace FinancialPlanner.BusinessLogic.Clients
                             client.UpdatedOn.ToString("yyyy-MM-dd hh:mm:ss"), client.UpdatedBy,imagePath,
                             client.Rating,client.ClientType,
                             client.ResiStatus,
-                            client.ID),true);
+                            client.ID,
+                            (client.IsActive) ? 1 : 0,client.Note),true);
 
                 Activity.ActivitiesService.Add(ActivityType.UpdateClient, EntryStatus.Success,
                          Source.Server, client.UpdatedByUserName, client.Name, client.MachineName);

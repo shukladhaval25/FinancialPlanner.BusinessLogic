@@ -18,10 +18,10 @@ namespace FinancialPlanner.BusinessLogic.Clients
         private const string SELECT_ALL_BY_CLIENT_ID_AND_ID = "SELECT C1.*,U.USERNAME AS UPDATEDBYUSERNAME FROM CLIENTFAMILYMEMBER C1, USERS U WHERE C1.UPDATEDBY = U.ID and C1.ID = {0} AND C1.CID = {1}";
 
         private const string INSERT_QUERY = "INSERT INTO CLIENTFAMILYMEMBER VALUES " + 
-            "({0},'{1}','{2}',{3},'{4}','{5}','{6}','{7}',{8},'{9}',{10},'{11}','{12}','{13}')";
+            "({0},'{1}','{2}',{3},'{4}','{5}','{6}','{7}',{8},'{9}',{10},'{11}','{12}','{13}',{14})";
         private const string UPDATE_QUERY = "UPDATE CLIENTFAMILYMEMBER SET NAME ='{0}',RELATIONSHIP ='{1}',DOB = {2}," +
             "ISDEPENDENT ='{3}',CHILDRENCLASS ='{4}',Description='{5}',UPDATEDON ='{6}', " + 
-            "UPDATEDBY ={7}, PAN ='{10}',AADHAR ='{11}',OCCUPATION='{12}' WHERE CID ={8} AND ID ={9}";
+            "UPDATEDBY ={7}, PAN ='{10}',AADHAR ='{11}',OCCUPATION='{12}',ISHUF = '{13}'  WHERE CID ={8} AND ID ={9}";
 
         private const string DELETE_BY_ID = "DELETE FROM CLIENTFAMILYMEMBER WHERE ID ={0}";
 
@@ -89,7 +89,8 @@ namespace FinancialPlanner.BusinessLogic.Clients
                    familyMember.Description,
                    familyMember.CreatedOn.ToString("yyyy-MM-dd hh:mm:ss"), familyMember.CreatedBy,
                    familyMember.UpdatedOn.ToString("yyyy-MM-dd hh:mm:ss"), familyMember.UpdatedBy,
-                   familyMember.Pancard,familyMember.AadharCard,familyMember.Occupation));
+                   familyMember.Pancard,familyMember.AadharCard,familyMember.Occupation,
+                   familyMember.IsHuf));
 
                 Activity.ActivitiesService.Add(ActivityType.CreateFamilyMember, EntryStatus.Success,
                          Source.Server, familyMember.UpdatedByUserName, clientName, familyMember.MachineName);
@@ -115,7 +116,8 @@ namespace FinancialPlanner.BusinessLogic.Clients
                    familyMember.UpdatedOn.ToString("yyyy-MM-dd hh:mm:ss"), 
                    familyMember.UpdatedBy,familyMember.Cid,familyMember.Id,
                    familyMember.Pancard,familyMember.AadharCard,
-                   familyMember.Occupation));
+                   familyMember.Occupation,
+                   familyMember.IsHuf));
 
                 Activity.ActivitiesService.Add(ActivityType.UpdateFamilyMember, EntryStatus.Success,
                          Source.Server, familyMember.UpdatedByUserName, familyMember.Name, familyMember.MachineName);
@@ -171,6 +173,7 @@ namespace FinancialPlanner.BusinessLogic.Clients
             familymember.Pancard = dr.Field<string>("PAN");
             familymember.AadharCard = dr.Field<string>("AADHAR");
             familymember.Occupation = dr.Field<string>("Occupation");
+            familymember.IsHuf = dr.Field<bool>("IsHuf");
 
             return familymember;
         }

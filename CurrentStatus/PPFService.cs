@@ -243,7 +243,7 @@ namespace FinancialPlanner.BusinessLogic.CurrentStatus
             PPF.UpdatedOn = dr.Field<DateTime>("UpdatedOn");
             PPF.UpdatedByUserName = dr.Field<string>("UpdatedByUserName");
             PPF.InvestmentReturnRate = float.Parse(dr["InvestmentReturnRate"].ToString());
-            PPF.IsAccountExtended = dr.Field<bool>("AccountExtended");
+            PPF.IsAccountExtended = dr["AccountExtended"] == System.DBNull.Value   ? false : dr.Field<bool>("AccountExtended");
             return PPF;
         }
     }

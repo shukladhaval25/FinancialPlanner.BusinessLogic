@@ -22,7 +22,19 @@ namespace FinancialPlanner.BusinessLogic.Clients
         private const string INSERT_QUERY = "INSERT INTO CLIENTCONTACT VALUES ({0},'{1}','{2}','{3}','{4}','{5}','{6}','{7}'," +
             "'{8}','{9}','{10}','{11}','{12}',{13},'{14}',{15},'{16}','{17}','{18}')";
 
-        private const string GET_CLIENT_PRIMARY_CONTACT = "SELECT  Client.ID, Client.Name, ClientContact.PrimaryEmail, ClientContact.PrimaryMobileNo FROM Client INNER JOIN ClientContact ON Client.ID = ClientContact.CID AND Client.ID = ClientContact.CID AND Client.ID = ClientContact.CID AND Client.ID = ClientContact.CID AND Client.ID = ClientContact.CID AND Client.ID = ClientContact.CID";
+        private const string GET_CLIENT_PRIMARY_CONTACT = "SELECT  Client.ID, Client.Name, ClientContact.PrimaryEmail, ClientContact.PrimaryMobileNo FROM Client " +
+            " INNER JOIN ClientContact ON Client.ID = ClientContact.CID" +
+            " INNER JOIN Planner ON CLIENT.ID = Planner.ClientId " +
+            " And (client.IsActive = 1 AND " +
+            "(DATEADD(D,-1, DATEADD(M, 3, Planner.StartDate)) = '{0}' OR" +
+            " DATEADD(D,-1, DATEADD(M, 6, Planner.StartDate)) = '{0}' OR" +
+            " DATEADD(D,-1, DATEADD(M, 9, Planner.StartDate)) = '{0}'))";
+
+        private const string GET_ANNUALREVIEW_CLIENT_PRIMARY_CONTACT = "SELECT  Client.ID, Client.Name, ClientContact.PrimaryEmail, ClientContact.PrimaryMobileNo FROM Client " +
+        " INNER JOIN ClientContact ON Client.ID = ClientContact.CID" +
+        " INNER JOIN Planner ON CLIENT.ID = Planner.ClientId " +
+        " And (client.IsActive = 1 AND " +
+        "(DATEADD(D,-1, DATEADD(M, 12, Planner.StartDate)) = '{0}'))";
 
         public ClientContact Get(int id)
         {
@@ -104,11 +116,15 @@ namespace FinancialPlanner.BusinessLogic.Clients
             }
         }
 
-        public IList<ClientPrimaryContact> GetPrimaryContact()
+        public IList<ClientPrimaryContact> GetPrimaryContact(DateTime dateTime,bool IsAnnualReview = false)
         {
             IList<ClientPrimaryContact> lstClients = new List<ClientPrimaryContact>();
 
-            DataTable dtAppConfig = DataBase.DBService.ExecuteCommand(GET_CLIENT_PRIMARY_CONTACT);
+            DataTable dtAppConfig = (IsAnnualReview) ?
+                 DataBase.DBService.ExecuteCommand(
+                string.Format(GET_ANNUALREVIEW_CLIENT_PRIMARY_CONTACT, dateTime))
+                : DataBase.DBService.ExecuteCommand(
+                string.Format(GET_CLIENT_PRIMARY_CONTACT,dateTime));
             foreach (DataRow dr in dtAppConfig.Rows)
             {
                 ClientPrimaryContact client = convertToClientObject(dr);
