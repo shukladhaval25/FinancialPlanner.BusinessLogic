@@ -44,6 +44,9 @@ namespace FinancialPlanner.BusinessLogic.CurrentStatus
         readonly string GET_BONDS_VALUE = "SELECT 'BONDS' AS NAME,(CURRENTVALUE) AS BONDSVALUE,INVESTMENTRETURNRATE AS ROI,GOALID FROM [BONDS] WHERE PID = {0} AND GOALID = {1}";
 
         #endregion
+
+        readonly string GET_OTHERS_VALUE = "SELECT 'OTHERS' AS NAME,(CURRENTVALUE) AS OTHERVALUE,INVESTMENTRETURNRATE AS ROI,GOALID FROM [OTHERS] WHERE PID = {0} AND GOALID = {1}";
+
         #endregion
 
         #region "GetAll"
@@ -91,6 +94,8 @@ namespace FinancialPlanner.BusinessLogic.CurrentStatus
         readonly string GET_ALL_BONDS_VALUE = "SELECT 'BONDS' AS NAME,(CURRENTVALUE) AS BONDSVALUE,INVESTMENTRETURNRATE AS ROI,GOALID FROM [BONDS] WHERE PID = {0}";
 
         #endregion
+
+        readonly string GET_ALL_OTHERS_VALUE = "SELECT 'OTHERS' AS NAME,(AMOUNT) AS OTHERSVALUE,INVESTMENTRETURNRATE AS ROI,GOALID FROM [OTHERS] WHERE PID = {0}";
         #endregion
 
         public IList<CurrentStatusInstrument> GetMappedInstrumentWithGoal(int plannerId, int goalId)
@@ -168,6 +173,12 @@ namespace FinancialPlanner.BusinessLogic.CurrentStatus
                 FinancialPlanner.Common.Logger.LogInfo("Get bonds information for current status proces completed.");
                 #endregion
 
+                #region "Others / Gold"
+                FinancialPlanner.Common.Logger.LogInfo("Get others information for current status proces start.");
+                addOthersToCurrentStatusInstrument(plannerId, csCal);
+                FinancialPlanner.Common.Logger.LogInfo("Get others information for current status proces completed.");
+                #endregion
+
                 return csCal;
             }
             catch(Exception ex)
@@ -187,6 +198,17 @@ namespace FinancialPlanner.BusinessLogic.CurrentStatus
                 setInstrument(csCal, dtInstrument);
             }            
         }
+
+        private void addOthersToCurrentStatusInstrument(int plannerId, IList<CurrentStatusInstrument> csCal)
+        {
+            DataTable dtInstrument = new DataTable();
+            dtInstrument = DataBase.DBService.ExecuteCommand(string.Format(GET_ALL_OTHERS_VALUE, plannerId));
+            if (dtInstrument != null && dtInstrument.Rows.Count > 0)
+            {
+                setInstrument(csCal, dtInstrument);
+            }
+        }
+
 
         private void addNSCToCurrentStatusInstrument(int plannerId, IList<CurrentStatusInstrument> csCal)
         {

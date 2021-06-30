@@ -155,6 +155,8 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ProspectClients\ProspectClientConversationService.cs" />
     <Compile Include="ProspectClients\ProspectClientService.cs" />
+    <Compile Include="ScoreCalculation\ScoreEntryService.cs" />
+    <Compile Include="ScoreCalculation\ScoreService.cs" />
     <Compile Include="TaskManagements\AdditionalPurchaseServiceImpl.cs" />
     <Compile Include="TaskManagements\ChangeOfNameServiceImpl.cs" />
     <Compile Include="TaskManagements\NominationServiceImpl.cs" />
