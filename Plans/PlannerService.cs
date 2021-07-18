@@ -68,6 +68,14 @@ namespace FinancialPlanner.BusinessLogic.Plans
         {
             try
             {
+                FinancialPlanner.Common.Logger.LogInfo(string.Format(INSERT_QUERY,
+                    planner.ClientId, planner.Name, planner.StartDate.ToString("yyyy-MM-dd"),
+                    planner.EndDate.ToString("yyyy-MM-dd"), planner.IsActive,
+                    planner.CreatedOn.ToString("yyyy-MM-dd hh:mm:ss"), planner.CreatedBy,
+                    planner.UpdatedOn.ToString("yyyy-MM-dd hh:mm:ss"), planner.UpdatedBy,
+                    planner.PlannerStartMonth, planner.AccountManagedBy, planner.Description,
+                    planner.IsDeleted, planner.ReviewFrequency));
+
                 DataBase.DBService.ExecuteCommand(string.Format(INSERT_QUERY,
                     planner.ClientId, planner.Name, planner.StartDate.ToString("yyyy-MM-dd"),
                     planner.EndDate.ToString("yyyy-MM-dd"), planner.IsActive,

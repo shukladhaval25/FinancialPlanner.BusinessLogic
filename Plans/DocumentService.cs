@@ -202,6 +202,11 @@ namespace FinancialPlanner.BusinessLogic.Plans
             Document.Path = dr.Field<string>("Path");
             Document.UpdatedOn = dr.Field<DateTime>("UpdatedOn");
             Document.UpdatedBy = dr.Field<int>("UpdatedBy");
+            if (!string.IsNullOrEmpty(Document.Path))
+            {
+                string fullDocumentPath = getFullFilePath(Document);
+                Document.Data = getStringfromFile(fullDocumentPath);
+            }
             return Document;
         }
 
@@ -212,6 +217,31 @@ namespace FinancialPlanner.BusinessLogic.Plans
             debuggerInfo.Method = methodName;
             debuggerInfo.ExceptionInfo = ex;
             Logger.LogDebug(debuggerInfo);
+        }
+
+        private string getStringfromFile(string filePath)
+        {
+            try
+            {
+                if (!string.IsNullOrEmpty(filePath))
+                {
+                    if (System.IO.File.Exists(filePath))
+                    {
+                        FileStream fs = new FileStream(filePath, FileMode.Open, FileAccess.Read);
+                        byte[] filebytes = new byte[fs.Length];
+                        fs.Read(filebytes, 0, Convert.ToInt32(fs.Length));
+                        return Convert.ToBase64String(filebytes,            Base64FormattingOptions.InsertLineBreaks);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                StackTrace st = new StackTrace();
+                StackFrame sf = st.GetFrame(0);
+                MethodBase currentMethodName = sf.GetMethod();
+                LogDebug(currentMethodName.Name, ex);
+            }
+            return null;
         }
     }
 }

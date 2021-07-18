@@ -122,9 +122,9 @@ namespace FinancialPlanner.BusinessLogic.Clients
 
             DataTable dtAppConfig = (IsAnnualReview) ?
                  DataBase.DBService.ExecuteCommand(
-                string.Format(GET_ANNUALREVIEW_CLIENT_PRIMARY_CONTACT, dateTime))
+                string.Format(GET_ANNUALREVIEW_CLIENT_PRIMARY_CONTACT, dateTime.ToString("yyyy-MM-dd")))
                 : DataBase.DBService.ExecuteCommand(
-                string.Format(GET_CLIENT_PRIMARY_CONTACT,dateTime));
+                string.Format(GET_CLIENT_PRIMARY_CONTACT,dateTime.ToString("yyyy-MM-dd")));
             foreach (DataRow dr in dtAppConfig.Rows)
             {
                 ClientPrimaryContact client = convertToClientObject(dr);
