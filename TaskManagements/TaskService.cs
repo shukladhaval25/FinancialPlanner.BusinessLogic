@@ -28,7 +28,7 @@ namespace FinancialPlanner.BusinessLogic.TaskManagements
             "TaskCard.ProjectId = TaskProject.ID INNER JOIN Users ON TaskCard.Owner = Users.ID AND " +
             "(TaskCard.TaskStatus <> 4 and TaskCard.TaskStatus<> 5)";
 
-        private readonly string SELECT_ALL_NOTIFIED_BY_USER = "SELECT  TaskCard.*, Users.UserName AS OwnerName, " +
+       private readonly string SELECT_ALL_NOTIFIED_BY_USER = "SELECT  TaskCard.*, Users.UserName AS OwnerName, " +
                          "TaskProject.Name AS ProjectName FROM Users INNER JOIN " +
                          "TaskCard ON Users.ID = TaskCard.Owner INNER JOIN " +
                          "TaskNotification ON TaskCard.ID = TaskNotification.TaskId INNER JOIN " +
@@ -60,6 +60,11 @@ namespace FinancialPlanner.BusinessLogic.TaskManagements
             "FROM Users INNER JOIN TaskCard ON Users.ID = TaskCard.Owner INNER JOIN " +
             "TaskProject ON TaskCard.ProjectId = TaskProject.ID WHERE (TaskCard.AssignTo = {0}) AND "+
             "(TaskCard.TaskStatus <> 4 and TaskCard.TaskStatus<> 5)";
+
+        private readonly string SELECT_BY_TASKID = "SELECT TaskCard.*, Users.UserName AS OwnerName,TaskProject.Name AS ProjectName " +
+           "FROM Users INNER JOIN TaskCard ON Users.ID = TaskCard.Owner INNER JOIN " +
+           "TaskProject ON TaskCard.ProjectId = TaskProject.ID WHERE (TaskCard.TaskId = '{0}') AND " +
+           "(TaskCard.TaskStatus <> 4 and TaskCard.TaskStatus<> 5)";
 
         private const string SELECT_BY_OVERDUE_TASKSTATUS = "SELECT * FROM [TaskCard] WHERE DUEDATE < {0} AND " +
             "(TaskCard.TaskStatus <> 1 or TaskCard.TaskStatus<> 2 or TaskCard.TaskStatus<> 3)";
@@ -241,7 +246,32 @@ namespace FinancialPlanner.BusinessLogic.TaskManagements
             }
         }
 
+        public IList<TaskCard> GetTaskByTaskId(string taskId)
+        {
+            try
+            {
+                Logger.LogInfo("Get: Assign to task process start");
+                IList<TaskCard> taskcards =
+                    new List<TaskCard>();
 
+                DataTable dtAppConfig = DataBase.DBService.ExecuteCommand(string.Format(SELECT_BY_TASKID, taskId));
+                foreach (DataRow dr in dtAppConfig.Rows)
+                {
+                    TaskCard task = convertToTaskCard(dr);
+                    taskcards.Add(task);
+                }
+                Logger.LogInfo("Get: Assign to task process completed.");
+                return taskcards;
+            }
+            catch (Exception ex)
+            {
+                StackTrace st = new StackTrace();
+                StackFrame sf = st.GetFrame(0);
+                MethodBase currentMethodName = sf.GetMethod();
+                LogDebug(currentMethodName.Name, ex);
+                return null;
+            }
+        }
         public IList<TaskCard> GetAll()
         {
             try

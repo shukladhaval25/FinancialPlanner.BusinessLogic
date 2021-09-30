@@ -48,7 +48,7 @@ namespace FinancialPlanner.BusinessLogic
                 }
                 else if (dr.Field<string>("SettingKey") == "POP3HostPort")
                 {
-                    MailServer.POP3_IMPS_HostPort = (dr.Field<string>("Value"));
+                    MailServer.POP3_IMPS_HostPort = int.Parse((dr.Field<string>("Value")));
                 }
             }
         }

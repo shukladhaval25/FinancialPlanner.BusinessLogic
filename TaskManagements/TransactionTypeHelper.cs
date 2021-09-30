@@ -24,7 +24,7 @@ namespace FinancialPlanner.BusinessLogic.TaskManagements
                 case "Redemption":
                     transactionTypeService = new FreshPurchaseTransactionServiceImpl();
                     break;
-                case "SIP Fresh":
+                case "New SIP":
                 case "SIP Old":
                     transactionTypeService = new SIPServiceImpl();
                     break;
@@ -34,13 +34,16 @@ namespace FinancialPlanner.BusinessLogic.TaskManagements
                 case "STP":
                     transactionTypeService = new STPTransactionServiceImpl();
                     break;
+                case "SWP Pause":
                 case "SWP":
                     transactionTypeService = new SWPTransactionServiceImpl();
                     break;
-                case "STP Cancellation":
+                case "STP Pause":
+                case "STP Cancel":
                     transactionTypeService = new STPCancellationCancellationTransactionServiceImpl();
                     break;
-                case "SIP Cancellation":
+                case "SIP Pause":
+                case "SIP Cancel":
                     transactionTypeService = new SIPCancellationTransactionServiceImpl();
                     break;
                 case "Bank Change Request":

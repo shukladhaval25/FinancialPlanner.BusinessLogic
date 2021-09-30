@@ -67,6 +67,9 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\FinancialPlanner\packages\Newtonsoft.Json.13.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
@@ -98,7 +101,9 @@
     <Compile Include="Clients\EmploymentService.cs" />
     <Compile Include="Clients\FamilyMemberBankService.cs" />
     <Compile Include="Clients\FamilyMemberService.cs" />
+    <Compile Include="Clients\FeesInvoiceService.cs" />
     <Compile Include="Clients\FestivalsService.cs" />
+    <Compile Include="Clients\MOMService.cs" />
     <Compile Include="Clients\SessionsService.cs" />
     <Compile Include="CommonService.cs" />
     <Compile Include="Compnay\CompanyService.cs" />
@@ -143,6 +148,7 @@
     <Compile Include="Plans\DocumentService.cs" />
     <Compile Include="Plans\ExpensesSesrvice.cs" />
     <Compile Include="Plans\GoalsService.cs" />
+    <Compile Include="Plans\ImageBankService.cs" />
     <Compile Include="Plans\IncomeService.cs" />
     <Compile Include="Plans\InvestmentSegmentService.cs" />
     <Compile Include="Plans\LoanService.cs" />
@@ -197,6 +203,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
