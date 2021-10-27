@@ -10,10 +10,14 @@ namespace FinancialPlanner.BusinessLogic.Clients
     public class FeesInvoiceService
     {
         private const string GET_CLIENT_NAME_QUERY = "SELECT NAME FROM CLIENT WHERE ID = {0}";
-        
+
+        private const string GET_MAX_INVOICEID = "select Max(InvoiceId)  from FeesInvoice where InvoiceId like '{0}%'";
+
+
 
         private const string SELECT_INVOICE_DETAILS_BY = "SELECT * FROM FeesInvoiceDetails WHERE INVOICEID = '{0}'";
         private readonly string DELETE_FEESINVOICEDETAILS_BY_ID = "DELETE FROM FEESINVOICEDETAILS WHERE ID = {0}";
+        private readonly string DELETE_FEESINVOICEDETAILS_BY_INVOICEID = "DELETE FROM FEESINVOICEDETAILS WHERE INVOICEID = '{0}'";
         private const string INSERT_FEES_INVOICE_DETAILS = "INSERT INTO FEESINVOICEDETAILS VALUES ('{0}','{1}',{2})";
         private const string UPDATE_FEES_INVOICE_DETAILS = "UPDATE FEESINVOICEDETAILS SET InvoiceId ='{0}', Particulars ='{1}', Amount = {2} where id = {3}";
 
@@ -22,6 +26,20 @@ namespace FinancialPlanner.BusinessLogic.Clients
         private readonly string INSERT_FEES_INVOICE = "INSERT INTO FEESINVOICE VALUES ('{0}','{1}',{2})";   
         private const string UPDATE_FEES_INVOICE = "UPDATE FEESINVOICE SET INVOICEDATE = '{0}' WHERE INVOICEID = '{1}'";
         private const string DELETE_FEES_INVOICE = "DELETE FROM FEESINVOICE WHERE INVOICEID = '{0}'";
+
+        public string GetMaxInvoiceId(string year)
+        {
+            string maxId = DataBase.DBService.ExecuteCommandScalar(string.Format(GET_MAX_INVOICEID, year));
+            if (string.IsNullOrEmpty(maxId))
+            {
+                return string.Format("{0}/1", year);
+            }
+            else
+            {
+                int number = int.Parse(maxId.Substring(maxId.LastIndexOf("/") + 1));
+                return string.Format("{0}/{1}", year,number  + 1);
+            }
+        }
        
 
         public List<FeesInvoiceTransacation> GetFeesInvoice(int clientId)
@@ -95,7 +113,7 @@ namespace FinancialPlanner.BusinessLogic.Clients
                 DataBase.DBService.BeginTransaction();
                 DataBase.DBService.ExecuteCommandString(string.Format(DELETE_FEES_INVOICE,
                     invoiceId), true);
-                DataBase.DBService.ExecuteCommandString(string.Format(DELETE_FEESINVOICEDETAILS_BY_ID,
+                DataBase.DBService.ExecuteCommandString(string.Format(DELETE_FEESINVOICEDETAILS_BY_INVOICEID,
                     invoiceId), true);
                 DataBase.DBService.CommitTransaction();
             }

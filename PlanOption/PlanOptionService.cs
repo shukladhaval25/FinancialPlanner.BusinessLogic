@@ -143,6 +143,7 @@ namespace FinancialPlanner.BusinessLogic.PlanOption
             planOpt.RiskProfileId = dr.Field<int>("RiskProfileId");
             planOpt.UpdatedOn = dr.Field<DateTime>("UpdatedOn");
             planOpt.UpdatedBy = dr.Field<int>("UpdatedBy");
+            
             return planOpt;
         }
     }

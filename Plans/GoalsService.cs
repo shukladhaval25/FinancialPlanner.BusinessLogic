@@ -24,7 +24,7 @@ namespace FinancialPlanner.BusinessLogic
         const string INSERT_QUERY = "INSERT INTO Goals VALUES (" +
             "{0},'{1}','{2}',{3},'{4}','{5}',{6},{7},'{8}','{9}',{10},'{11}',{12},{13},'{14}',{15},'{16}')";
         const string INSERT_GOALLOAN_QUERY = "INSERT INTO LOANFORGOALS " + 
-            "VALUES ({0},{1},{2},{3},{4},{5},{6},'{7}',{8},'{9}',{10})";
+            "VALUES ({0},{1},{2},{3},{4},{5},{6},'{7}',{8},'{9}',{10},{11})";
 
         const string UPDATE_QUERY = "UPDATE Goals SET " +
             "CATEGORY = '{0}',NAME ='{1}',AMOUNT = {2}, " +
@@ -35,7 +35,7 @@ namespace FinancialPlanner.BusinessLogic
 
         const string UPDATE_LOANFORGOAL_QUERY = "UPDATE LOANFORGOALS SET LOANAMOUNT = {0}," +
             "EMI = {1}, ROI = {2}, LOANYEARS = {3}, STARTYEAR = {4}, ENDYEAR = {5}, " +
-            "UPDATEDON = '{6}', UPDATEDBY = {7} WHERE GOALID = {8}";
+            "UPDATEDON = '{6}', UPDATEDBY = {7},LOANPORTION={9} WHERE GOALID = {8}";
 
         const string DELET_QUERY = "UPDATE Goals SET ISDELETED = '1' WHERE ID ={0}";
         private readonly string DELETE_LOANFORGOAL_QUERY = "DELETE FROM LOANFORGOALS WHERE GOALID ={0}";
@@ -89,6 +89,7 @@ namespace FinancialPlanner.BusinessLogic
             loanForGoal.LoanYears = dr.Field<int>("LoanYears");
             loanForGoal.StratYear = dr.Field<int>("StartYear");
             loanForGoal.EndYear = dr.Field<int>("EndYear");
+            loanForGoal.LoanPortion = (dr["LoanPortion"] == DBNull.Value) ? 0 : dr.Field<int>("LoanPortion");
 
             return loanForGoal;
         }
@@ -207,7 +208,7 @@ namespace FinancialPlanner.BusinessLogic
                      goals.OtherAmount,goals.IsDeleted), true);
 
                 if (goals.LoanForGoal != null && year == startYear)
-                    addLoanForGoal(goals);
+                    addLoanForGoal(goals, goals.Name.Replace("'", "''") + " " + year);
 
                 Activity.ActivitiesService.Add(ActivityType.CreateGoals, EntryStatus.Success,
                          Source.Server, goals.UpdatedByUserName, clientName, goals.MachineName);
@@ -230,17 +231,17 @@ namespace FinancialPlanner.BusinessLogic
                      goals.OtherAmount,goals.IsDeleted), true);
 
             if (goals.LoanForGoal != null)
-                addLoanForGoal(goals);
+                addLoanForGoal(goals, goals.Name.Replace("'", "''"));
 
             Activity.ActivitiesService.Add(ActivityType.CreateGoals, EntryStatus.Success,
                      Source.Server, goals.UpdatedByUserName, clientName, goals.MachineName);
             DataBase.DBService.CommitTransaction();
         }
 
-        private static void addLoanForGoal(Goals Goals)
+        private static void addLoanForGoal(Goals Goals,string goalName)
         {
             int goalId;
-            int.TryParse(DataBase.DBService.ExecuteCommandScalar(string.Format(SELECT_GOAL_ID, Goals.Name, Goals.Pid, Goals.Amount)), out goalId);
+            int.TryParse(DataBase.DBService.ExecuteCommandScalar(string.Format(SELECT_GOAL_ID, goalName, Goals.Pid, Goals.Amount)), out goalId);
 
             Goals.LoanForGoal.GoalId = goalId;
             DataBase.DBService.ExecuteCommandString(string.Format(INSERT_GOALLOAN_QUERY,
@@ -251,7 +252,8 @@ namespace FinancialPlanner.BusinessLogic
                                   Goals.LoanForGoal.CreatedOn.ToString("yyyy-MM-dd hh:mm:ss"),
                                   Goals.LoanForGoal.CreatedBy,
                                   Goals.LoanForGoal.UpdatedOn.ToString("yyyy-MM-dd hh:mm:ss"),
-                                  Goals.LoanForGoal.UpdatedBy), true);
+                                  Goals.LoanForGoal.UpdatedBy,
+                                  Goals.LoanForGoal.LoanPortion), true);
         }
 
         public void Update(Goals Goals)
@@ -271,7 +273,7 @@ namespace FinancialPlanner.BusinessLogic
                    Goals.EligibleForInsuranceCoverage,Goals.Id,Goals.OtherAmount), true);
 
                 if (Goals.LoanForGoal != null && Goals.LoanForGoal.Id == 0)
-                    addLoanForGoal(Goals);
+                    addLoanForGoal(Goals, Goals.Name);
                 else if (Goals.LoanForGoal != null && Goals.LoanForGoal.Id != 0)
                     updateLoansForGoal(Goals);
                 else
@@ -299,7 +301,8 @@ namespace FinancialPlanner.BusinessLogic
                   goals.LoanForGoal.LoanYears,
                   goals.LoanForGoal.StratYear , goals.LoanForGoal.EndYear,
                   goals.LoanForGoal.UpdatedOn.ToString("yyyy-MM-dd hh:mm:ss"),
-                  goals.LoanForGoal.UpdatedBy, goals.LoanForGoal.GoalId), true);
+                  goals.LoanForGoal.UpdatedBy, goals.LoanForGoal.GoalId,
+                  goals.LoanForGoal.LoanPortion), true);
         }
 
         public void Delete(Goals Goals)

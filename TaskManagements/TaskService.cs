@@ -192,7 +192,7 @@ namespace FinancialPlanner.BusinessLogic.TaskManagements
                     taskCard.DueDate.ToString("yyyy-MM-dd hh:mm:ss"), taskCard.Id,
                     taskCard.OtherName), true);
 
-                if (taskCard.ProjectId == 1)
+                if ((taskCard.ProjectId == 1 || taskCard.ProjectId == 2) && !taskCard.TransactionType.Equals("Others"))
                 {
                     updateTransactionType(taskCard, taskCard.Id);
                 }
@@ -496,7 +496,7 @@ namespace FinancialPlanner.BusinessLogic.TaskManagements
 
                 int id = getTaskID(taskcard);
 
-                if (id > 0 && taskcard.ProjectId == 1)
+                if (id > 0 && (taskcard.ProjectId == 1 || taskcard.ProjectId == 2) && !taskcard.TransactionType.Equals("Others"))
                 {
                     saveTransactionType(taskcard, id);
                 }

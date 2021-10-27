@@ -22,9 +22,9 @@ namespace FinancialPlanner.BusinessLogic.Clients
         private const string SELECT_MOM_BY_MOMINFORAMTION = "SELECT MID FROM MOM WHERE MEETINGDATE = '{0}' AND MeetingType = '{1}' AND  ClientId = {2} AND MarkAsImportant = {3} AND " +
             " Duration ='{4}' AND NOTES = '{5}'";
 
-        private const string INSERT_MOM_POINTS = "INSERT INTO MOMPOINTS VALUES ({0},'{1}','{2}',{3},'{4}','{5}')";
+        private const string INSERT_MOM_POINTS = "INSERT INTO MOMPOINTS VALUES ({0},'{1}','{2}',{3},'{4}','{5}','{6}')";
 
-        private const string UPDATE_MOM_POINTS = "UPDATE MOMPOINTS SET DiscussedPoint='{0}',Responsibility ='{1}',EmpId ={2},TaskId='{3}',TaskStatus ='{4}' WHERE ID = {5}";
+        private const string UPDATE_MOM_POINTS = "UPDATE MOMPOINTS SET DiscussedPoint='{0}',Responsibility ='{1}',EmpId ={2},TaskId='{3}',TaskStatus ='{4}',FutureActionPlan ='{6}' WHERE ID = {5}";
 
         private const string DELETE_MOMPOINTS_BY_ID = "DELETE FROM MOMPOINTS WHERE ID = {0}";
         private const string DELETE_MOMPOINTS_BY_MID = "DELETE FROM MOMPOINTS WHERE MID = {0}";
@@ -114,7 +114,8 @@ namespace FinancialPlanner.BusinessLogic.Clients
                         point.Responsibility,
                         point.EmpId,
                         point.TaskId,
-                        point.TaskSatus), true);
+                        point.TaskStatus,
+                        point.FutureAction), true);
                     }
                     else
                     {
@@ -123,8 +124,9 @@ namespace FinancialPlanner.BusinessLogic.Clients
                         point.Responsibility,
                         point.EmpId,
                         point.TaskId,
-                        point.TaskSatus,
-                        point.Id), true);
+                        point.TaskStatus,
+                        point.Id,
+                        point.FutureAction), true);
                     }
                 }
 
@@ -188,7 +190,8 @@ namespace FinancialPlanner.BusinessLogic.Clients
                         point.Responsibility,
                         point.EmpId,
                         point.TaskId,
-                        point.TaskSatus), true);
+                        point.TaskStatus,
+                        point.FutureAction), true);
                     }
                 }
                 else
@@ -250,9 +253,10 @@ namespace FinancialPlanner.BusinessLogic.Clients
                 mOMPoint.EmpId = drMOMPoint["EmpId"] == DBNull.Value ? 0 : int.Parse(drMOMPoint["EmpId"].ToString());
                 mOMPoint.Id = int.Parse(drMOMPoint["Id"].ToString());
                 mOMPoint.MId = int.Parse(drMOMPoint["MId"].ToString());
+                mOMPoint.FutureAction  = drMOMPoint.Field<string>("FutureActionPlan");
                 mOMPoint.Responsibility = drMOMPoint.Field<string>("Responsibility");
                 mOMPoint.TaskId = drMOMPoint["TaskId"] == DBNull.Value ? "" : drMOMPoint.Field<string>("TaskId");
-                mOMPoint.TaskSatus = drMOMPoint.Field<string>("TaskStatus");
+                mOMPoint.TaskStatus = drMOMPoint.Field<string>("TaskStatus");
                 mOMPoint.UserName = drMOMPoint.Field<string>("UserName");
                 mOMTransaction.MOMPoints.Add(mOMPoint);
             }

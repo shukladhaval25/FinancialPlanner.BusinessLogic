@@ -12,7 +12,10 @@ namespace FinancialPlanner.BusinessLogic.Plans
     {
         private const string GET_CLIENT_NAME_QUERY = "SELECT C.NAME FROM CLIENT C, PLANNER P  WHERE P.CLIENTID = C.ID AND P.ID = {0}";
         const string SELECT_ALL = "SELECT N1.*,U.USERNAME AS UPDATEDBYUSERNAME FROM NONFINANCIALASSET N1, USERS U WHERE N1.UPDATEDBY = U.ID AND N1.PID = {0}";
-        const string SELECT_BY_ID = "SELECT N1.*,U.USERNAME AS UPDATEDBYUSERNAME FROM NONFINANCIALASSET N1, USERS U WHERE N1.UPDATEDBY = U.ID AND N1.PID = {0} AND N1.ID = {1}";
+        const string SELECT_BY_ID = "SELECT N1.*,U.USERNAME AS UPDATEDBYUSERNAME FROM NONFINANCIALASSET N1, USERS U WHERE N1.UPDATEDBY = U.ID AND N1.MappedGoalId = {0}";
+
+        const string SELECT_BY_MAPPED_GOAL_ID = "SELECT N1.*, U.USERNAME AS UPDATEDBYUSERNAME FROM NONFINANCIALASSET N1, USERS U WHERE N1.UPDATEDBY = U.ID AND N1.MappedGoalId = {0}";
+
         const string INSERT_QUERY = "INSERT INTO NONFINANCIALASSET VALUES ({0},'{1}'," +
             "{2},{3},{4},'{5}',{6},{7},{8},'{9}','{10}','{11}',{12},'{13}',{14},{15},'{16}')";
         const string UPDATE_QUERY ="UPDATE NONFINANCIALASSET SET NAME ='{0}',CURRENTVALUE ={1},PRIMARYSHARE ={2},SECONDARYSHARE ={3}," +
@@ -41,6 +44,32 @@ namespace FinancialPlanner.BusinessLogic.Plans
                 StackTrace st = new StackTrace ();
                 StackFrame sf = st.GetFrame (0);
                 MethodBase  currentMethodName = sf.GetMethod();
+                LogDebug(currentMethodName.Name, ex);
+                return null;
+            }
+        }
+
+        public IList<NonFinancialAsset> GetByMappedGoalId(int mappedGoalId)
+        {
+            try
+            {
+                Logger.LogInfo("Get: Non financial asset process start");
+                IList<NonFinancialAsset> lstNonFinancialAsset = new List<NonFinancialAsset>();
+
+                DataTable dtAppConfig = DataBase.DBService.ExecuteCommand(string.Format(SELECT_BY_MAPPED_GOAL_ID, mappedGoalId));
+                foreach (DataRow dr in dtAppConfig.Rows)
+                {
+                    NonFinancialAsset nonfinancialAsset = convertToNonFinancialAssetObject(dr);
+                    lstNonFinancialAsset.Add(nonfinancialAsset);
+                }
+                Logger.LogInfo("Get: Family member information process completed.");
+                return lstNonFinancialAsset;
+            }
+            catch (Exception ex)
+            {
+                StackTrace st = new StackTrace();
+                StackFrame sf = st.GetFrame(0);
+                MethodBase currentMethodName = sf.GetMethod();
                 LogDebug(currentMethodName.Name, ex);
                 return null;
             }
