@@ -22,7 +22,7 @@ namespace FinancialPlanner.BusinessLogic.LifeInsurance
             "{21},'{22}','{23}','{24}'," +
             "{25},{26},'{27}',{28}," +
             "'{29}',{30},'{31}','{32}'," +
-            "'{33}','{34}',{35},'{36}',{37},'{38}')";
+            "'{33}','{34}',{35},'{36}',{37},'{38}',{39})";
 
 
 
@@ -35,12 +35,13 @@ namespace FinancialPlanner.BusinessLogic.LifeInsurance
             "[LoanTaken] = {20},[LoanDate] ='{21}',[BalanceUnit] = '{22}', [AsOnDate] = '{23}'," +
             "[CurrentValue] = {24},[ExpectedMaturityValue] = '{25}', [Ridder1] = '{26}', " +
             "[Ridder1Amount] = {27}, [Ridder2] = '{28}', [Ridder2Amount] = {29}, [Remarks] = '{30}', " +
-            "[AttachmentPath] = '{31}', [UpdatedOn] = '{32}', [UpdatedBy] ={33},[Agent] ='{34}', [LastPremiumDate] ='{37}' " +
+            "[AttachmentPath] = '{31}', [UpdatedOn] = '{32}', [UpdatedBy] ={33},[Agent] ='{34}', [LastPremiumDate] ='{37}', " +
+            "[SetReminder] = {38} " +
             "WHERE ID = {35} AND PID = {36}";
 
         const string SELECT_PREMIUM_DATE = "SELECT LifeInsurance.Applicant, Client.Name, LifeInsurance.Company, LifeInsurance.PolicyName, LifeInsurance.PolicyNo, CONVERT(varchar, LifeInsurance.NextPremDate, 103)  As NextPremDate,LifeInsurance.Premium FROM LifeInsurance INNER JOIN Planner ON LifeInsurance.PID = Planner.ID INNER JOIN Client ON Planner.ClientId = Client.ID  WHERE (LifeInsurance.NextPremDate BETWEEN '{0}' AND '{1}')";
 
-        const string SELECT_MATURITY_DATE = "SELECT LifeInsurance.Applicant, Client.Name, LifeInsurance.Company, LifeInsurance.PolicyName, LifeInsurance.PolicyNo, CONVERT(varchar, LifeInsurance.MaturityDate, 103)  As NextPremDate,LifeInsurance.ExpectedMaturityValue As Premium FROM LifeInsurance INNER JOIN Planner ON LifeInsurance.PID = Planner.ID INNER JOIN Client ON Planner.ClientId = Client.ID WHERE (LifeInsurance.MaturityDate BETWEEN '{0}' AND '{1}')";
+        const string SELECT_MATURITY_DATE = "SELECT LifeInsurance.Applicant, Client.Name, LifeInsurance.Company, LifeInsurance.PolicyName, LifeInsurance.PolicyNo, CONVERT(varchar, LifeInsurance.MaturityDate, 103)  As NextPremDate,LifeInsurance.ExpectedMaturityValue As Premium FROM LifeInsurance INNER JOIN Planner ON LifeInsurance.PID = Planner.ID INNER JOIN Client ON Planner.ClientId = Client.ID WHERE (LifeInsurance.MaturityDate BETWEEN '{0}' AND '{1}' and LifeInsurance.SetReminder = 1)";
 
         public IList<LicPremiumReminder> GetByPremiumdate(DateTime fromDate, DateTime toDate)
         {
@@ -188,7 +189,8 @@ namespace FinancialPlanner.BusinessLogic.LifeInsurance
                       lifeInsurance.Agent,
                       lifeInsurance.CreatedOn.ToString("yyyy-MM-dd hh:mm:ss"), lifeInsurance.CreatedBy,
                       lifeInsurance.UpdatedOn.ToString("yyyy-MM-dd hh:mm:ss"), lifeInsurance.UpdatedBy,
-                      lifeInsurance.LastPremiumDate), true);
+                      lifeInsurance.LastPremiumDate,
+                      (lifeInsurance.SetReminder == true) ? 1 : 0), true);
 
                 Activity.ActivitiesService.Add(ActivityType.CreateLifeInsurance, EntryStatus.Success,
                          Source.Server, lifeInsurance.UpdatedByUserName, clientName, lifeInsurance.MachineName);
@@ -229,7 +231,8 @@ namespace FinancialPlanner.BusinessLogic.LifeInsurance
                       lifeInsurance.Rider1Amount, lifeInsurance.Rider2, lifeInsurance.Rider2Amount, lifeInsurance.Remarks,
                       lifeInsurance.AttachmentPath,
                       lifeInsurance.UpdatedOn.ToString("yyyy-MM-dd hh:mm:ss"), lifeInsurance.UpdatedBy, lifeInsurance.Agent, lifeInsurance.Id, lifeInsurance.Pid,
-                      lifeInsurance.LastPremiumDate), true);
+                      lifeInsurance.LastPremiumDate,
+                       (lifeInsurance.SetReminder == true) ? 1 : 0), true);
 
                 Activity.ActivitiesService.Add(ActivityType.UpdateLifeInsurance, EntryStatus.Success,
                          Source.Server, lifeInsurance.UpdatedByUserName, clientName, lifeInsurance.MachineName);
@@ -312,6 +315,7 @@ namespace FinancialPlanner.BusinessLogic.LifeInsurance
             lifeInsurance.UpdatedOn = dr.Field<DateTime>("UpdatedOn");
             lifeInsurance.UpdatedByUserName = dr.Field<string>("UpdatedByUserName");
             lifeInsurance.LastPremiumDate = dr.Field<DateTime?>("LastPremiumDate");
+            lifeInsurance.SetReminder = (dr["SetReminder"] == DBNull.Value) ? false  : bool.Parse(dr["SetReminder"].ToString());
             return lifeInsurance;
         }
 

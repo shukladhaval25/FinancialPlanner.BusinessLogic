@@ -157,6 +157,7 @@
     <Compile Include="Plans\LoanService.cs" />
     <Compile Include="PlanOption\LumsumInvestmentRecomendationService.cs" />
     <Compile Include="Plans\NonFinancialAssetService.cs" />
+    <Compile Include="Plans\OtherRecommedationSettingService.cs" />
     <Compile Include="Plans\PersonalAccidentInsuranceService.cs" />
     <Compile Include="Plans\PlannerAssumptionService.cs" />
     <Compile Include="Plans\PlannerService.cs" />

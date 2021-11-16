@@ -17,13 +17,13 @@ namespace FinancialPlanner.BusinessLogic.Plans
         private const string GET_CLIENT_NAME_QUERY = "SELECT C.NAME FROM CLIENT C, PLANNER P  WHERE P.CLIENTID = C.ID AND P.ID = {0}";
 
         private const string INSERT_QUERY = "INSERT INTO[dbo].[PersonalAccidentInsurance] " +
-          "([PID],[InsuranceCompanyName],[SumAssured] ,[Premium]) VALUES " +
-          "({0},'{1}','{2}',{3})";
+          "([PID],[InsuranceCompanyName],[SumAssured] ,[Premium],[Name]) VALUES " +
+          "({0},'{1}','{2}',{3},'{4}')";
 
         private const string UPDATE_QUERY = "UPDATE[dbo].[PersonalAccidentInsurance] " +
-            "SET [InsuranceCompanyName] = '{0}', [SumAssured] = '{1}', [Premium] = {2} WHERE [ID] = {3}";
+            "SET [InsuranceCompanyName] = '{0}', [SumAssured] = '{1}', [Premium] = {2},[Name] ='{3}' WHERE [ID] = {4}";
 
-        private const string DELETE_QUERY = "DELETE PERSONALACCIDENTINSURNACE WHERE ID = {0}";
+        private const string DELETE_QUERY = "DELETE from PersonalAccidentInsurance WHERE ID = {0}";
 
         private const string SELECT_BY_PROJECT_ID = "SELECT * FROM PersonalAccidentInsurance WHERE PID ={0}";
 
@@ -64,7 +64,8 @@ namespace FinancialPlanner.BusinessLogic.Plans
                    personalAccidentInsurance.PId,
                    personalAccidentInsurance.InsuranceCompanyName,
                    personalAccidentInsurance.SumAssured,
-                   personalAccidentInsurance.Premium));
+                   personalAccidentInsurance.Premium,
+                   personalAccidentInsurance.Name));
 
                 //Activity.ActivitiesService.Add(ActivityType.CreateLoan, EntryStatus.Success,
                 //         Source.Server, personalAccidentInsurance.UpdatedByUserName, clientName, personalAccidentInsurance.MachineName);
@@ -88,7 +89,9 @@ namespace FinancialPlanner.BusinessLogic.Plans
                 DataBase.DBService.ExecuteCommand(string.Format(UPDATE_QUERY,
                    personalAccidentInsurance.InsuranceCompanyName, 
                    personalAccidentInsurance.SumAssured,
-                   personalAccidentInsurance.Premium, personalAccidentInsurance.Id));
+                   personalAccidentInsurance.Premium,
+                   personalAccidentInsurance.Name,
+                   personalAccidentInsurance.Id));
             }
             catch (Exception ex)
             {
@@ -100,14 +103,14 @@ namespace FinancialPlanner.BusinessLogic.Plans
             }
         }
 
-        public void Delete(PersonalAccidentInsurance personalAccidentInsurance)
+        public void Delete(int Id)
         {
             try
             {
-                string clientName = DataBase.DBService.ExecuteCommandScalar(string.Format(GET_CLIENT_NAME_QUERY, personalAccidentInsurance.Id));
+                string clientName = DataBase.DBService.ExecuteCommandScalar(string.Format(GET_CLIENT_NAME_QUERY, 0));
 
                 DataBase.DBService.ExecuteCommand(string.Format(DELETE_QUERY,
-                  personalAccidentInsurance.Id));
+                  Id));
             }
             catch (Exception ex)
             {
@@ -124,6 +127,7 @@ namespace FinancialPlanner.BusinessLogic.Plans
             PersonalAccidentInsurance personalAccidentInsurance = new PersonalAccidentInsurance();
             personalAccidentInsurance.Id = dr.Field<int>("ID");
             personalAccidentInsurance.PId = dr.Field<int>("PID");
+            personalAccidentInsurance.Name = dr.Field<string>("Name");
             personalAccidentInsurance.InsuranceCompanyName = dr.Field<string>("InsuranceCompanyName");
             personalAccidentInsurance.SumAssured = dr.Field<string>("SumAssured");
             personalAccidentInsurance.Premium = double.Parse(dr["Premium"].ToString());

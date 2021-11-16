@@ -93,6 +93,8 @@ namespace FinancialPlanner.BusinessLogic.CurrentStatus
 
         readonly string GET_ALL_BONDS_VALUE = "SELECT 'BONDS' AS NAME,(CURRENTVALUE) AS BONDSVALUE,INVESTMENTRETURNRATE AS ROI,GOALID FROM [BONDS] WHERE PID = {0}";
 
+        readonly string GET_ALL_ULIP_VALUE = "SELECT 'ULIP' AS 'ULIP', (NAV * UNITS) AS ULIPVALUE,INVESTMENTRETURNRATE AS ROI,GOALID FROM ULIP WHERE PID = {0}";
+
         #endregion
 
         readonly string GET_ALL_OTHERS_VALUE = "SELECT 'OTHERS' AS NAME,(AMOUNT) AS OTHERSVALUE,INVESTMENTRETURNRATE AS ROI,GOALID FROM [OTHERS] WHERE PID = {0}";
@@ -171,6 +173,10 @@ namespace FinancialPlanner.BusinessLogic.CurrentStatus
                 FinancialPlanner.Common.Logger.LogInfo("Get bonds information for current status proces start.");
                 addBondsToCurrentStatusInstrument(plannerId, csCal);
                 FinancialPlanner.Common.Logger.LogInfo("Get bonds information for current status proces completed.");
+
+                FinancialPlanner.Common.Logger.LogInfo("Get ULIP information for current status proces start.");
+                addULIPToCurrentStatusInstrument(plannerId, csCal);
+                FinancialPlanner.Common.Logger.LogInfo("Get ULIP information for current status proces completed.");
                 #endregion
 
                 #region "Others / Gold"
@@ -186,6 +192,16 @@ namespace FinancialPlanner.BusinessLogic.CurrentStatus
                 FinancialPlanner.Common.Logger.LogDebug(ex.Message);
                 FinancialPlanner.Common.Logger.LogInfo("Error occured in get all current status amount for plannerId :" + plannerId.ToString());
                 throw ex;
+            }
+        }
+
+        private void addULIPToCurrentStatusInstrument(int plannerId, IList<CurrentStatusInstrument> csCal)
+        {
+            DataTable dtInstrument = new DataTable();
+            dtInstrument = DataBase.DBService.ExecuteCommand(string.Format(GET_ALL_ULIP_VALUE, plannerId));
+            if (dtInstrument != null && dtInstrument.Rows.Count > 0)
+            {
+                setInstrument(csCal, dtInstrument);
             }
         }
 

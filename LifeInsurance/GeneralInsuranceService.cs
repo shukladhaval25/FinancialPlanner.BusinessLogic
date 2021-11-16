@@ -17,18 +17,18 @@ namespace FinancialPlanner.BusinessLogic.LifeInsurance
             "{0},'{1}','{2}',{3}," +
             "'{4}','{5}','{6}','{7}','{8}'," +
             "{9},{10},{11},'{12}', " +
-            "'{13}','{14}',{15},'{16}',{17})";
+            "'{13}','{14}',{15},'{16}',{17},{18})";
         const string UPDATE_LIFE_INSURANCE = "UPDATE GENERALINSURANCE SET " +
             "[Applicant] = '{0}', [ISSUEDATE] ='{1}', [TERMSINYEARS] ={2},[RenewalDate] = '{3}', " +
             "[PolicyNo] ='{4}',[Company] ='{5}',[Policy] ='{6}',[Type] ='{7}'," +
             "[SumAssured]= {8},[Bonus] = {9}, [Premium] = {10}," +
             "[Remark] = '{11}', " +
-            "[AttachmentPath] = '{12}', [UpdatedOn] = '{13}', [UpdatedBy] ={14} " +
-            "WHERE ID = {15} AND PID = {16}";
+            "[AttachmentPath] = '{12}', [UpdatedOn] = '{13}', [UpdatedBy] ={14}, [SetReminder] = {15}" +
+            "WHERE ID = {16} AND PID = {17}";
 
         const string DELETE_LIFE_INSURNACE = "DELETE FROM GENERALINSURANCE WHERE ID = {0} AND PID ={1}";
 
-        const string SELECT_RENEWAL_REMINDER = "SELECT Client.Name, GeneralInsurance.Applicant,     GeneralInsurance.Company, GeneralInsurance.Policy, GeneralInsurance.RenewalDate, GeneralInsurance.Premium, GeneralInsurance.PolicyNo FROM Planner INNER JOIN Client ON Planner.ClientId = Client.ID INNER JOIN GeneralInsurance ON Planner.ID = GeneralInsurance.PID AND Planner.ID = GeneralInsurance.PID AND Planner.ID = GeneralInsurance.PID WHERE (GeneralInsurance.RenewalDate BETWEEN '{0}' AND '{1}')";
+        const string SELECT_RENEWAL_REMINDER = "SELECT Client.Name, GeneralInsurance.Applicant,     GeneralInsurance.Company, GeneralInsurance.Policy, GeneralInsurance.RenewalDate, GeneralInsurance.Premium, GeneralInsurance.PolicyNo FROM Planner INNER JOIN Client ON Planner.ClientId = Client.ID INNER JOIN GeneralInsurance ON Planner.ID = GeneralInsurance.PID AND Planner.ID = GeneralInsurance.PID AND Planner.ID = GeneralInsurance.PID WHERE (GeneralInsurance.RenewalDate BETWEEN '{0}' AND '{1}' AND GeneralInsurance.SetReminder = 1)";
 
         public IList<Common.Model.CurrentStatus.GeneralInsurance> GetAll(int plannerId)
         {
@@ -57,7 +57,7 @@ namespace FinancialPlanner.BusinessLogic.LifeInsurance
             }
         }
 
-        public IList<GeneralInsuranceRenewalReminder> GetRenewalReminder(DateTime fromDate,DateTime toDate)
+        public IList<GeneralInsuranceRenewalReminder> GetRenewalReminder(DateTime fromDate, DateTime toDate)
         {
             try
             {
@@ -145,7 +145,8 @@ namespace FinancialPlanner.BusinessLogic.LifeInsurance
                       GeneralInsurance.Premium,
                       GeneralInsurance.Remark, GeneralInsurance.AttachmentPath,
                       GeneralInsurance.CreatedOn.ToString("yyyy-MM-dd hh:mm:ss"), GeneralInsurance.CreatedBy,
-                      GeneralInsurance.UpdatedOn.ToString("yyyy-MM-dd hh:mm:ss"), GeneralInsurance.UpdatedBy), true);
+                      GeneralInsurance.UpdatedOn.ToString("yyyy-MM-dd hh:mm:ss"), GeneralInsurance.UpdatedBy,
+                        (GeneralInsurance.SetReminder == true) ? 1 : 0), true);
 
                 Activity.ActivitiesService.Add(ActivityType.CreateGeneralInsurance, EntryStatus.Success,
                          Source.Server, GeneralInsurance.UpdatedByUserName, clientName, GeneralInsurance.MachineName);
@@ -179,7 +180,10 @@ namespace FinancialPlanner.BusinessLogic.LifeInsurance
                       GeneralInsurance.SumAssured, GeneralInsurance.Bonus, GeneralInsurance.Premium,
                       GeneralInsurance.Remark,
                       GeneralInsurance.AttachmentPath,
-                      GeneralInsurance.UpdatedOn.ToString("yyyy-MM-dd hh:mm:ss"), GeneralInsurance.UpdatedBy, GeneralInsurance.Id, GeneralInsurance.Pid), true);
+                      GeneralInsurance.UpdatedOn.ToString("yyyy-MM-dd hh:mm:ss"),
+                      GeneralInsurance.UpdatedBy,
+                      (GeneralInsurance.SetReminder == true) ? 1 : 0,
+                      GeneralInsurance.Id, GeneralInsurance.Pid), true);
 
                 Activity.ActivitiesService.Add(ActivityType.UpdateGeneralInsurance, EntryStatus.Success,
                          Source.Server, GeneralInsurance.UpdatedByUserName, clientName, GeneralInsurance.MachineName);
@@ -242,6 +246,7 @@ namespace FinancialPlanner.BusinessLogic.LifeInsurance
             GeneralInsurance.UpdatedBy = dr.Field<int>("UpdatedBy");
             GeneralInsurance.UpdatedOn = dr.Field<DateTime>("UpdatedOn");
             GeneralInsurance.UpdatedByUserName = dr.Field<string>("UpdatedByUserName");
+            GeneralInsurance.SetReminder =(dr["SetReminder"] == DBNull.Value) ? false : bool.Parse(dr["SetReminder"].ToString());
             return GeneralInsurance;
         }
 
