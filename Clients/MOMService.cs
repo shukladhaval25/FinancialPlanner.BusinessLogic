@@ -94,7 +94,7 @@ namespace FinancialPlanner.BusinessLogic.Clients
 
                 DataBase.DBService.BeginTransaction();
                 DataBase.DBService.ExecuteCommandString(string.Format(UPDATE_MOM,
-                    mOMTransaction.MeetingDate,
+                    mOMTransaction.MeetingDate.ToString("yyyy-MM-dd"),
                     mOMTransaction.MeetingType,
                     mOMTransaction.CId,
                     (mOMTransaction.MarkAsImportant == true) ? 1 : 0,
@@ -171,7 +171,7 @@ namespace FinancialPlanner.BusinessLogic.Clients
 
                 DataBase.DBService.BeginTransaction();
                 DataBase.DBService.ExecuteCommandString(string.Format(INSERT_MOM,
-                    mOMTransaction.MeetingDate,
+                    mOMTransaction.MeetingDate.ToString("yyyy-MM-dd"),
                     mOMTransaction.MeetingType,
                     mOMTransaction.CId,
                     (mOMTransaction.MarkAsImportant == true) ? 1 : 0,

@@ -147,8 +147,10 @@
     <Compile Include="PlanOption\SIPTypeInvestmentRecomendationService.cs" />
     <Compile Include="PlanOption\STPInvestmentRecomendationService.cs" />
     <Compile Include="PlanOption\SwitchInvestmentRecommendationService.cs" />
+    <Compile Include="Plans\AssumptionConfigService.cs" />
     <Compile Include="Plans\AssumptionMasterService.cs" />
     <Compile Include="Plans\DocumentService.cs" />
+    <Compile Include="Plans\ExistingInsuranceService.cs" />
     <Compile Include="Plans\ExpensesSesrvice.cs" />
     <Compile Include="Plans\GoalsService.cs" />
     <Compile Include="Plans\ImageBankService.cs" />
@@ -164,6 +166,7 @@
     <Compile Include="Plans\RecommendedSchemesService.cs" />
     <Compile Include="Plans\RiskProfiledReturnService.cs" />
     <Compile Include="ProcessesAction\ProcessActionService.cs" />
+    <Compile Include="Process\ProcessService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ProspectClients\ProspectClientConversationService.cs" />
     <Compile Include="ProspectClients\ProspectClientService.cs" />
