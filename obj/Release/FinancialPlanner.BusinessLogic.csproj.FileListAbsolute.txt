@@ -38,3 +38,4 @@ C:\Application Softwares\FinancialPlanner.BusinessLogic\obj\Release\FinancialPla
 C:\Application Softwares\FinancialPlanner.BusinessLogic\obj\Release\FinancialPlanner.BusinessLogic.csproj.CopyComplete
 C:\Application Softwares\FinancialPlanner.BusinessLogic\obj\Release\FinancialPlanner.BusinessLogic.dll
 C:\Application Softwares\FinancialPlanner.BusinessLogic\obj\Release\FinancialPlanner.BusinessLogic.pdb
+C:\Application Softwares\FinancialPlanner.BusinessLogic\bin\Release\Newtonsoft.Json.xml

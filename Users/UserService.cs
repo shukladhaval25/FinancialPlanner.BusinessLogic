@@ -11,14 +11,15 @@ namespace FinancialPlanner.BusinessLogic.Users
 {
     public class UserService
     {
-        private const string INSERT_QUERY = "INSERT INTO USERS VALUES ({0},'{1}','{2}','{3}','{4}','{5}',{6},'{7}',{8},{9},'{10}')";
+        private const string INSERT_QUERY = "INSERT INTO USERS VALUES ({0},'{1}','{2}','{3}','{4}','{5}',{6},'{7}',{8},{9},'{10}',{11},{12})";
         private const string SELECT_ALL = "SELECT U1.*,U.USERNAME AS UPDATEDBYUSERNAME FROM USERS U1, USERS U WHERE U1.ISDELETED = 0 AND U1.UPDATEDBY = U.ID";
         private const string SELECT_ID = "SELECT U1.*,U.USERNAME AS UPDATEDBYUSERNAME FROM USERS U1, USERS U WHERE U1.ISDELETED = 0 AND U1.UPDATEDBY = U.ID and U1.ID = {0}";
 
         private const string SELECT_BY_NAME = "SELECT U1.*,U.USERNAME AS UPDATEDBYUSERNAME FROM USERS U1, USERS U WHERE U1.ISDELETED = 0 AND U1.UPDATEDBY = U.ID and U1.USERNAME = '{0}'";
         private const string SELECT_MAX_ID = "SELECT MAX(ID) FROM USERS";
         private const string UPDATE_QUERY = "UPDATE USERS SET FIRSTNAME = '{0}'," +
-                "LASTNAME = '{1}', PASSWORD = '{2}',UPDATEDON ='{3}',UPDATEDBY = {4},ROLEID = {6} WHERE ID= {5}";
+                "LASTNAME = '{1}', PASSWORD = '{2}',UPDATEDON ='{3}',UPDATEDBY = {4},ROLEID = {6},DESIGNATIONID = {7}, REPORTTOID = {8} WHERE ID= {5}";
+
         private const string DELETE_QUERY = "UPDATE USERS SET ISDELETED = '{1}' WHERE ID = {0}";
 
         public IList<User> Get()
@@ -49,6 +50,10 @@ namespace FinancialPlanner.BusinessLogic.Users
             user.UpdatedByUserName = dr.Field<string>("UpdatedByUserName");
             if (dr["RoleId"] != DBNull.Value)
                 user.RoleId = dr.Field<int>("RoleId");
+            if (dr["DesignationId"] != DBNull.Value)
+                user.DesignationId = dr.Field<int>("DesignationId");
+            if (dr["ReportToId"] != DBNull.Value)
+                user.ReportToId = dr.Field<int>("ReportToId");
             return user;
         }
 
@@ -105,7 +110,9 @@ namespace FinancialPlanner.BusinessLogic.Users
                     maxValue, user.UserName, user.FirstName, user.LastName, user.Password,
                     user.CreatedOn.ToString("yyyy-MM-dd hh:mm:ss"), user.CreatedBy, 
                     user.UpdatedOn.ToString("yyyy-MM-dd hh:mm:ss"), user.UpdatedBy,
-                    user.RoleId,user.IsDeleted));
+                    user.RoleId,user.IsDeleted,
+                    user.DesignationId,
+                    user.ReportToId));
                 Activity.ActivitiesService.Add(ActivityType.CreateUser, EntryStatus.Success,
                          Source.Server, user.UpdatedByUserName, user.UserName, user.MachineName);
             }
@@ -120,7 +127,7 @@ namespace FinancialPlanner.BusinessLogic.Users
         {
             DataBase.DBService.ExecuteCommandString(string.Format(UPDATE_QUERY,
                 user.FirstName, user.LastName,user.Password, user.UpdatedOn.ToString("yyyy-MM-dd hh:mm:ss"), 
-                user.UpdatedBy, user.Id,user.RoleId));
+                user.UpdatedBy, user.Id,user.RoleId,user.DesignationId,user.ReportToId));
             Activity.ActivitiesService.Add(ActivityType.UpdateUser, EntryStatus.Success,
                         Source.Server, user.UpdatedByUserName, user.UserName, user.MachineName);
         }

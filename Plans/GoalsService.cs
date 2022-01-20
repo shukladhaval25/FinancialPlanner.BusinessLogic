@@ -89,7 +89,7 @@ namespace FinancialPlanner.BusinessLogic
             loanForGoal.LoanYears = dr.Field<int>("LoanYears");
             loanForGoal.StratYear = dr.Field<int>("StartYear");
             loanForGoal.EndYear = dr.Field<int>("EndYear");
-            loanForGoal.LoanPortion = (dr["LoanPortion"] == DBNull.Value) ? 0 : dr.Field<int>("LoanPortion");
+            loanForGoal.LoanPortion = (dr["LoanPortion"] == DBNull.Value) ? 0 : decimal.Parse(dr["LoanPortion"].ToString());
 
             return loanForGoal;
         }

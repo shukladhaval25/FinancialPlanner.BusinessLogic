@@ -190,11 +190,13 @@ namespace FinancialPlanner.BusinessLogic.Plans
             nonFinancialAsset.OtherHolderName = dr.Field<string>("OtherHolderName");
             nonFinancialAsset.OtherHolderShare = dr.Field<int>("OtherHolderShare");
             nonFinancialAsset.MappedGoalId = dr.Field<int>("MappedGoalId");
-            nonFinancialAsset.AssetMappingShare = dr.Field<int>("AssetMappingShare");
+            nonFinancialAsset.AssetMappingShare = dr.Field<decimal>("AssetMappingShare");
             nonFinancialAsset.AssetRealisationYear = dr.Field<string>("AssetRealisationYear");
             nonFinancialAsset.Description = dr.Field<string>("Description");
             nonFinancialAsset.GrowthPercentage = dr.Field<decimal>("GrowthPercentage");
             nonFinancialAsset.EligibleForInsuranceCover = dr.Field<bool>("EligibleForInsuranceCover");
+            nonFinancialAsset.UpdatedOn = dr.Field<DateTime>("UpdatedOn");
+            nonFinancialAsset.UpdatedBy = dr.Field<int>("UpdatedBy");
             return nonFinancialAsset;
         }
 

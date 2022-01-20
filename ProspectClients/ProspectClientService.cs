@@ -10,14 +10,15 @@ namespace FinancialPlanner.BusinessLogic.ProspectClients
 {
     public class ProspectClientService
     {
-        private const string INSERT_PROSPECTCLIENT_QUERY = "INSERT INTO PROSPECTCLIENT VALUES ('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','{8}',{9},'{10}',{11},'{12}','{13}')";
+        private const string INSERT_PROSPECTCLIENT_QUERY = "INSERT INTO PROSPECTCLIENT VALUES ('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','{8}',{9},'{10}',{11},'{12}','{13}','{14}','{15}')";
        
         private const string SELECT_ALL = "SELECT U1.*,U.USERNAME AS UPDATEDBYUSERNAME FROM PROSPECTCLIENT U1, USERS U WHERE U1.UPDATEDBY = U.ID AND U1.IsConvertedToClient = 'FALSE' ORDER BY U1.NAME ASC";
         private const string SELECT_BY_ID = "SELECT U1.*,U.USERNAME AS UPDATEDBYUSERNAME FROM PROSPECTCLIENT U1, USERS U WHERE U1.UPDATEDBY = U.ID and U1.ID = {0}";
         private const string SELECT_BY_NAME = "SELECT U1.*,U.USERNAME AS UPDATEDBYUSERNAME FROM PROSPECTCLIENT U1, USERS U WHERE U1.UPDATEDBY = U.ID and U1.NAME LIKE '%{0}%'";
 
         private const string UPDATE_PROSPECTCLIENT_QUERY = "UPDATE PROSPECTCLIENT SET NAME = '{0}',PHONENO ='{1}',EMAIL ='{2}',OCCUPATION ='{3}'," +
-                "EVENT = '{4}', EVENTDATE = '{5}',REFEREDBY ='{6}',UPDATEDON ='{7}',UPDATEDBY = {8},ISCONVERTEDTOCLIENT ='{9}', STOPSENDINGEMAIL ='{10}' WHERE ID= {11}";
+                "EVENT = '{4}', EVENTDATE = '{5}',REFEREDBY ='{6}',UPDATEDON ='{7}',UPDATEDBY = {8},ISCONVERTEDTOCLIENT ='{9}', STOPSENDINGEMAIL ='{10}',Remarks ='{11}'," +
+            "INTRODUCTIONCOMPLETED = '{12}', INTRODUCTIONCOMPLETEDDATE = '{13}' WHERE ID= {14}";
 
         private const string DELETE_QUERY = "DELETE FROM PROSPECTCLIENT WHERE ID = {0}";
         private const string DELETE_CONVERSATION_QUERY = "DELETE FROM PROSPECTCLIENTCONVERSATION WHERE PROSPECTCLIENTID = {0}";
@@ -72,7 +73,9 @@ namespace FinancialPlanner.BusinessLogic.ProspectClients
                      prospectClient.ReferedBy,prospectClient.Remarks,
                      prospectClient.CreatedOn.ToString("yyyy-MM-dd hh:mm:ss"), prospectClient.CreatedBy, 
                      prospectClient.UpdatedOn.ToString("yyyy-MM-dd hh:mm:ss"), prospectClient.UpdatedBy,
-                     prospectClient.IsConvertedToClient, prospectClient.StopSendingEmail));
+                     prospectClient.IsConvertedToClient, prospectClient.StopSendingEmail,
+                     prospectClient.IntroductionCompleted,
+                     prospectClient.IntroductionCompletedDate.ToString("yyyy-MM-dd hh:mm:ss")));
 
                 Activity.ActivitiesService.Add(ActivityType.CreateProspectClient, EntryStatus.Success,
                          Source.Client, prospectClient.UpdatedByUserName, prospectClient.Name, prospectClient.MachineName);
@@ -93,7 +96,11 @@ namespace FinancialPlanner.BusinessLogic.ProspectClients
                      prospectClient.Occupation, prospectClient.Event, prospectClient.EventDate.ToString("yyyy-MM-dd hh:mm:ss"),
                      prospectClient.ReferedBy,
                      prospectClient.UpdatedOn.ToString("yyyy-MM-dd hh:mm:ss"), prospectClient.UpdatedBy,
-                     prospectClient.IsConvertedToClient, prospectClient.StopSendingEmail,prospectClient.ID));
+                     prospectClient.IsConvertedToClient, prospectClient.StopSendingEmail,
+                     prospectClient.Remarks,
+                     prospectClient.IntroductionCompleted,
+                     prospectClient.IntroductionCompletedDate.ToString("yyyy-MM-dd hh:mm:ss"),
+                     prospectClient.ID));
 
                 Activity.ActivitiesService.Add(ActivityType.UpdateProspectClient, EntryStatus.Success,
                          Source.Client, prospectClient.UpdatedByUserName, prospectClient.Name, prospectClient.MachineName);
@@ -142,6 +149,11 @@ namespace FinancialPlanner.BusinessLogic.ProspectClients
             prospClient.UpdatedByUserName = dr.Field<string>("UpdatedByUserName");
             prospClient.IsConvertedToClient = dr.Field<bool>("IsConvertedToClient");
             prospClient.StopSendingEmail = dr.Field<bool>("StopSendingEmail");
+            prospClient.IntroductionCompleted = dr.Field<bool>("IntroductionCompleted");
+            if (dr["IntroductionCompletedDate"] != DBNull.Value)
+            {
+                prospClient.IntroductionCompletedDate = dr.Field<DateTime>("IntroductionCompletedDate");
+            }
             return prospClient;
         }
     }

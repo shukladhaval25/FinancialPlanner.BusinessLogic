@@ -25,7 +25,7 @@ namespace FinancialPlanner.BusinessLogic.Clients
         private const string GET_CLIENT_PRIMARY_CONTACT = "SELECT  Client.ID, Client.Name, ClientContact.PrimaryEmail, ClientContact.PrimaryMobileNo FROM Client " +
             " INNER JOIN ClientContact ON Client.ID = ClientContact.CID" +
             " INNER JOIN Planner ON CLIENT.ID = Planner.ClientId " +
-            " And (client.IsActive = 1 AND " +
+            " And (client.IsActive = 1 AND Planner.IsDeleted = 0  AND " +
             "(DATEADD(D,-1, DATEADD(M, 3, Planner.StartDate)) = '{0}' OR" +
             " DATEADD(D,-1, DATEADD(M, 6, Planner.StartDate)) = '{0}' OR" +
             " DATEADD(D,-1, DATEADD(M, 9, Planner.StartDate)) = '{0}'))";
@@ -33,7 +33,7 @@ namespace FinancialPlanner.BusinessLogic.Clients
         private const string GET_ANNUALREVIEW_CLIENT_PRIMARY_CONTACT = "SELECT  Client.ID, Client.Name, ClientContact.PrimaryEmail, ClientContact.PrimaryMobileNo FROM Client " +
         " INNER JOIN ClientContact ON Client.ID = ClientContact.CID" +
         " INNER JOIN Planner ON CLIENT.ID = Planner.ClientId " +
-        " And (client.IsActive = 1 AND " +
+        " And (client.IsActive = 1 AND Planner.IsDeleted = 0  AND " +
         "(DATEADD(D,-1, DATEADD(M, 12, Planner.StartDate)) = '{0}'))";
 
         public ClientContact Get(int id)
