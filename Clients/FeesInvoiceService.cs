@@ -79,7 +79,7 @@ namespace FinancialPlanner.BusinessLogic.Clients
                 DataBase.DBService.BeginTransaction();
                 DataBase.DBService.ExecuteCommandString(string.Format(INSERT_FEES_INVOICE,
                     feesInvoiceTransacation.InvoiceNo,
-                    feesInvoiceTransacation.InvoiceDate,
+                    feesInvoiceTransacation.InvoiceDate.ToString("yyyy-MM-dd"),
                     feesInvoiceTransacation.CId), true);
 
 
@@ -136,7 +136,7 @@ namespace FinancialPlanner.BusinessLogic.Clients
 
                 DataBase.DBService.BeginTransaction();
                 DataBase.DBService.ExecuteCommandString(string.Format(UPDATE_FEES_INVOICE,
-                    feesInvoiceTransacation.InvoiceDate,
+                    feesInvoiceTransacation.InvoiceDate.ToString("yyyy-MM-dd"),
                     feesInvoiceTransacation.CId,
                     feesInvoiceTransacation.InvoiceNo), true);
 

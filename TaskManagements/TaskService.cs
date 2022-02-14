@@ -1,8 +1,10 @@
 ﻿using FinancialPlanner.BusinessLogic.Clients;
+using FinancialPlanner.BusinessLogic.Process;
 using FinancialPlanner.BusinessLogic.Users;
 using FinancialPlanner.Common;
 using FinancialPlanner.Common.Model;
 using FinancialPlanner.Common.Model.TaskManagement;
+using FinancialPlanner.Common.Planning;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -61,7 +63,7 @@ namespace FinancialPlanner.BusinessLogic.TaskManagements
             "TaskProject ON TaskCard.ProjectId = TaskProject.ID WHERE (TaskCard.AssignTo = {0}) AND "+
             "(TaskCard.TaskStatus <> 4 and TaskCard.TaskStatus<> 5)";
 
-        private readonly string SELECT_BY_TASKID = "SELECT TaskCard.*, Users.UserName AS OwnerName,TaskProject.Name AS ProjectName " +
+        private readonly string SELECT_BY_TASKID_WHICH_NOT_CLOSE_OR_DISCARD = "SELECT TaskCard.*, Users.UserName AS OwnerName,TaskProject.Name AS ProjectName " +
            "FROM Users INNER JOIN TaskCard ON Users.ID = TaskCard.Owner INNER JOIN " +
            "TaskProject ON TaskCard.ProjectId = TaskProject.ID WHERE (TaskCard.TaskId = '{0}') AND " +
            "(TaskCard.TaskStatus <> 4 and TaskCard.TaskStatus<> 5)";
@@ -112,6 +114,17 @@ namespace FinancialPlanner.BusinessLogic.TaskManagements
                 "group by format(ActualCompletedOn,'MMM.yyyy')";
 
 
+        private const string SELECT_CLIENTPROCESS_ID = "select CP.ID as ClientProcessId," +
+            "CPD.Id as ClientProcessDetailId," +
+            "CP.PrimaryStepId,CP.LinkSubStepId from ClientProcess CP " +
+            "inner join ClientProcessDetail CPD on CPD.CPID = CP.ID inner join TaskCard on CPD.RefTaskId = TaskCard.TaskId where TaskCard.TaskId = '{0}'";
+
+        private const string UPDATE_CLIENT_PROCESS_DETAILS = "UPDATE ClientProcessDetail SET ActualCompleteDate = GETDATE() WHERE ID = {0}";
+        private const string UPDATE_CLIENT_PROCESS = "UPDATE CLIENTPROCESS SET STATUS='C' WHERE ID = {0}";
+
+        private const string SELECT_NEXT_PROCESS_ID = "SELECT Top(1) P.[Id] as PrimaryStepId, L.[Id] as LinkSubStepId FROM[PrimaryStep] P LEFT join LinkSubStep L on  P.Id = L.PrimaryStepId where P.Id >= {0} and(L.Id > {1}  or L.Id is Null) order by P.StepNo, L.StepNo";
+
+        private const string SELECT_PRIMARY_STEP = "select PrimaryStep.*, Users.Id AS UserId from PrimaryStep, Users where StepNo = {0} and Users.DesignationId = PrimaryStep.PrimaryResponsibility";
 
         public IList<TaskCard> GetNotified(int userId)
         {
@@ -196,10 +209,53 @@ namespace FinancialPlanner.BusinessLogic.TaskManagements
                 {
                     updateTransactionType(taskCard, taskCard.Id);
                 }
+                DataBase.DBService.CommitTransaction();
+
+                if (taskCard.TaskStatus == Common.Model.TaskManagement.TaskStatus.Complete)
+                {
+                    DataTable dataTable = DataBase.DBService.ExecuteCommand(string.Format(SELECT_CLIENTPROCESS_ID, taskCard.TaskId));
+                    if (dataTable.Rows.Count > 0)
+                    {
+                        DataBase.DBService.ExecuteCommandString(string.Format(UPDATE_CLIENT_PROCESS_DETAILS, dataTable.Rows[0]["ClientProcessDetailId"].ToString()));
+
+                        DataBase.DBService.ExecuteCommandString(string.Format(UPDATE_CLIENT_PROCESS, dataTable.Rows[0]["ClientProcessId"].ToString()));
+
+                        //TODO: Get next process id and add process and task for that
+                        DataTable dtNextProcess = DataBase.DBService.ExecuteCommand(string.Format(SELECT_NEXT_PROCESS_ID,
+                            dataTable.Rows[0]["PrimaryStepId"].ToString(), dataTable.Rows[0]["LinkSubStepId"].ToString()));
+                        if (dtNextProcess.Rows.Count > 0)
+                        {
+                            ClientProcessService clientProcessService = new ClientProcessService();
+                            ClientProcess clientProcess = new ClientProcess();
+                            clientProcess.ClientId = (int) taskCard.CustomerId;
+                            clientProcess.PrimaryStepId = int.Parse(dtNextProcess.Rows[0]["PrimaryStepId"].ToString());   // dr.Field<int>("PrimaryStepId");
+                            //clientProcess.LinkStepId = int.Parse(dtNextProcess.Rows[0]["LinkSubStepId"].ToString());
+                            clientProcess.Status = "P";
+                            clientProcess.IsProcespectClient = false;
+                            if (dtNextProcess.Rows[0]["LinkSubStepId"] != DBNull.Value)
+                            {
+                                clientProcess.LinkStepId = int.Parse(dtNextProcess.Rows[0]["LinkSubStepId"].ToString());
+                            }
+                            int assignTo = (int)taskCard.AssignTo;
+                            //DataTable dtPrimaryStep = DataBase.DBService.ExecuteCommand(string.Format(SELECT_PRIMARY_STEP, clientProcess.PrimaryStepId));
+
+                            //if (dtPrimaryStep.Rows.Count > 0)
+                            //{
+                            //    int.TryParse(dtPrimaryStep.Rows[0]["UserId"].ToString(), out assignTo);
+                            //}
+                            //if (dtPrimaryStep.Rows.Count > 0)
+                            //{
+                            //    int.TryParse(dtPrimaryStep.Rows[0]["UserId"].ToString(), out assignTo);
+                            //}
+                            clientProcessService.Add(clientProcess, assignTo);
+                        }
+                    }
+                }
+
                 //DataBase.DBService.ExecuteCommandString(string.Format(UPDATE_TASKID, taskCard.TaskId + "-" + id, id), true);
                 //Activity.ActivitiesService.Add(ActivityType.CreateTask, EntryStatus.Success,
                 //        Source.Server, taskCard.UpdatedByUserName, taskCard.TaskId, taskCard.MachineName);
-                DataBase.DBService.CommitTransaction();
+               
                 return taskCard.Id;
             }
             catch (Exception ex)
@@ -254,7 +310,7 @@ namespace FinancialPlanner.BusinessLogic.TaskManagements
                 IList<TaskCard> taskcards =
                     new List<TaskCard>();
 
-                DataTable dtAppConfig = DataBase.DBService.ExecuteCommand(string.Format(SELECT_BY_TASKID, taskId));
+                DataTable dtAppConfig = DataBase.DBService.ExecuteCommand(string.Format(SELECT_BY_TASKID_WHICH_NOT_CLOSE_OR_DISCARD, taskId));
                 foreach (DataRow dr in dtAppConfig.Rows)
                 {
                     TaskCard task = convertToTaskCard(dr);
@@ -272,6 +328,7 @@ namespace FinancialPlanner.BusinessLogic.TaskManagements
                 return null;
             }
         }
+
         public IList<TaskCard> GetAll()
         {
             try
