@@ -20,6 +20,35 @@ namespace FinancialPlanner.BusinessLogic.Plans
             "SEGMENTRATIO = {2}, UPDATEDON ='{3}', UPDATEDBY = {4} WHERE ID = {5}";
         const string DELETE_QUERY = "DELETE INVESTMENTSEGMENT WHERE ID = {0}";
         private readonly string GET_RISK_PROFILE_NAME_QUERY = "SELECT [NAME] FROM [RISKPROFILEDMASTER] WHERE ID = {0}";
+        readonly string MODEL_PORTFOLIO_QUERY = "SELECT  RiskProfiledMaster.ID, RiskProfiledMaster.Name, InvestmentSegment.INVESTMENTTYPE, InvestmentSegment.SEGMENTNAME, InvestmentSegment.SEGMENTRATIO, RecommendedSchemes.SCHEMENAME              FROM RiskProfiledMaster " +
+            "INNER JOIN InvestmentSegment ON RiskProfiledMaster.ID = InvestmentSegment.RISKPROFIILEID AND RiskProfiledMaster.ID = InvestmentSegment.RISKPROFIILEID AND RiskProfiledMaster.ID = InvestmentSegment.RISKPROFIILEID AND                        RiskProfiledMaster.ID = InvestmentSegment.RISKPROFIILEID AND RiskProfiledMaster.ID = InvestmentSegment.RISKPROFIILEID AND RiskProfiledMaster.ID = InvestmentSegment.RISKPROFIILEID " +
+            "INNER JOIN RecommendedSchemes ON InvestmentSegment.ID = RecommendedSchemes.InvestmentSegmentID AND InvestmentSegment.ID = RecommendedSchemes.InvestmentSegmentID AND InvestmentSegment.ID = RecommendedSchemes.InvestmentSegmentID AND InvestmentSegment.ID = RecommendedSchemes.InvestmentSegmentID AND InvestmentSegment.ID = RecommendedSchemes.InvestmentSegmentID AND InvestmentSegment.ID = RecommendedSchemes.InvestmentSegmentID WHERE        (RiskProfiledMaster.ID ={0})";
+
+        public IList<ModelPortfolio> GetModelPorfolio(int riskProfileId)
+        {
+            try
+            {
+                Logger.LogInfo("Get: Investment segment process start");
+                IList<ModelPortfolio> modelPortfolios = new List<ModelPortfolio>();
+
+                DataTable dtAppConfig = DataBase.DBService.ExecuteCommand(string.Format(MODEL_PORTFOLIO_QUERY, riskProfileId));
+                foreach (DataRow dr in dtAppConfig.Rows)
+                {
+                    ModelPortfolio modelPortfolio = convertToModelPortfolioObject(dr);
+                    modelPortfolios.Add(modelPortfolio);
+                }
+                Logger.LogInfo("Get: Investment segment process completed.");
+                return modelPortfolios;
+            }
+            catch (Exception ex)
+            {
+                StackTrace st = new StackTrace();
+                StackFrame sf = st.GetFrame(0);
+                MethodBase currentMethodName = sf.GetMethod();
+                LogDebug(currentMethodName.Name, ex);
+                return null;
+            }
+        }
 
         public IList<InvestmentSegment> GetAll(int riskProfileId)
         {
@@ -147,6 +176,18 @@ namespace FinancialPlanner.BusinessLogic.Plans
             invSeg.InvestmentType = dr.Field<string>("InvestmentType");
             invSeg.SegmentName = dr.Field<string>("SegmentName");
             invSeg.SegmentRatio = float.Parse(dr["SegmentRatio"].ToString());
+            return invSeg;
+        }
+
+        private ModelPortfolio convertToModelPortfolioObject(DataRow dr)
+        {
+            ModelPortfolio invSeg = new ModelPortfolio();
+            invSeg.RiskProfileId = dr.Field<int>("ID");
+            invSeg.RiskProfileName = dr.Field<string>("Name");
+            invSeg.InvestmentType = dr.Field<string>("InvestmentType");
+            invSeg.SegmentName = dr.Field<string>("SegmentName");
+            invSeg.SegmentRatio = float.Parse(dr["SegmentRatio"].ToString());
+            invSeg.SchemeName = dr.Field<string>("SCHEMENAME");
             return invSeg;
         }
     }

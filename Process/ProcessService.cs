@@ -14,12 +14,16 @@ namespace FinancialPlanner.BusinessLogic.Process
     {
 
         private const string GET_CLIENT_NAME_QUERY = "SELECT C.NAME FROM CLIENT C, PLANNER P  WHERE P.CLIENTID = C.ID AND P.ID = {0}";
-        const string SELECT_QUERY = "SELECT PrimaryStep.Id, PrimaryStep.StepNo, PrimaryStep.Title, PrimaryStep.Description, PrimaryStep.Remarks, PrimaryStep.DurationInMinutes, PrimaryStep.TimelineInDays, PrimaryStep.PrimaryResponsibility, PrimaryStep.Owner, PrimaryStep.Checker, LinkSubStep.Id AS LinkSubStep.Id, LinkSubStep.PrimaryStepId, LinkSubStep.StepNo AS LinkSubStep.StepNo, LinkSubStep.Title AS LinkSubStep.Title, LinkSubStep.Description AS LinkSubStep.Description, LinkSubStep.Remarks AS LinkSubStep.Remarks, LinkSubStep.DurationInMinutes AS LinkSubStep.DurationInMinutes, LinkSubStep.TimelineInDays AS LinkSubStep.TimelineInDays, LinkSubStep.PrimaryResponsibility AS LinkSubStep.PrimaryResponsibility, LinkSubStep.Owner AS LinkSubStep.Owner, LinkSubStep.Checker AS LinkSubStep.Checker FROM PrimaryStep INNER JOIN LinkSubStep ON PrimaryStep.Id = LinkSubStep.PrimaryStepId";
+        const string SELECT_QUERY = "SELECT PrimaryStep.Id, PrimaryStep.StepNo, PrimaryStep.Title, PrimaryStep.Description, PrimaryStep.Remarks, PrimaryStep.DurationInMinutes, PrimaryStep.TimelineInDays, PrimaryStep.PrimaryResponsibility, PrimaryStep.Owner, PrimaryStep.Checker, LinkSubStep.Id AS LinkSubStep.Id, LinkSubStep.PrimaryStepId, LinkSubStep.StepNo AS LinkSubStep.StepNo, LinkSubStep.Title AS LinkSubStep.Title, LinkSubStep.Description AS LinkSubStep.Description, LinkSubStep.Remarks AS LinkSubStep.Remarks, LinkSubStep.DurationInMinutes AS LinkSubStep.DurationInMinutes, LinkSubStep.TimelineInDays AS LinkSubStep.TimelineInDays, LinkSubStep.PrimaryResponsibility AS LinkSubStep.PrimaryResponsibility, LinkSubStep.Owner AS LinkSubStep.Owner, LinkSubStep.Checker AS LinkSubStep.Checker,LinkSubStep.AllowByPassProcess FROM PrimaryStep INNER JOIN LinkSubStep ON PrimaryStep.Id = LinkSubStep.PrimaryStepId";
 
         const string SELECT_PRIMARY_STEP = "SELECT[Id],[StepNo],[Title],[Description],[Remarks]" +
             ",[DurationInMinutes],[TimelineInDays],[PrimaryResponsibility],[Owner],[Checker] FROM [dbo].[PrimaryStep]";
         const string SELECT_LINKSUBSTEP_QUERY_BY_PRIMARY_STEP = "SELECT [Id],[PrimaryStepId],[StepNo],[Title],[Description],[Remarks]" +
-            ",[DurationInMinutes],[TimelineInDays],[PrimaryResponsibility],[Owner],[Checker] FROM [dbo].[LinkSubStep] WHERE PrimaryStepId = {0}";
+            ",[DurationInMinutes],[TimelineInDays],[PrimaryResponsibility],[Owner],[Checker],[AllowByPassProcess] FROM [dbo].[LinkSubStep] WHERE PrimaryStepId = {0}";
+
+        const string SELECT_LINKSUBSTEP_QUERY_BY_TASKID = "SELECT        LinkSubStep.Id, LinkSubStep.PrimaryStepId, LinkSubStep.StepNo, LinkSubStep.Title, LinkSubStep.Description, LinkSubStep.Remarks, LinkSubStep.DurationInMinutes, LinkSubStep.TimelineInDays, LinkSubStep.PrimaryResponsibility, LinkSubStep.Owner, LinkSubStep.Checker, LinkSubStep.AllowByPassProcess FROM  LinkSubStep INNER JOIN " +
+            "ClientProcess ON LinkSubStep.PrimaryStepId = ClientProcess.PrimaryStepId AND LinkSubStep.Id = ClientProcess.LinkSubStepId INNER JOIN ClientProcessDetail ON ClientProcess.Id = ClientProcessDetail.Id " +
+            "WHERE (ClientProcessDetail.RefTaskId = '{0}')";
 
         const string DELETE_PRIMARY_STEP_QUERY = "DELETE FROM PRIMARYSTEP WHERE ID = {0}";
         const string DELETE_LINKSUBSTEP_QUERY_BY_PRIMARYSTEPID = "DELETE FROM LINKSUBSTEP WHERE PRIMARYSTEPID = {0}";
@@ -27,8 +31,9 @@ namespace FinancialPlanner.BusinessLogic.Process
 
         const string INSERT_PRIMARY_STEP_QUERY = "INSERT INTO [dbo].[PrimaryStep] " +
            "([StepNo],[Title],[Description],[Remarks],[DurationInMinutes],[TimelineInDays],[PrimaryResponsibility],[Owner],[Checker]) VALUES ({0},'{1}','{2}','{3}',{4},{5},{6},{7},{8})";
+
         const string INSERT_LINKSUB_STEP_QUERY = "INSERT INTO [dbo].[LinkSubStep] " +
-            "([PrimaryStepId],[StepNo],[Title],[Description],[Remarks],[DurationInMinutes],[TimelineInDays],[PrimaryResponsibility],[Owner],[Checker]) VALUES ({0},{1},'{2}','{3}','{4}',{5},{6},{7},{8},{9})";
+            "([PrimaryStepId],[StepNo],[Title],[Description],[Remarks],[DurationInMinutes],[TimelineInDays],[PrimaryResponsibility],[Owner],[Checker],[AllowByPassProcess]) VALUES ({0},{1},'{2}','{3}','{4}',{5},{6},{7},{8},{9},{10})";
 
         const string UPDATE_PRIMARY_STEP_QUERY = "UPDATE [dbo].[PrimaryStep] " +
             "SET [StepNo] = {0}" +
@@ -52,6 +57,7 @@ namespace FinancialPlanner.BusinessLogic.Process
            ",[PrimaryResponsibility] = {6}" +
            ",[Owner] = {7}" +
            ",[Checker] = {8}" +
+            ",[AllowByPassProcess] = {10} " +
            "WHERE Id = {9}";
 
         public IList<PrimaryStep> GetPrimarySteps()
@@ -84,6 +90,32 @@ namespace FinancialPlanner.BusinessLogic.Process
                 Logger.LogInfo("Get: LinkSubStep process start");
                 IList<LinkSubStep> processSteps = new List<LinkSubStep>();
                 DataTable dtAppConfig = DataBase.DBService.ExecuteCommand(string.Format(SELECT_LINKSUBSTEP_QUERY_BY_PRIMARY_STEP,primaryStepId));
+                foreach (DataRow dr in dtAppConfig.Rows)
+                {
+                    LinkSubStep processStep = convertToLinkSubStep(dr);
+                    processSteps.Add(processStep);
+                }
+                Logger.LogInfo("Get: LinkSubStep process completed.");
+                return processSteps;
+            }
+            catch (Exception ex)
+            {
+                StackTrace st = new StackTrace();
+                StackFrame sf = st.GetFrame(0);
+                MethodBase currentMethodName = sf.GetMethod();
+                LogDebug(currentMethodName.Name, ex);
+                throw ex;
+            }
+        }
+
+        public IList<LinkSubStep> GetLinkSubStepsByRefTaskId(string  refTaskId)
+        {
+
+            try
+            {
+                Logger.LogInfo("Get: LinkSubStep process start");
+                IList<LinkSubStep> processSteps = new List<LinkSubStep>();
+                DataTable dtAppConfig = DataBase.DBService.ExecuteCommand(string.Format(SELECT_LINKSUBSTEP_QUERY_BY_TASKID, refTaskId));
                 foreach (DataRow dr in dtAppConfig.Rows)
                 {
                     LinkSubStep processStep = convertToLinkSubStep(dr);
@@ -161,7 +193,17 @@ namespace FinancialPlanner.BusinessLogic.Process
                        linkSubStep.StepNo, linkSubStep.Title, linkSubStep.Description,
                        linkSubStep.Remarks, linkSubStep.DurationInMinutes,
                        linkSubStep.TimelineInDays, linkSubStep.PrimaryResponsibility,
-                       linkSubStep.Owner, linkSubStep.Checker));
+                       linkSubStep.Owner, linkSubStep.Checker, (linkSubStep.AllowByPassProcess) ? 1 : 0));
+
+                    if (linkSubStep.Points.Count > 0)
+                    {
+                        string id =  DataBase.DBService.ExecuteCommandScalar("SELECT [Id] FROM[FinancialPlanner].[dbo].[LinkSubStep] " +
+                            " Where PrimaryStepId = " + linkSubStep.PrimaryStepId + " and StepNo = " + linkSubStep.StepNo + " and Title = '" + linkSubStep.Title + "'");
+                        foreach(string point in linkSubStep.Points)
+                        {
+                            DataBase.DBService.ExecuteCommand(string.Format("INSERT INTO LINKSUBSTEPPOINTS VALUES ({0},'{1}')", id, point));
+                        }
+                    }
                 }
                 else
                 {
@@ -175,7 +217,21 @@ namespace FinancialPlanner.BusinessLogic.Process
                         linkSubStep.PrimaryResponsibility,
                         linkSubStep.Owner,
                         linkSubStep.Checker,
-                        linkSubStep.Id));
+                        linkSubStep.Id,
+                        (linkSubStep.AllowByPassProcess) ? 1: 0 ));
+
+                    DataBase.DBService.ExecuteCommand("Delete from LINKSUBSTEPPOINTS where LinkSubStepId =" + linkSubStep.Id);
+
+                    if (linkSubStep.Points.Count > 0)
+                    {
+                        string id = DataBase.DBService.ExecuteCommandScalar("SELECT [Id] FROM[FinancialPlanner].[dbo].[LinkSubStep] " +
+                            " Where PrimaryStepId = " + linkSubStep.PrimaryStepId + " and StepNo = " + linkSubStep.StepNo + " and Title = '" + linkSubStep.Title + "'");
+                        foreach (string point in linkSubStep.Points)
+                        {
+                            DataBase.DBService.ExecuteCommand(string.Format("INSERT INTO LINKSUBSTEPPOINTS VALUES ({0},'{1}')", id, point));
+                        }
+                    }
+
                 }
 
                 string linkSubStepId = DataBase.DBService.ExecuteCommandScalar(string.Format("SELECT Id FROM LinkSubStep where StepNo = {0} and Title = '{1}' and DurationInMinutes = {2} and TimelineInDays = {3} and PrimaryStepId ={4}", linkSubStep.StepNo, linkSubStep.Title, linkSubStep.DurationInMinutes, linkSubStep.TimelineInDays,linkSubStep.PrimaryStepId));
@@ -261,6 +317,17 @@ namespace FinancialPlanner.BusinessLogic.Process
             linkSubStep.PrimaryResponsibility = dr.Field<int>("PrimaryResponsibility");
             linkSubStep.Owner = dr.Field<int>("Owner");
             linkSubStep.Checker = dr.Field<int>("Checker");
+            linkSubStep.AllowByPassProcess = (dr["AllowByPassProcess"] == DBNull.Value) ? false : bool.Parse(dr["AllowByPassProcess"].ToString());
+            linkSubStep.Points = new List<string>();
+            DataTable dtPoints = DataBase.DBService.ExecuteCommand(string.Format("SELECT POINT FROM LINKSUBSTEPPOINTS WHERE LinkSubStepId ={0}", linkSubStep.Id));
+
+            if (dtPoints.Rows.Count > 0)
+            {
+                foreach(DataRow dataRow in dtPoints.Rows)
+                {
+                    linkSubStep.Points.Add(dataRow[0].ToString());
+                }
+            }
             return linkSubStep;
         }
         

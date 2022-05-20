@@ -30,6 +30,14 @@ namespace FinancialPlanner.BusinessLogic.CurrentStatus
 
         const string DELETE_FixedDeposit = "DELETE FROM FixedDeposit WHERE ID = {0}";
 
+        const string SELECT_FD_MATURITY = "SELECT N1.*, U.USERNAME AS UPDATEDBYUSERNAME FROM FixedDeposit N1, USERS U WHERE N1.UPDATEDBY = U.ID and MaturityDate BETWEEN '{0}' AND '{1}'";
+            
+            
+            //"SELECT FixedDeposit.INVESTERNAME, Client.Name, " +
+            //       "FixedDeposit.AccountNo, FixedDeposit.MaturityDate, FixedDeposit.BankName " + 
+            //       " FROM Client INNER JOIN Planner ON Client.ID = Planner.ClientId AND Client.ID = Planner.ClientId "+ 
+            //       " RIGHT OUTER JOIN FixedDeposit ON Planner.ID = FixedDeposit.PID AND Planner.ID = FixedDeposit.PID WHERE (FixedDeposit.MaturityDate BETWEEN '{0}' AND '{1}')";
+
 
         public IList<FixedDeposit> GetAll(int plannerId)
         {
@@ -208,6 +216,33 @@ namespace FinancialPlanner.BusinessLogic.CurrentStatus
             FixedDeposit.UpdatedOn = dr.Field<DateTime>("UpdatedOn");
             FixedDeposit.UpdatedByUserName = dr.Field<string>("UpdatedByUserName");
             return FixedDeposit;
+        }
+      
+
+        public IList<FixedDeposit> GetFDMaturity(DateTime from, DateTime to)
+        {
+            try
+            {
+                Logger.LogInfo("Get: FD maturity process start");
+                IList<FixedDeposit> lstPPFOption = new List<FixedDeposit>();
+
+                DataTable dtAppConfig = DataBase.DBService.ExecuteCommand(string.Format(SELECT_FD_MATURITY, from.ToString("yyyy-MM-dd"), to.ToString("yyyy-MM-dd")));
+                foreach (DataRow dr in dtAppConfig.Rows)
+                {
+                    FixedDeposit mf = convertToFixedDeposit(dr);
+                    lstPPFOption.Add(mf);
+                }
+                Logger.LogInfo("Get: FD maturity process completed.");
+                return lstPPFOption;
+            }
+            catch (Exception ex)
+            {
+                StackTrace st = new StackTrace();
+                StackFrame sf = st.GetFrame(0);
+                MethodBase currentMethodName = sf.GetMethod();
+                LogDebug(currentMethodName.Name, ex);
+                return null;
+            }
         }
     }
 }

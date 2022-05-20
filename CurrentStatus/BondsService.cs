@@ -32,6 +32,8 @@ namespace FinancialPlanner.BusinessLogic.CurrentStatus
 
         const string DELETE_Bonds = "DELETE FROM Bonds WHERE ID = {0}";
 
+        const string SELECT_BONDS_MATURITY = "SELECT N1.*, U.USERNAME AS UPDATEDBYUSERNAME FROM Bonds N1, USERS U WHERE N1.UPDATEDBY = U.ID  and MaturityDate BETWEEN '{0}' AND '{1}'";
+
 
         public IList<Bonds> GetAll(int plannerId)
         {
@@ -58,8 +60,32 @@ namespace FinancialPlanner.BusinessLogic.CurrentStatus
                 return null;
             }
         }
-   
 
+        public IList<Bonds> GeMaturity(DateTime from, DateTime to)
+        {
+            try
+            {
+                Logger.LogInfo("Get: Bonds maturity process start");
+                IList<Bonds> lstPPFOption = new List<Bonds>();
+
+                DataTable dtAppConfig = DataBase.DBService.ExecuteCommand(string.Format(SELECT_BONDS_MATURITY, from.ToString("yyyy-MM-dd"), to.ToString("yyyy-MM-dd")));
+                foreach (DataRow dr in dtAppConfig.Rows)
+                {
+                    Bonds mf = convertToBonds(dr);
+                    lstPPFOption.Add(mf);
+                }
+                Logger.LogInfo("Get: Bonds maturity process completed.");
+                return lstPPFOption;
+            }
+            catch (Exception ex)
+            {
+                StackTrace st = new StackTrace();
+                StackFrame sf = st.GetFrame(0);
+                MethodBase currentMethodName = sf.GetMethod();
+                LogDebug(currentMethodName.Name, ex);
+                return null;
+            }
+        }
         public Bonds Get(int id)
         {
             try

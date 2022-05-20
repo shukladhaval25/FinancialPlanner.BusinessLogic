@@ -111,7 +111,7 @@ namespace FinancialPlanner.BusinessLogic.LifeInsurance
             return licPremiumReminder;
         }
 
-        const string DELETE_LIFE_INSURNACE = "DELETE FROM LIFEINSURANCE WHERE ID = {0} AND PID {1}";
+        const string DELETE_LIFE_INSURNACE = "DELETE FROM LIFEINSURANCE WHERE ID = {0} AND PID = {1}";
 
         public IList<Common.Model.CurrentStatus.LifeInsurance> GetAll(int plannerId)
         {

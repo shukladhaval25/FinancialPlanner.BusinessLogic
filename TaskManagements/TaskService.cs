@@ -185,10 +185,10 @@ namespace FinancialPlanner.BusinessLogic.TaskManagements
         public int Update(TaskCard taskCard)
         {
             try
-            {                
+            {
                 DataBase.DBService.ExecuteCommand(SELECT_ALL);
                 DataBase.DBService.BeginTransaction();
-                DataBase.DBService.ExecuteCommandString(string.Format(UPDATE_TASK,                    
+                DataBase.DBService.ExecuteCommandString(string.Format(UPDATE_TASK,
                     taskCard.TransactionType,
                     (int)taskCard.Type,
                     taskCard.CustomerId,
@@ -198,7 +198,7 @@ namespace FinancialPlanner.BusinessLogic.TaskManagements
                     (int)taskCard.TaskStatus,
                     taskCard.Owner,
                     taskCard.AssignTo,
-                    taskCard.CompletedPercentage,                    
+                    taskCard.CompletedPercentage,
                     taskCard.UpdatedOn.ToString("yyyy-MM-dd hh:mm:ss"),
                     taskCard.UpdatedBy,
                     taskCard.DueDate.ToString("yyyy-MM-dd hh:mm:ss"),
@@ -209,9 +209,15 @@ namespace FinancialPlanner.BusinessLogic.TaskManagements
                 {
                     updateTransactionType(taskCard, taskCard.Id);
                 }
+
+                if (taskCard.ProcessApprovedBy != null)
+                {
+                    DataBase.DBService.ExecuteCommandString("INSERT INTO TaskProcessByPassApproval VALUES ('" + taskCard.TaskId + "'," + taskCard.ProcessApprovedBy + ",'" + DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss") + "')",true);
+                }
+
                 DataBase.DBService.CommitTransaction();
 
-                if (taskCard.TaskStatus == Common.Model.TaskManagement.TaskStatus.Complete)
+                if (taskCard.TaskStatus == Common.Model.TaskManagement.TaskStatus.Complete || (taskCard.TaskStatus == Common.Model.TaskManagement.TaskStatus.Blocked && taskCard.ProcessApprovedBy != null))
                 {
                     DataTable dataTable = DataBase.DBService.ExecuteCommand(string.Format(SELECT_CLIENTPROCESS_ID, taskCard.TaskId));
                     if (dataTable.Rows.Count > 0)

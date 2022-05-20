@@ -87,6 +87,7 @@
     <Compile Include="ApplicationMaster\BankService.cs" />
     <Compile Include="ApplicationMaster\ClientRatingService.cs" />
     <Compile Include="ApplicationMaster\AreaService.cs" />
+    <Compile Include="ApplicationMaster\CustomNotificationService.cs" />
     <Compile Include="ApplicationMaster\InsuranceCompanyService.cs" />
     <Compile Include="ApplicationMaster\OrganisationTypeService.cs" />
     <Compile Include="ApplicationMaster\ReportPageSettingService.cs" />
@@ -134,6 +135,7 @@
     <Compile Include="Email\EmailService.cs" />
     <Compile Include="LifeInsurance\GeneralInsuranceService.cs" />
     <Compile Include="LifeInsurance\LifeInsuranceService.cs" />
+    <Compile Include="MailManager.cs" />
     <Compile Include="Permissions\FormsService.cs" />
     <Compile Include="Permissions\RolePermissionService.cs" />
     <Compile Include="PlanOption\CashFlowService.cs" />

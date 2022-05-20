@@ -40,7 +40,10 @@ namespace FinancialPlanner.BusinessLogic.Process
         private const string INSERT_CLIENT_PROCESS_DETAILS = "INSERT INTO ClientProcessDetail" +
             "(CPID,ASSIGNTO,ASSIGNDATE,EXPECTEDCOMPLEDATE,REFTASKID) VALUES ({0},{1},'{2}','{3}','{4}')";
 
-        private const string SELECT_ALL_CURRENT_CLIENT_PROCESS= "SELECT Client.ID,Client.Name,LinkSubStep.Title, ClientProcess.Status, ClientProcess.PrimaryStepId,ClientProcess.LinkSubStepId,PrimaryStep.StepNo as PrimaryStepNo,LinkSubStep.StepNo as LinkSubStepNo,ClientProcessDetail.RefTaskId,Users.UserName,ClientProcessDetail.AssignTo,ClientProcessDetail.ExpectedCompleDate,ClientProcessDetail.ActualCompleteDate," +
+        private const string INSERT_CLIENT_PROCESS_DETAILS_WITH_COMPLITIONDATE = "INSERT INTO ClientProcessDetail" +
+          "(CPID,ASSIGNTO,ASSIGNDATE,EXPECTEDCOMPLEDATE,ACTUALCOMPLETEDATE,REFTASKID) VALUES ({0},{1},'{2}','{3}','{4}','{5}')";
+
+        private const string SELECT_ALL_CURRENT_CLIENT_PROCESS= "SELECT Client.ID,Client.Name,LinkSubStep.Title, ClientProcess.Status, ClientProcess.PrimaryStepId,ClientProcess.LinkSubStepId,PrimaryStep.StepNo as PrimaryStepNo,LinkSubStep.StepNo as LinkSubStepNo,ClientProcessDetail.RefTaskId,LinkSubStep.AllowByPassProcess,Users.UserName,ClientProcessDetail.AssignTo,ClientProcessDetail.ExpectedCompleDate,ClientProcessDetail.ActualCompleteDate," +
           " CASE " +
           " WHEN TaskStatus = 0 THEN 'Backlog' "+
 		  " WHEN TaskStatus = 1 THEN 'In Progress' " +
@@ -60,7 +63,7 @@ namespace FinancialPlanner.BusinessLogic.Process
             "where ClientProcess.Status = 'P'";
 
 
-        private const string SELECT_CLIENT_PROCESS_BY_CLIENTID_PLANNERID = "SELECT Client.ID,Client.Name,LinkSubStep.Title, ClientProcess.Status, ClientProcess.PrimaryStepId,ClientProcess.LinkSubStepId, PrimaryStep.StepNo as PrimaryStepNo,LinkSubStep.StepNo as LinkSubStepNo,ClientProcessDetail.RefTaskId,Users.UserName, ClientProcessDetail.AssignTo,ClientProcessDetail.ExpectedCompleDate,ClientProcessDetail.ActualCompleteDate,ClientProcess.PlannerId" +
+        private const string SELECT_CLIENT_PROCESS_BY_CLIENTID_PLANNERID = "SELECT Client.ID,Client.Name,LinkSubStep.Title, ClientProcess.Status, ClientProcess.PrimaryStepId,ClientProcess.LinkSubStepId, PrimaryStep.StepNo as PrimaryStepNo,LinkSubStep.StepNo as LinkSubStepNo,ClientProcessDetail.RefTaskId,LinkSubStep.AllowByPassProcess,Users.UserName, ClientProcessDetail.AssignTo,ClientProcessDetail.ExpectedCompleDate,ClientProcessDetail.ActualCompleteDate,ClientProcess.PlannerId," +
             " CASE " +
           " WHEN TaskStatus = 0 THEN 'Backlog' " +
           " WHEN TaskStatus = 1 THEN 'In Progress' " +
@@ -131,6 +134,7 @@ namespace FinancialPlanner.BusinessLogic.Process
             currentClientProcess.LinkSubStepId = dr.Field<int>("LinkSubStepId");
             currentClientProcess.PrimaryStepNo = dr.Field<int>("PrimaryStepNo");
             currentClientProcess.LinkSubStepNo = dr.Field<int>("LinkSubStepNo");
+            currentClientProcess.AllowByPassProcess = (dr["AllowByPassProcess"] == DBNull.Value) ? false : bool.Parse(dr["AllowByPassProcess"].ToString());
             currentClientProcess.RefTaskId = dr.Field<string>("RefTaskId");
             currentClientProcess.AssignTo = dr.Field<int>("AssignTo");
             currentClientProcess.UserName = dr.Field<string>("UserName");
@@ -147,7 +151,7 @@ namespace FinancialPlanner.BusinessLogic.Process
             return currentClientProcess;
         }
 
-        public void Add(ClientProcess clientProcess, int assignTo)
+        public void Add(ClientProcess clientProcess, int assignTo,bool addTaskForProcess = true )
         {
             try
             {
@@ -164,8 +168,12 @@ namespace FinancialPlanner.BusinessLogic.Process
                     {
                         throw new Exception("Invalid process step as parameter.");
                     }
-                    
-                    string taskId = addTask(clientProcess, assignTo);
+
+                    string taskId = string.Empty;
+                    if (addTaskForProcess)
+                    {
+                        taskId = addTask(clientProcess, assignTo);
+                    }
                     addClientProcess(clientProcess, assignTo,taskId);
                 }
             }
@@ -188,12 +196,28 @@ namespace FinancialPlanner.BusinessLogic.Process
             System.Threading.Thread.Sleep(1000);
             int maxProcessId = int.Parse(DataBase.DBService.ExecuteCommandScalar(SELECT_MAX_CLIENTPROCESS_ID));
 
-            DataBase.DBService.ExecuteCommand(string.Format(INSERT_CLIENT_PROCESS_DETAILS,
-                    maxProcessId,
-                    assignTo,
-                    DateTime.Now.ToString("yyyy-MM-dd"),
-                    getDueDate(clientProcess).ToString("yyyy-MM-dd"),
-                    taskId));
+           
+            if (taskId.Equals("") && clientProcess.Status.Equals("C"))
+            {
+                DataBase.DBService.ExecuteCommand(string.Format(INSERT_CLIENT_PROCESS_DETAILS_WITH_COMPLITIONDATE,
+                   maxProcessId,
+                   assignTo,
+                   DateTime.Now.ToString("yyyy-MM-dd"),
+                   getDueDate(clientProcess).ToString("yyyy-MM-dd"),
+                   DateTime.Now.ToString("yyyy-MM-dd"),
+                   taskId));
+
+            }
+            else
+            {
+                DataBase.DBService.ExecuteCommand(string.Format(INSERT_CLIENT_PROCESS_DETAILS,
+                   maxProcessId,
+                   assignTo,
+                   DateTime.Now.ToString("yyyy-MM-dd"),
+                   getDueDate(clientProcess).ToString("yyyy-MM-dd"),
+                   taskId));
+
+            }
         }
 
         private string addTask(ClientProcess clientProcess, int AssignTo)

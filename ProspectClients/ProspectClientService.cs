@@ -1,10 +1,12 @@
 ﻿using FinancialPlanner.BusinessLogic.Process;
+using FinancialPlanner.Common.EmailManager;
 using FinancialPlanner.Common.Model;
 using FinancialPlanner.Common.Planning;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Net.Mail;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -37,7 +39,7 @@ namespace FinancialPlanner.BusinessLogic.ProspectClients
 
         private const string INSERT_CLIENT_PROCESS_DETAILS = "INSERT INTO ClientProcessDetail VALUES ({0},{1},'{2}','{3}','{4}','Null')";
 
-        private const string SELECT_PRIMARY_LINKSUBSTEP_ID = "SELECT TOP(1) P.[Id] as PrimaryStepId," +
+        private const string SELECT_PRIMARY_LINKSUBSTEP_ID = "SELECT TOP(3) P.[Id] as PrimaryStepId," +
             " L.[Id] as LinkSubStepId FROM[PrimaryStep] P LEFT join LinkSubStep L on  P.Id = L.PrimaryStepId" +
             " Where P.[Id] = {0} order by P.StepNo, L.StepNo";
 
@@ -123,7 +125,7 @@ namespace FinancialPlanner.BusinessLogic.ProspectClients
                         int.TryParse(dtPrimaryStep.Rows[0]["UserId"].ToString(),out assignTo);
                     }
                     
-                    clientProcessService.Add(clientProcess, assignTo);
+                    clientProcessService.Add(clientProcess, assignTo,false);
                     
                 }
                 //DataTable dtPrimaryStep = DataBase.DBService.ExecuteCommand(string.Format(SELECT_PRIMARY_STEP, 1));
@@ -190,6 +192,10 @@ namespace FinancialPlanner.BusinessLogic.ProspectClients
                     // Add code for task to convert to client.
                     //DataTable dtPrimaryStep = DataBase.DBService.ExecuteCommand(string.Format(SELECT_PRIMARY_LINKSUBSTEP_ID, 2));
 
+                    //Add entry into process step
+                    ClientProcessService clientProcessService = new ClientProcessService();
+                    ClientProcess clientProcess = new ClientProcess();
+
                     DataTable dtStepNo = DataBase.DBService.ExecuteCommand(
                         string.Format(SELECT_PRIMARY_LINKSUBSTEP_ID,2));
 
@@ -197,20 +203,17 @@ namespace FinancialPlanner.BusinessLogic.ProspectClients
                     {
                         //int maxId = int.Parse(DataBase.DBService.ExecuteCommandScalar(SELECT_MAX_ID));
 
-                        //Add entry into process step
-                        ClientProcessService clientProcessService = new ClientProcessService();
-                        ClientProcess clientProcess = new ClientProcess();
                         clientProcess.ClientId = prospectClient.ClientId;
                         clientProcess.PrimaryStepId = dr.Field<int>("PrimaryStepId");
-                        clientProcess.LinkStepId = 1;
-                        clientProcess.Status = "P";
+                        clientProcess.LinkStepId = 0;
+                        clientProcess.Status = "C";
                         clientProcess.IsProcespectClient = false;
                         if (dr["LinkSubStepId"] != DBNull.Value)
                         {
                             clientProcess.LinkStepId = dr.Field<int>("LinkSubStepId");
                         }
 
-                        int assignTo = 0;
+                        int assignTo = prospectClient.ClientAssignTo;
                         DataTable dtPrimaryStep = DataBase.DBService.ExecuteCommand(string.Format(SELECT_PRIMARY_STEP, clientProcess.PrimaryStepId));
 
                         if (dtPrimaryStep.Rows.Count > 0)
@@ -221,30 +224,18 @@ namespace FinancialPlanner.BusinessLogic.ProspectClients
                         {
                             int.TryParse(dtPrimaryStep.Rows[0]["UserId"].ToString(), out assignTo);
                         }
-                        clientProcessService.Add(clientProcess, prospectClient.ClientAssignTo);
 
-
-                        //DataBase.DBService.ExecuteCommand(string.Format(INSERT_CLIENT_PROCESS,
-                        //    prospectClient.ID, 2, 1, 'C', 1));
-
-                        //int maxProcessId = int.Parse(DataBase.DBService.ExecuteCommandScalar(SELECT_MAX_CLIENTPROCESS_ID));
-
-                        //DataBase.DBService.ExecuteCommand(string.Format(INSERT_CLIENT_PROCESS_DETAILS,
-                        //    maxProcessId,
-                        //    dr["UserId"].ToString(),
-                        //    DateTime.Now.ToString("yyyy-MM-dd"),
-                        //    DateTime.Now.ToString("yyyy-MM-dd"),
-                        //    DateTime.Now.ToString("yyyy-MM-dd")
-                        //    ));
+                        clientProcessService.Add(clientProcess, prospectClient.ClientAssignTo,false);
                     }
 
+                    clientProcess.ClientId = prospectClient.ClientId;
+                    clientProcess.PrimaryStepId = 2;
+                    clientProcess.LinkStepId = 4;
+                    clientProcess.Status = "P";
+                    clientProcess.IsProcespectClient = false;
+                    clientProcessService.Add(clientProcess, prospectClient.ClientAssignTo);
+                    sendEmailToAddRegisterNewClientEmailId(prospectClient);
                 }
-
-                if (!isIntroductionCompleted.Equals(prospectClient.IntroductionCompleted) && prospectClient.IntroductionCompleted)
-                {
-                    // Add code for tas to introduction completed.
-                }
-
 
                 Activity.ActivitiesService.Add(ActivityType.UpdateProspectClient, EntryStatus.Success,
                          Source.Client, prospectClient.UpdatedByUserName, prospectClient.Name, prospectClient.MachineName);
@@ -254,6 +245,82 @@ namespace FinancialPlanner.BusinessLogic.ProspectClients
                 FinancialPlanner.Common.Logger.LogDebug(ex.Message);
                 throw ex;
             }
+        }
+
+        private void sendEmailToAddRegisterNewClientEmailId(ProspectClient prospectClient)
+        {
+            //string emailBody = "Dear Mohit Tolani," +
+            //    "Greetings From ASCENT FINANCIAL SOLUTIONS!!!" +
+            //    "We would like to request you that kindly add the following mentioned mail ID of a New Client. From Now Onwards, we will be communicating and interacting with this Mentioned New Client by this mail ID." +
+
+            //    " Kindly find below the details," +
+            //    " Client Name: " +
+            //    "Registered Mail ID: " +
+            //    "We thank you to allow us our request for the addition of a New Mail ID." +
+            //    "Regards, " +
+            //    "ASCENT FINANCIAL SOLUTIONS PVT.LTD." +
+            //    "315 - 316 Notus IT Park, " +
+            //    "Sarabhai Campus, Genda Circle, " +
+            //    "Vadodara – 390 023." +
+            //    "PH.: 0265 - 2961205." +
+            //    "Mob.: 9512538380" +
+            //    "http://www.ascentsolutions.in/";
+
+            string primaryEmail = "loans.ascentsolutions@gmail.com";
+            string bcc = "";
+
+            MailManager mailManager = new MailManager();
+            string host = FinancialPlanner.Common.EmailManager.MailServer.HostName;
+            MailMessage mailMessage = new MailMessage();
+
+            mailMessage.From = new MailAddress(MailServer.FromEmail);
+            mailMessage.To.Add(new MailAddress(primaryEmail));
+            if (!string.IsNullOrEmpty(bcc))
+            {
+                mailMessage.Bcc.Add(new MailAddress(bcc));
+            }
+            mailMessage.Subject = "Add new client email address.";
+            mailMessage.IsBodyHtml = false;
+            mailMessage.Body = "Dear Mohit Tolani, " + Environment.NewLine + Environment.NewLine +
+
+               "Greetings From ASCENT FINANCIAL SOLUTIONS!!!" + Environment.NewLine + Environment.NewLine +
+
+               "We would like to request you that kindly add the following mentioned mail ID of a New Client. From Now Onwards, we will be communicating and interacting with this Mentioned New Client by this mail ID." + Environment.NewLine + Environment.NewLine +
+
+               "Kindly find below the details," + Environment.NewLine + Environment.NewLine +
+
+               "Client Name: " + prospectClient.Name + Environment.NewLine + Environment.NewLine +
+
+               "Registered Mail ID:" + prospectClient.Email + Environment.NewLine + Environment.NewLine +
+
+               "We thank you to allow us our request for the addition of a New Mail ID." + Environment.NewLine + Environment.NewLine +
+
+
+              "Regards," + Environment.NewLine +
+
+               "Financial Planning Team" + Environment.NewLine +
+               "ASCENT FINANCIAL SOLUTIONS PVT. LTD." + Environment.NewLine +
+               "315,316 Notus IT park, Sarabhai Campus," + Environment.NewLine +
+               "Genda Circle, Vadodara, Gujarat 390023" + Environment.NewLine +
+                "PH.: 0265 - 2961205." + Environment.NewLine +
+                "Mob.: 9512538380" + Environment.NewLine +
+               "http://www.ascentsolutions.in";
+
+            string reviewSheetPath = string.Empty;
+            bool isEmailSend = FinancialPlanner.Common.EmailManager.EmailService.SendEmailWithChilkat(mailMessage, reviewSheetPath);
+            //if (isEmailSend)
+            //{
+            //    // MessageBox.Show("Quarterly Review Template report send to client on '" + primaryEmail + "'.", "Email", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            //    gridViewClient.SetRowCellValue(index, "Status", "Email send successfully");
+            //}
+            //else
+            //{
+            //    gridViewClient.SetRowCellValue(index, "Status", "Unable to send email to:" + primaryEmail);
+            //    //MessageBox.Show("Unable to send email to '" + primaryEmail + "'. Check your email configuration setting.", "Email", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            //}
+
+
+
         }
 
         public void DeleteProspectClient(ProspectClient prospectClient)

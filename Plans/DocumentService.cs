@@ -16,7 +16,10 @@ namespace FinancialPlanner.BusinessLogic.Plans
     public class DocumentService
     {
         private const string GET_CLIENT_NAME_QUERY = "SELECT C.NAME FROM CLIENT C, PLANNER P  WHERE P.CLIENTID = C.ID AND P.ID = {0}";
-        const string SELECT_ALL = "SELECT N1.*,U.USERNAME AS UPDATEDBYUSERNAME FROM Document N1, USERS U WHERE N1.UPDATEDBY = U.ID AND N1.PID = {0}";
+        const string SELECT_ALL_BY_PID = "SELECT N1.*,U.USERNAME AS UPDATEDBYUSERNAME FROM Document N1, USERS U WHERE N1.UPDATEDBY = U.ID AND N1.PID = {0}";
+
+        const string SELECT_ALL_BY_CID = "SELECT N1.*,U.USERNAME AS UPDATEDBYUSERNAME FROM Document N1, USERS U WHERE N1.UPDATEDBY = U.ID AND N1.CID = {0}";
+
         const string SELECT_BYID = "SELECT N1.*,U.USERNAME AS UPDATEDBYUSERNAME FROM Document N1, USERS U WHERE N1.UPDATEDBY = U.ID AND N1.ID = {0} AND N1.PID ={1}";
 
         const string INSERT_QUERY = "INSERT INTO Document VALUES (" +
@@ -31,7 +34,7 @@ namespace FinancialPlanner.BusinessLogic.Plans
                 Logger.LogInfo("Get: Document process start");
                 IList<Document> lstDocument = new List<Document>();
 
-                DataTable dtAppConfig =  DataBase.DBService.ExecuteCommand(string.Format(SELECT_ALL,plannerId));
+                DataTable dtAppConfig =  DataBase.DBService.ExecuteCommand(string.Format(SELECT_ALL_BY_PID,plannerId));
                 foreach (DataRow dr in dtAppConfig.Rows)
                 {
                     Document Document = convertToDocumentObject(dr);
@@ -45,6 +48,35 @@ namespace FinancialPlanner.BusinessLogic.Plans
                 StackTrace st = new StackTrace ();
                 StackFrame sf = st.GetFrame (0);
                 MethodBase  currentMethodName = sf.GetMethod();
+                LogDebug(currentMethodName.Name, ex);
+                return null;
+            }
+        }
+
+        public IList<Document> GetAllByClientId(int clientId,int plannerId)
+        {
+            try
+            {
+                Logger.LogInfo("Get: Document process start");
+                IList<Document> lstDocument = new List<Document>();
+
+                DataTable dtAppConfig = DataBase.DBService.ExecuteCommand(string.Format(SELECT_ALL_BY_CID, clientId));
+                foreach (DataRow dr in dtAppConfig.Rows)
+                {
+                    if (dr["Category"].ToString().Equals("KYC") || dr["PID"].ToString().Equals(plannerId.ToString()))
+                    {
+                        Document Document = convertToDocumentObject(dr);
+                        lstDocument.Add(Document);
+                    }
+                }
+                Logger.LogInfo("Get: Document process completed.");
+                return lstDocument;
+            }
+            catch (Exception ex)
+            {
+                StackTrace st = new StackTrace();
+                StackFrame sf = st.GetFrame(0);
+                MethodBase currentMethodName = sf.GetMethod();
                 LogDebug(currentMethodName.Name, ex);
                 return null;
             }

@@ -32,6 +32,7 @@ namespace FinancialPlanner.BusinessLogic.Clients
         private const string DELETE_QUERY = "UPDATE CLIENT SET ISDELETED = 1, " +
             "UPDATEDON = '{0}', UPDATEDBY = {1} WHERE ID = {2}";
 
+        
         #region "Client ARN"
         private const string SELECT_ARN = "SELECT ClientARN.*, ARN.ARNNumber, ARN.Name FROM ClientARN INNER JOIN" +
                          " ARN ON ClientARN.ARNId = ARN.Id where clientARN.CId = {0}";
