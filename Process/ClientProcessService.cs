@@ -89,8 +89,24 @@ namespace FinancialPlanner.BusinessLogic.Process
             users = new UserService().Get();
         }
 
+        public int GettTaskAssignTo(int primaryStepId, int linkStepId, int clientId)
+        {
+            string query = "";
+            if (primaryStepId.Equals(2) && linkStepId.Equals(4))
+            {
+                query = string.Format("select id  from Users where DesignationId in (select PrimaryResponsibility from LinkSubStep where PrimaryStepId = {0} and id = {1})", primaryStepId, linkStepId);
+                string primaryResponsibilityDesignationId = DataBase.DBService.ExecuteCommandScalar(query);
+                return (string.IsNullOrEmpty(primaryResponsibilityDesignationId) ? 0 : int.Parse(primaryResponsibilityDesignationId));
+            }
+            else
+            {
+                query = string.Format("select ProspectClient.ResponsibilityAssignTo from ProspectClient where ClientId  = {0}", clientId);
+                string primaryResponsibilityDesignationId = DataBase.DBService.ExecuteCommandScalar(query);
+                return (string.IsNullOrEmpty(primaryResponsibilityDesignationId) ? 0 : int.Parse(primaryResponsibilityDesignationId));
+            }
+        }
 
-         public IList<CurrentClientProcess> GetClientProcess(int clientId,int? plannerId)
+        public IList<CurrentClientProcess> GetClientProcess(int clientId,int? plannerId)
         {
             IList<CurrentClientProcess> currentClientProcesses = new List<CurrentClientProcess>();
 
@@ -170,6 +186,7 @@ namespace FinancialPlanner.BusinessLogic.Process
                     }
 
                     string taskId = string.Empty;
+                   
                     if (addTaskForProcess)
                     {
                         taskId = addTask(clientProcess, assignTo);
@@ -275,7 +292,7 @@ namespace FinancialPlanner.BusinessLogic.Process
             taskCard.TaskStatus = Common.Model.TaskManagement.TaskStatus.Backlog;
             taskCard.DueDate = getDueDate(clientProcess);
             taskCard.CompletedPercentage = 0;
-            taskCard.Description = string.Format(DESCRIPTION, primaryStepNo, taskCard.Title);
+            taskCard.Description = clientProcess.Description + System.Environment.NewLine + string.Format(DESCRIPTION, primaryStepNo, taskCard.Title);
             taskCard.MachineName = System.Environment.MachineName;
             if (clientProcess.IsProcespectClient)
             {

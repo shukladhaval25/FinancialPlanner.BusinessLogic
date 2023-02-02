@@ -11,7 +11,7 @@ namespace FinancialPlanner.BusinessLogic.Clients
     {
         private const string GET_CLIENT_NAME_QUERY = "SELECT NAME FROM CLIENT WHERE ID = {0}";
 
-        private const string GET_MAX_INVOICEID = "select Max(InvoiceId)  from FeesInvoice where InvoiceId like '{0}%'";
+        private const string GET_MAX_INVOICEID = "select  MAX(CAST(SUBSTRING(InvoiceId, 9, Len(InvoiceId) - 2) AS bigint )) AS max_order from FeesInvoice where InvoiceId like '{0}%'";
 
 
 
@@ -36,7 +36,7 @@ namespace FinancialPlanner.BusinessLogic.Clients
             }
             else
             {
-                int number = int.Parse(maxId.Substring(maxId.LastIndexOf("/") + 1));
+                int number = int.Parse(maxId);
                 return string.Format("{0}/{1}", year,number  + 1);
             }
         }

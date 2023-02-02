@@ -14,7 +14,7 @@ namespace FinancialPlanner.BusinessLogic.ProspectClients
 {
     public class ProspectClientService
     {
-        private const string INSERT_PROSPECTCLIENT_QUERY = "INSERT INTO PROSPECTCLIENT VALUES ('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','{8}',{9},'{10}',{11},'{12}','{13}','{14}','{15}',{16},null)";
+        private const string INSERT_PROSPECTCLIENT_QUERY = "INSERT INTO PROSPECTCLIENT VALUES ('{0}','{1}','{2}','{3}','{4}','{5}','{6}','{7}','{8}',{9},'{10}',{11},'{12}','{13}','{14}','{15}',{16},null,{17},{18})";
 
         private const string SELECT_ALL = "SELECT U1.*,U.USERNAME AS UPDATEDBYUSERNAME FROM PROSPECTCLIENT U1, USERS U WHERE U1.UPDATEDBY = U.ID AND U1.IsConvertedToClient = 'FALSE' ORDER BY U1.NAME ASC";
         private const string SELECT_BY_ID = "SELECT U1.*,U.USERNAME AS UPDATEDBYUSERNAME FROM PROSPECTCLIENT U1, USERS U WHERE U1.UPDATEDBY = U.ID and U1.ID = {0}";
@@ -24,7 +24,8 @@ namespace FinancialPlanner.BusinessLogic.ProspectClients
 
         private const string UPDATE_PROSPECTCLIENT_QUERY = "UPDATE PROSPECTCLIENT SET NAME = '{0}',PHONENO ='{1}',EMAIL ='{2}',OCCUPATION ='{3}'," +
                 "EVENT = '{4}', EVENTDATE = '{5}',REFEREDBY ='{6}',UPDATEDON ='{7}',UPDATEDBY = {8},ISCONVERTEDTOCLIENT ='{9}', STOPSENDINGEMAIL ='{10}',Remarks ='{11}'," +
-            "INTRODUCTIONCOMPLETED = '{12}', INTRODUCTIONCOMPLETEDDATE = '{13}',CLIENTASSIGNTO = {14},CLIENTID = {15} WHERE ID= {16}";
+            "INTRODUCTIONCOMPLETED = '{12}', INTRODUCTIONCOMPLETEDDATE = '{13}',CLIENTASSIGNTO = {14},CLIENTID = {15}," +
+            " RESPONSIBILITYASSIGNTO = {17},OPERATIONEXECUTE = {18} WHERE ID= {16}";
 
         private const string DELETE_QUERY = "DELETE FROM PROSPECTCLIENT WHERE ID = {0}";
         private const string DELETE_CONVERSATION_QUERY = "DELETE FROM PROSPECTCLIENTCONVERSATION WHERE PROSPECTCLIENTID = {0}";
@@ -98,7 +99,9 @@ namespace FinancialPlanner.BusinessLogic.ProspectClients
                      prospectClient.IsConvertedToClient, prospectClient.StopSendingEmail,
                      prospectClient.IntroductionCompleted,
                      prospectClient.IntroductionCompletedDate.ToString("yyyy-MM-dd hh:mm:ss"),
-                     prospectClient.ClientAssignTo));
+                     prospectClient.ClientAssignTo,
+                     prospectClient.ResposibilityAssignTo,
+                     prospectClient.OperationExecute));
 
 
                 //DataTable dtPrimaryStep = DataBase.DBService.ExecuteCommand(string.Format(SELECT_PRIMARY_STEP, 1));
@@ -184,7 +187,9 @@ namespace FinancialPlanner.BusinessLogic.ProspectClients
                  prospectClient.IntroductionCompletedDate.ToString("yyyy-MM-dd hh:mm:ss"),
                  prospectClient.ClientAssignTo,
                  prospectClient.ClientId,
-                 prospectClient.ID));
+                 prospectClient.ID,
+                 prospectClient.ResposibilityAssignTo,
+                 prospectClient.OperationExecute));
 
                 //Converted to client from prospect list.
                 if (!isConvertedToClien.Equals(prospectClient.IsConvertedToClient) && prospectClient.IsConvertedToClient)
@@ -220,11 +225,7 @@ namespace FinancialPlanner.BusinessLogic.ProspectClients
                         {
                             int.TryParse(dtPrimaryStep.Rows[0]["UserId"].ToString(), out assignTo);
                         }
-                        if (dtPrimaryStep.Rows.Count > 0)
-                        {
-                            int.TryParse(dtPrimaryStep.Rows[0]["UserId"].ToString(), out assignTo);
-                        }
-
+                       
                         clientProcessService.Add(clientProcess, prospectClient.ClientAssignTo,false);
                     }
 
@@ -233,6 +234,7 @@ namespace FinancialPlanner.BusinessLogic.ProspectClients
                     clientProcess.LinkStepId = 4;
                     clientProcess.Status = "P";
                     clientProcess.IsProcespectClient = false;
+                    prospectClient.ClientAssignTo = GettTaskAssignTo(clientProcess.PrimaryStepId, clientProcess.LinkStepId,prospectClient.ClientId);
                     clientProcessService.Add(clientProcess, prospectClient.ClientAssignTo);
                     sendEmailToAddRegisterNewClientEmailId(prospectClient);
                 }
@@ -244,6 +246,23 @@ namespace FinancialPlanner.BusinessLogic.ProspectClients
             {
                 FinancialPlanner.Common.Logger.LogDebug(ex.Message);
                 throw ex;
+            }
+        }
+
+        public int GettTaskAssignTo(int primaryStepId, int linkStepId, int clientId)
+        {
+            string query = "";
+            if (primaryStepId.Equals(2) && linkStepId.Equals(4))
+            {
+                query = string.Format("select id  from Users where DesignationId in (select PrimaryResponsibility from LinkSubStep where PrimaryStepId = {0} and id = {1})", primaryStepId, linkStepId);
+                string primaryResponsibilityDesignationId = DataBase.DBService.ExecuteCommandScalar(query);
+                return (string.IsNullOrEmpty(primaryResponsibilityDesignationId) ? 0 : int.Parse(primaryResponsibilityDesignationId));
+            }
+            else
+            {
+                query = string.Format("select ProspectClient.ResponsibilityAssignTo from ProspectClient where ClientId  = {0}", clientId);
+                string primaryResponsibilityDesignationId = DataBase.DBService.ExecuteCommandScalar(query);
+                return (string.IsNullOrEmpty(primaryResponsibilityDesignationId) ? 0 : int.Parse(primaryResponsibilityDesignationId));
             }
         }
 
@@ -372,6 +391,14 @@ namespace FinancialPlanner.BusinessLogic.ProspectClients
             if (dr["ClientId"] != DBNull.Value)
             {
                 prospClient.ClientId = dr.Field<int>("ClientId");
+            }
+            if (dr["ResponsibilityAssignTo"] != DBNull.Value)
+            {
+                prospClient.ResposibilityAssignTo = dr.Field<int>("ResponsibilityAssignTo");
+            }
+            if (dr["OperationExecute"] != DBNull.Value)
+            {
+                prospClient.OperationExecute = dr.Field<int>("OperatieonExecute");
             }
             return prospClient;
         }

@@ -22,7 +22,7 @@ namespace FinancialPlanner.BusinessLogic.Process
             ",[DurationInMinutes],[TimelineInDays],[PrimaryResponsibility],[Owner],[Checker],[AllowByPassProcess] FROM [dbo].[LinkSubStep] WHERE PrimaryStepId = {0}";
 
         const string SELECT_LINKSUBSTEP_QUERY_BY_TASKID = "SELECT        LinkSubStep.Id, LinkSubStep.PrimaryStepId, LinkSubStep.StepNo, LinkSubStep.Title, LinkSubStep.Description, LinkSubStep.Remarks, LinkSubStep.DurationInMinutes, LinkSubStep.TimelineInDays, LinkSubStep.PrimaryResponsibility, LinkSubStep.Owner, LinkSubStep.Checker, LinkSubStep.AllowByPassProcess FROM  LinkSubStep INNER JOIN " +
-            "ClientProcess ON LinkSubStep.PrimaryStepId = ClientProcess.PrimaryStepId AND LinkSubStep.Id = ClientProcess.LinkSubStepId INNER JOIN ClientProcessDetail ON ClientProcess.Id = ClientProcessDetail.Id " +
+            "ClientProcess ON LinkSubStep.PrimaryStepId = ClientProcess.PrimaryStepId AND LinkSubStep.Id = ClientProcess.LinkSubStepId INNER JOIN ClientProcessDetail ON ClientProcess.Id = ClientProcessDetail.CPID " +
             "WHERE (ClientProcessDetail.RefTaskId = '{0}')";
 
         const string DELETE_PRIMARY_STEP_QUERY = "DELETE FROM PRIMARYSTEP WHERE ID = {0}";

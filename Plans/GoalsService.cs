@@ -19,6 +19,8 @@ namespace FinancialPlanner.BusinessLogic
         const string SELECT_BYID = "SELECT N1.*,U.USERNAME AS UPDATEDBYUSERNAME FROM Goals N1, USERS U WHERE N1.UPDATEDBY = U.ID AND N1.ID = {0} AND N1.PID ={1} AND N1.ISDELETED = 0";
         const string SELECT_GOAL_ID = "SELECT ID FROM GOALS WHERE NAME = '{0}' and PID = {1} AND AMOUNT = {2} AND ISDELETED = 0";
 
+        
+
         const string SELECT_LOANGFORGOAL_BYID = "SELECT N1.*,U.USERNAME AS UPDATEDBYUSERNAME FROM LOANFORGOALS N1, USERS U WHERE N1.UPDATEDBY = U.ID AND N1.GOALID ={0}";
 
         const string INSERT_QUERY = "INSERT INTO Goals VALUES (" +
@@ -39,6 +41,15 @@ namespace FinancialPlanner.BusinessLogic
 
         const string DELET_QUERY = "UPDATE Goals SET ISDELETED = '1' WHERE ID ={0}";
         private readonly string DELETE_LOANFORGOAL_QUERY = "DELETE FROM LOANFORGOALS WHERE GOALID ={0}";
+
+        const string SELECT_MAX_PRIORITY = "SELECT MAX(PRIORITY) FROM GOALS GROUP BY PID HAVING PID = {0}";
+
+        public int GetMaxPriorty(int plannerId)
+        {
+            int result;
+            int.TryParse( DataBase.DBService.ExecuteCommandScalar(string.Format(SELECT_MAX_PRIORITY, plannerId)),out result);
+            return result;
+        }
 
         public IList<Goals> GetAll(int plannerId)
         {

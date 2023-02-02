@@ -1,6 +1,7 @@
 ﻿using FinancialPlanner.Common.Model.TaskManagement;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -91,7 +92,27 @@ namespace FinancialPlanner.BusinessLogic.TaskManagements
         }
         public object GetTransaction()
         {
-            return (transactionTypeService == null) ? null : transactionTypeService.GetTransaction(id);
+            return (transactionTypeService == null) ? getTaskLinkSubProcessPointsStatus(id) : transactionTypeService.GetTransaction(id);
+        }
+        private object getTaskLinkSubProcessPointsStatus(int id)
+        {
+
+            DataTable dtTaskLinkSubProcessPointsStatus = DataBase.DBService.ExecuteCommand("SELECT * FROM TaskLinkSubStepPoints WHERE TASKID = " + id);
+            if (dtTaskLinkSubProcessPointsStatus.Rows.Count == 0)
+                return null;
+
+            List<TaskLinkSubPointsStatus> taskLinkSubPointsStatuses = new List<TaskLinkSubPointsStatus>();
+            for (int rowCount = 0; rowCount < dtTaskLinkSubProcessPointsStatus.Rows.Count; rowCount++)
+            {
+                TaskLinkSubPointsStatus taskLinkSub = new TaskLinkSubPointsStatus();
+                taskLinkSub.Id = int.Parse(dtTaskLinkSubProcessPointsStatus.Rows[rowCount]["TaskId"].ToString());
+                taskLinkSub.CId = int.Parse(dtTaskLinkSubProcessPointsStatus.Rows[rowCount]["CID"].ToString());
+                taskLinkSub.Point = dtTaskLinkSubProcessPointsStatus.Rows[rowCount]["Point"].ToString();
+                taskLinkSub.Status = dtTaskLinkSubProcessPointsStatus.Rows[rowCount]["Status"].ToString();
+                taskLinkSubPointsStatuses.Add(taskLinkSub);
+            }
+
+            return taskLinkSubPointsStatuses;
         }
     }
 }

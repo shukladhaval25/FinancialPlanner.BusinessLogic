@@ -24,6 +24,17 @@ namespace FinancialPlanner.BusinessLogic.TaskManagements
            "INNER JOIN TaskProject ON " +
            "TaskCard.ProjectId = TaskProject.ID INNER JOIN Users ON TaskCard.Owner = Users.ID";
 
+        private readonly string SELECT_ALL_TASKS_WITH_COMMENTS = "SELECT TaskCard.*,TaskProject.Name as ProjectName,Users.UserName AS OwnerName,TaskComment.comment, u1.UserName As CommentedBy, TaskComment.CommentedOn " +
+            "FROM TaskCard " +
+            "INNER JOIN TaskProject ON TaskCard.ProjectId = TaskProject.ID " +
+            "INNER JOIN Users ON TaskCard.Owner = Users.ID " +
+            "FULL OUTER join TaskComment on TaskCard.id = TaskComment.TaskId " +
+            "LEFT join Users u1 on TaskComment.CommentedBy = u1.ID " +
+            "order by TaskCard.ID";
+
+            //"FULL OUTER join TaskComment on TaskCard.id = TaskComment.TaskId " +
+            //"LEFT join Users u1 on TaskComment.CommentedBy = u1.ID order by TaskCard.ID ";
+
         private readonly string SELECT_ALL =
             "SELECT TaskCard.*,TaskProject.Name as ProjectName,Users.UserName AS OwnerName FROM TaskCard " +
             "INNER JOIN TaskProject ON " +
@@ -46,7 +57,8 @@ namespace FinancialPlanner.BusinessLogic.TaskManagements
         private string SELECT_OVERDUE_TASKS_BY_USEID = "SELECT TaskCard.*,TaskProject.Name as ProjectName,Users.UserName AS OwnerName " +
             "FROM TASKCARD INNER JOIN TaskProject ON " +
             "TaskCard.ProjectId = TaskProject.ID INNER JOIN Users ON TaskCard.Owner = Users.ID WHERE DueDate < GETDATE() AND " +
-            "TASKCARD.ASSIGNTO = {0} AND (TaskCard.TaskStatus <> 4 and TaskCard.TaskStatus<> 5)";
+            "TASKCARD.ASSIGNTO = {0} AND (" +
+            "TaskCard.TaskStatus <> 3 and TaskCard.TaskStatus <> 4 and TaskCard.TaskStatus<> 5)";
 
         private const string SELECT_TASK_BYPROJECTNAME_OPENSTATUS_ASSIGNTO = "SELECT Taskcard.* FROM TaskProject " +
             "LEFT OUTER JOIN TaskCard ON TaskProject.ID = TaskCard.ProjectId " +
@@ -209,6 +221,17 @@ namespace FinancialPlanner.BusinessLogic.TaskManagements
                 {
                     updateTransactionType(taskCard, taskCard.Id);
                 }
+                if (taskCard.TaskId.StartsWith("OT") && taskCard.TaskTransactionType != null)
+                {
+                    List<TaskLinkSubPointsStatus> taskLinkSubPointsStatuses = new List<TaskLinkSubPointsStatus>();
+                    FinancialPlanner.Common.JSONSerialization jsonSerialization = new FinancialPlanner.Common.JSONSerialization();
+                    taskLinkSubPointsStatuses = jsonSerialization.DeserializeFromString<List<TaskLinkSubPointsStatus>>(taskCard.TaskTransactionType.ToString());
+                    DataBase.DBService.ExecuteCommandString("Delete from TaskLinkSubStepPoints where TaskId =" + taskCard.Id,true);
+                    foreach (TaskLinkSubPointsStatus taskLinkSub in taskLinkSubPointsStatuses)
+                    {
+                        DataBase.DBService.ExecuteCommandString("INSERT INTO TaskLinkSubStepPoints VALUES (" + taskCard.Id + "," + taskCard.CustomerId + ",'" + taskLinkSub.Point + "','" + taskLinkSub.Status + "')", true);
+                    }
+                }
 
                 if (taskCard.ProcessApprovedBy != null)
                 {
@@ -227,8 +250,34 @@ namespace FinancialPlanner.BusinessLogic.TaskManagements
                         DataBase.DBService.ExecuteCommandString(string.Format(UPDATE_CLIENT_PROCESS, dataTable.Rows[0]["ClientProcessId"].ToString()));
 
                         //TODO: Get next process id and add process and task for that
-                        DataTable dtNextProcess = DataBase.DBService.ExecuteCommand(string.Format(SELECT_NEXT_PROCESS_ID,
-                            dataTable.Rows[0]["PrimaryStepId"].ToString(), dataTable.Rows[0]["LinkSubStepId"].ToString()));
+                        DataTable dtProcessSteps = DataBase.DBService.ExecuteCommand("Select PrimaryStep.StepNo, LinkSubStep.StepNo,PrimaryStep.id as PrimaryStepId,LinkSubStep.id as LinkSubStepId, LinkSubStep.Description    from PrimaryStep" +
+                            " inner join LinkSubStep on PrimaryStep.id = LinkSubStep.PrimaryStepId" +
+                            " order by PrimaryStep.StepNo, LinkSubStep.StepNo ");
+                        DataTable dtNextProcess = new DataTable();
+                        dtNextProcess.Columns.Add("PrimaryStepId", System.Type.GetType("System.Int32"));
+                        dtNextProcess.Columns.Add("LinkSubStepId", System.Type.GetType("System.Int32"));
+                        dtNextProcess.Columns.Add("Description");
+                        bool matchRecord = false;
+                        foreach (DataRow dr in dtProcessSteps.Rows)
+                        {
+                            if (matchRecord)
+                            {
+                                DataRow row = dtNextProcess.NewRow();
+                                row["PrimaryStepId"] = dr["PrimaryStepId"].ToString();
+                                row["LinkSubStepId"] = dr["LinkSubStepId"].ToString();
+                                row["Description"] = dr["Description"].ToString();
+                                dtNextProcess.Rows.Add(row);
+                                break;
+                            }
+
+                            if (dr["PrimaryStepId"].ToString().Equals(dataTable.Rows[0]["PrimaryStepId"].ToString()) && 
+                                dr["LinkSubStepId"].ToString().Equals(dataTable.Rows[0]["LinkSubStepId"].ToString()))
+                            {
+                                matchRecord = true;
+                            }
+                        }
+                         //DataBase.DBService.ExecuteCommand(string.Format(SELECT_NEXT_PROCESS_ID,
+                         //   dataTable.Rows[0]["PrimaryStepId"].ToString(), dataTable.Rows[0]["LinkSubStepId"].ToString()));
                         if (dtNextProcess.Rows.Count > 0)
                         {
                             ClientProcessService clientProcessService = new ClientProcessService();
@@ -237,12 +286,15 @@ namespace FinancialPlanner.BusinessLogic.TaskManagements
                             clientProcess.PrimaryStepId = int.Parse(dtNextProcess.Rows[0]["PrimaryStepId"].ToString());   // dr.Field<int>("PrimaryStepId");
                             //clientProcess.LinkStepId = int.Parse(dtNextProcess.Rows[0]["LinkSubStepId"].ToString());
                             clientProcess.Status = "P";
+                            clientProcess.Description = dtNextProcess.Rows[0]["Description"].ToString();
                             clientProcess.IsProcespectClient = false;
                             if (dtNextProcess.Rows[0]["LinkSubStepId"] != DBNull.Value)
                             {
                                 clientProcess.LinkStepId = int.Parse(dtNextProcess.Rows[0]["LinkSubStepId"].ToString());
                             }
-                            int assignTo = (int)taskCard.AssignTo;
+
+                            int assignTo = clientProcessService.GettTaskAssignTo(clientProcess.PrimaryStepId, clientProcess.LinkStepId, clientProcess.ClientId);
+                            //(int)taskCard.AssignTo;
                             //DataTable dtPrimaryStep = DataBase.DBService.ExecuteCommand(string.Format(SELECT_PRIMARY_STEP, clientProcess.PrimaryStepId));
 
                             //if (dtPrimaryStep.Rows.Count > 0)
@@ -347,6 +399,33 @@ namespace FinancialPlanner.BusinessLogic.TaskManagements
                 foreach (DataRow dr in dtAppConfig.Rows)
                 {
                     TaskCard task = convertToTaskCard(dr);
+                    taskcards.Add(task);
+                }
+                Logger.LogInfo("Get: Task Card process completed.");
+                return taskcards;
+            }
+            catch (Exception ex)
+            {
+                StackTrace st = new StackTrace();
+                StackFrame sf = st.GetFrame(0);
+                MethodBase currentMethodName = sf.GetMethod();
+                LogDebug(currentMethodName.Name, ex);
+                return null;
+            }
+        }
+
+        public IList<TaskCardWithComments> GetAllTaskWithComments()
+        {
+            try
+            {
+                Logger.LogInfo("Get: Task Card process start");
+                IList<TaskCardWithComments> taskcards =
+                    new List<TaskCardWithComments>();
+
+                DataTable dtAppConfig = DataBase.DBService.ExecuteCommand(SELECT_ALL_TASKS_WITH_COMMENTS);
+                foreach (DataRow dr in dtAppConfig.Rows)
+                {
+                    TaskCardWithComments task = convertToTaskCardWithComment(dr);
                     taskcards.Add(task);
                 }
                 Logger.LogInfo("Get: Task Card process completed.");
@@ -604,7 +683,28 @@ namespace FinancialPlanner.BusinessLogic.TaskManagements
         {
             TransactionTypeHelper transactionTypeHelper = new TransactionTypeHelper(taskCard,id);
 
-            return (transactionTypeHelper == null) ? null : transactionTypeHelper.GetTransaction();
+            return (transactionTypeHelper == null) ? getTaskLinkSubProcessPointsStatus(id) : transactionTypeHelper.GetTransaction();
+        }
+
+        private object getTaskLinkSubProcessPointsStatus(int id)
+        {
+
+            DataTable dtTaskLinkSubProcessPointsStatus = DataBase.DBService.ExecuteCommand("SELECT * FROM TaskLinkSubStepPoints WHERE TASKID = " + id);
+            if (dtTaskLinkSubProcessPointsStatus.Rows.Count == 0)
+                return null;
+
+            List <TaskLinkSubPointsStatus> taskLinkSubPointsStatuses = new List<TaskLinkSubPointsStatus>();
+            for (int rowCount = 0; rowCount < dtTaskLinkSubProcessPointsStatus.Rows.Count; rowCount++)
+            {
+                TaskLinkSubPointsStatus taskLinkSub = new TaskLinkSubPointsStatus();
+                taskLinkSub.Id = int.Parse( dtTaskLinkSubProcessPointsStatus.Rows[rowCount]["TaskId"].ToString());
+                taskLinkSub.CId = int.Parse(dtTaskLinkSubProcessPointsStatus.Rows[rowCount]["CID"].ToString());
+                taskLinkSub.Point = dtTaskLinkSubProcessPointsStatus.Rows[rowCount]["Point"].ToString();
+                taskLinkSub.Status = dtTaskLinkSubProcessPointsStatus.Rows[rowCount]["Status"].ToString();
+                taskLinkSubPointsStatuses.Add(taskLinkSub);
+            }
+
+            return taskLinkSubPointsStatuses;
         }
 
         private TaskCard convertToTaskCard(DataRow dr)
@@ -633,6 +733,38 @@ namespace FinancialPlanner.BusinessLogic.TaskManagements
             taskCard.CustomerName = getCustomerName(taskCard.CustomerId);
             taskCard.TaskTransactionType = getTransactionType(taskCard, taskCard.Id);
             taskCard.OtherName = dr.Field<string>("OtherName");
+            return taskCard;
+        }
+
+        private TaskCardWithComments convertToTaskCardWithComment(DataRow dr)
+        {
+            TaskCardWithComments taskCard = new TaskCardWithComments();
+            taskCard.Id = dr.Field<int>("ID");
+            taskCard.TaskId = dr.Field<string>("TaskId");
+            taskCard.ProjectId = dr.Field<int>("ProjectId");
+            taskCard.TransactionType = dr.Field<string>("TransactionType");
+            taskCard.Type = (CardType)dr.Field<int>("CardType");
+            taskCard.CustomerId = dr.Field<int>("Cid");
+            taskCard.Title = dr.Field<string>("Title");
+            taskCard.Description = dr.Field<string>("Description");
+            taskCard.Priority = (Priority)dr.Field<int>("Priority");
+            taskCard.TaskStatus = (Common.Model.TaskManagement.TaskStatus)dr.Field<int>("TaskStatus");
+            taskCard.Owner = dr.Field<int>("Owner");
+            taskCard.AssignTo = dr.Field<int?>("AssignTo");
+            taskCard.CreatedBy = dr.Field<int>("CreatedBy");
+            taskCard.CreatedOn = dr.Field<DateTime>("CreatedOn");
+            taskCard.UpdatedOn = dr.Field<DateTime>("UpdatedOn");
+            //taskCard.ActualCompletedDate = dr.Field<DateTime>("ActualCompletedDate");
+            taskCard.DueDate = dr.Field<DateTime>("DueDate");
+            taskCard.ProjectName = dr.Field<string>("ProjectName");
+            taskCard.OwnerName = dr.Field<string>("OwnerName");
+            taskCard.AssignToName = getAssignTo(dr.Field<int?>("AssignTo"));
+            taskCard.CustomerName = getCustomerName(taskCard.CustomerId);
+            taskCard.TaskTransactionType = getTransactionType(taskCard, taskCard.Id);
+            taskCard.OtherName = dr.Field<string>("OtherName");
+            taskCard.Comment = dr.Field<string>("Comment");
+            taskCard.CommentedBy = dr.Field<string>("CommentedBy");
+            taskCard.CommentedOn = dr.Field<DateTime?>("CommentedOn");
             return taskCard;
         }
 

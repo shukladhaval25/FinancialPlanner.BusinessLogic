@@ -29,9 +29,11 @@ namespace FinancialPlanner.BusinessLogic.Clients
         private const string DELETE_MOMPOINTS_BY_ID = "DELETE FROM MOMPOINTS WHERE ID = {0}";
         private const string DELETE_MOMPOINTS_BY_MID = "DELETE FROM MOMPOINTS WHERE MID = {0}";
 
-        private const string INSERT_MOM = "INSERT INTO MOM VALUES  ('{0}','{1}',{2},{3},'{4}','{5}')";
+        private const string INSERT_MOM = "INSERT INTO MOM VALUES  ('{0}','{1}',{2},{3},'{4}','{5}','{6}')";
 
         private const string UPDATE_MOM = "UPDATE MOM SET MeetingDate='{0}', MeetingType ='{1}', ClientId = {2}, MarkAsImportant = {3}, Duration ='{4}', Notes ='{5}' WHERE MID = {6}";
+
+        private const string UPDATE_MOM_EMAILSENDDATE = "UPDATE MOM SET EmailSendDate='{0}' WHERE MID = {1}";
 
         private const string DELETE_MOM_BY_MID = "DELETE FROM MOM WHERE MID = {0}";
 
@@ -145,6 +147,27 @@ namespace FinancialPlanner.BusinessLogic.Clients
             }
         }
 
+        public void UpdateEmailSenDate(MOMTransaction mOMTransaction)
+        {
+            try
+            {
+                string clientName = DataBase.DBService.ExecuteCommandScalar(string.Format(GET_CLIENT_NAME_QUERY, mOMTransaction.CId));
+
+                DataBase.DBService.ExecuteCommandString(string.Format(UPDATE_MOM_EMAILSENDDATE,
+                    mOMTransaction.EmailSendDate.Value.ToString("yyyy-MM-dd hh:mm:ss tt"),
+                    mOMTransaction.MId));
+            }
+            catch (Exception ex)
+            {
+                DataBase.DBService.RollbackTransaction();
+                StackTrace st = new StackTrace();
+                StackFrame sf = st.GetFrame(0);
+                MethodBase currentMethodName = sf.GetMethod();
+                LogDebug(currentMethodName.Name, ex);
+                throw ex;
+            }
+        }
+
         public void DeleteMOMPoint(int id)
         {
             try
@@ -176,7 +199,8 @@ namespace FinancialPlanner.BusinessLogic.Clients
                     mOMTransaction.CId,
                     (mOMTransaction.MarkAsImportant == true) ? 1 : 0,
                     mOMTransaction.Duration,
-                    mOMTransaction.Notes), true);
+                    mOMTransaction.Notes,
+                    mOMTransaction.EmailSendDate), true);
 
                 int mid = getMOMId(mOMTransaction);
 
@@ -184,6 +208,7 @@ namespace FinancialPlanner.BusinessLogic.Clients
                 {
                     foreach (MOMPoint point in mOMTransaction.MOMPoints)
                     {
+
                         DataBase.DBService.ExecuteCommandString(string.Format(INSERT_MOM_POINTS,
                         mid,
                         point.DiscussedPoint,
@@ -244,6 +269,14 @@ namespace FinancialPlanner.BusinessLogic.Clients
             mOMTransaction.MarkAsImportant = bool.Parse(dr["MarkAsImportant"].ToString());
             mOMTransaction.Duration = dr.Field<string>("Duration");
             mOMTransaction.Notes = dr.Field<string>("Notes");
+            if (dr["EmailSendDate"] != DBNull.Value && !dr["EmailSendDate"].ToString().Contains("1900"))
+            {
+                DateTime emailSendDate;
+                if ( DateTime.TryParse(dr["EmailSendDate"].ToString(), out emailSendDate))
+                {
+                    mOMTransaction.EmailSendDate = emailSendDate;
+                }
+            }
 
             mOMTransaction.MOMPoints = new List<MOMPoint>();
             foreach (DataRow drMOMPoint in dtMOMPoints.Select("MId = " + mOMTransaction.MId))
