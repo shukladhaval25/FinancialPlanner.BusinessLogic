@@ -82,6 +82,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Activity\ActivitiesService.cs" />
+    <Compile Include="Activity\ApprovalService.cs" />
     <Compile Include="ApplicationMaster\AMCService.cs" />
     <Compile Include="ApplicationMaster\ARNService.cs" />
     <Compile Include="ApplicationMaster\BankService.cs" />

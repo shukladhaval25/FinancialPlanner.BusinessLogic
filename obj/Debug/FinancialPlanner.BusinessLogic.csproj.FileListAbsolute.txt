@@ -34,7 +34,6 @@ C:\Application Softwares\FinancialPlanner.BusinessLogic\bin\Debug\ChilkatDotNet4
 C:\Application Softwares\FinancialPlanner.BusinessLogic\bin\Debug\FinancialPlanner.Common.pdb
 C:\Application Softwares\FinancialPlanner.BusinessLogic\bin\Debug\FinancialPlanner.Common.dll.config
 C:\Application Softwares\FinancialPlanner.BusinessLogic\bin\Debug\Newtonsoft.Json.xml
-C:\Application Softwares\FinancialPlanner.BusinessLogic\obj\Debug\FinancialPlanner.BusinessLogic.csprojAssemblyReference.cache
 C:\Application Softwares\FinancialPlanner.BusinessLogic\obj\Debug\FinancialPlanner.BusinessLogic.csproj.CoreCompileInputs.cache
 C:\Application Softwares\FinancialPlanner.BusinessLogic\obj\Debug\FinancialPlanner.BusinessLogic.csproj.CopyComplete
 C:\Application Softwares\FinancialPlanner.BusinessLogic\obj\Debug\FinancialPlanner.BusinessLogic.dll

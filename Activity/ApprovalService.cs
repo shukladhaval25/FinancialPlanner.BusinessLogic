@@ -1,3 +1,5 @@
+using FinancialPlanner.Common;
+using FinancialPlanner.Common.Model.Approval;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -10,6 +12,8 @@ namespace FinancialPlanner.BusinessLogic.Approval
 {
     public class ApprovalService
     {
+        private const string GET_CLIENT_NAME_QUERY = "SELECT NAME FROM CLIENT WHERE ID = {0}";
+
         private const string INSERT_QUERY = "INSERT INTO APPROVALS " +
                 "(LINKEDID,REQUESTRAISEDBY,REQUESTEDON, AUTHORISEDUSERSTOAPPROVE,APPROVALSTATUS," +
                     "ACTIONTAKENBY, ACTIONTAKENON, DESCRIPTION, APPROVALTYPE ) " +
@@ -119,6 +123,7 @@ namespace FinancialPlanner.BusinessLogic.Approval
                 // Activity.ActivitiesService.Add(ActivityType.UpdateULIP, EntryStatus.Success,
                 //          Source.Server, ULIP.UpdatedByUserName, "ULIP", ULIP.MachineName);
                 DataBase.DBService.CommitTransaction();
+                return true;
             }
             catch (Exception ex)
             {
@@ -145,9 +150,10 @@ namespace FinancialPlanner.BusinessLogic.Approval
                        approval.Id,
                        approval.ApprovalType), true);
 
-                // Activity.ActivitiesService.Add(ActivityType.UpdateULIP, EntryStatus.Success,
+                //Activity.ActivitiesService.Add(ActivityType.UpdateULIP, EntryStatus.Success,
                 //          Source.Server, ULIP.UpdatedByUserName, "ULIP", ULIP.MachineName);
                 DataBase.DBService.CommitTransaction();
+                return true;
             }
             catch (Exception ex)
             {
@@ -177,6 +183,7 @@ namespace FinancialPlanner.BusinessLogic.Approval
                 // Activity.ActivitiesService.Add(ActivityType.UpdateULIP, EntryStatus.Success,
                 //          Source.Server, ULIP.UpdatedByUserName, "ULIP", ULIP.MachineName);
                 DataBase.DBService.CommitTransaction();
+                return true;
             }
             catch (Exception ex)
             {
@@ -188,7 +195,14 @@ namespace FinancialPlanner.BusinessLogic.Approval
                 throw ex;
             }
         }
-
+        private void LogDebug(string methodName, Exception ex)
+        {
+            DebuggerLogInfo debuggerInfo = new DebuggerLogInfo();
+            debuggerInfo.ClassName = this.GetType().Name;
+            debuggerInfo.Method = methodName;
+            debuggerInfo.ExceptionInfo = ex;
+            Logger.LogDebug(debuggerInfo);
+        }
 
     }
 }
