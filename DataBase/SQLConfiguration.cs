@@ -122,6 +122,7 @@ namespace FinancialPlanner.BusinessLogic.DataBase
             _sqlCommand.Connection = _sqlConnection;
             _sqlCommand.CommandText = sqlQuery;
             _sqlCommand.ExecuteNonQuery();
+            Close();
         }
 
         public void ExecuteCommand(string sqlQuery, bool isTransaction)
@@ -153,6 +154,7 @@ namespace FinancialPlanner.BusinessLogic.DataBase
                 
                 _sqlDataAdapter = new SqlDataAdapter(sqlQuery, _sqlConnection);
                 _sqlDataAdapter.Fill(dt);
+                Close();
             }
             catch(Exception ex)
             {
@@ -174,7 +176,7 @@ namespace FinancialPlanner.BusinessLogic.DataBase
             _sqlCommand.CommandText = sqlQuery;
             _sqlCommand.Connection = _sqlConnection;
             value = (_sqlCommand.ExecuteScalar() == null) ? string.Empty : _sqlCommand.ExecuteScalar().ToString();
-
+            Close();
             return value;
         }
     }
