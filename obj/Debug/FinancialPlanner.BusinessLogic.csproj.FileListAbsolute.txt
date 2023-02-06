@@ -38,3 +38,4 @@ C:\Application Softwares\FinancialPlanner.BusinessLogic\obj\Debug\FinancialPlann
 C:\Application Softwares\FinancialPlanner.BusinessLogic\obj\Debug\FinancialPlanner.BusinessLogic.csproj.CopyComplete
 C:\Application Softwares\FinancialPlanner.BusinessLogic\obj\Debug\FinancialPlanner.BusinessLogic.dll
 C:\Application Softwares\FinancialPlanner.BusinessLogic\obj\Debug\FinancialPlanner.BusinessLogic.pdb
+C:\Application Softwares\FinancialPlanner.BusinessLogic\obj\Debug\FinancialPlanner.BusinessLogic.csprojAssemblyReference.cache

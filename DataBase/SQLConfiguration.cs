@@ -79,17 +79,24 @@ namespace FinancialPlanner.BusinessLogic.DataBase
 
         public void BeginTransaction()
         {
+            if (_sqlConnection.State != System.Data.ConnectionState.Open)
+            {
+                _sqlConnection.ConnectionString = getConnectionString();
+                Open();
+            }
             _sqlTransaction = _sqlConnection.BeginTransaction();
         }
 
         public void CommitTransaction()
         {
             _sqlTransaction.Commit();
+            Close();
         }
 
         public void RollBackTransaction()
         {
             _sqlTransaction.Rollback();
+            Close();
         }
 
         public object GetTransaction()
@@ -145,6 +152,10 @@ namespace FinancialPlanner.BusinessLogic.DataBase
             DataTable dt = new DataTable();
             try
             {
+                _sqlConnection = null;
+                _sqlCommand = null;
+                _sqlConnection = new SqlConnection();
+                _sqlCommand = new SqlCommand();
                 if (_sqlConnection.State != System.Data.ConnectionState.Open)
                 {
                     _sqlConnection.ConnectionString = getConnectionString();

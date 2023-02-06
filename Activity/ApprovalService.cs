@@ -15,10 +15,10 @@ namespace FinancialPlanner.BusinessLogic.Approval
         private const string GET_CLIENT_NAME_QUERY = "SELECT NAME FROM CLIENT WHERE ID = {0}";
 
         private const string INSERT_QUERY = "INSERT INTO APPROVALS " +
-                "(LINKEDID,REQUESTRAISEDBY,REQUESTEDON, AUTHORISEDUSERSTOAPPROVE,APPROVALSTATUS," +
-                    "ACTIONTAKENBY, ACTIONTAKENON, DESCRIPTION, APPROVALTYPE ) " +
+                "(LINKEDITEMID,REQUESTRAISEDBY,REQUESTEDON, AUTHORISEDUSERSTOAPPROVE,APPROVALSTATUS," +
+                    " DESCRIPTION, APPROVALTYPE ) " +
                 " VALUES (" +
-                "{0},{1},'{2}','{3}',{4},{5},'{6}','{7}',{8})";
+                "{0},{1},'{2}','{3}',{4},'{5}',{6})";
 
 
         //DECLARE @tags NVARCHAR(400) = 'Admin,Dhaval,Parag,road,touring,bike'
@@ -45,10 +45,9 @@ namespace FinancialPlanner.BusinessLogic.Approval
                    approval.RequestRaisedBy,
                    approval.RequestedOn,
                    approval.AuthorisedUsersToApprove,
-                   approval.Status,
-                   approval.ActionTakenBy,
+                   Convert.ToInt32(approval.Status),
                    approval.Description,
-                   approval.ApprovalType));
+                   Convert.ToInt32(approval.ApprovalType)),true);
 
                 //Activity.ActivitiesService.Add(ActivityType.CreateArea, EntryStatus.Success,
                 //         Source.Server, Area.UpdatedByUserName, Area.Name, Area.MachineName);
@@ -56,6 +55,7 @@ namespace FinancialPlanner.BusinessLogic.Approval
             }
             catch (Exception ex)
             {
+                DataBase.DBService.RollbackTransaction();
                 StackTrace st = new StackTrace();
                 StackFrame sf = st.GetFrame(0);
                 MethodBase currentMethodName = sf.GetMethod();
@@ -99,8 +99,14 @@ namespace FinancialPlanner.BusinessLogic.Approval
             approvalDTO.RequestedOn = dr.Field<DateTime>("RequestedOn");
             approvalDTO.AuthorisedUsersToApprove = dr.Field<string>("AuthorisedUsersToApprove");
             approvalDTO.Status = (ApprovalStatus)dr.Field<int>("Status");
-            approvalDTO.ActionTakenBy = dr.Field<int>("ActionTakenBy");
-            approvalDTO.ActionTakenOn = dr.Field<DateTime>("ActionTakenOn");
+            if (dr["ActionTakenBy"] != DBNull.Value)
+            {
+                approvalDTO.ActionTakenBy = dr.Field<int>("ActionTakenBy") ;
+            }
+            if (dr["ActionTakenOn"] != DBNull.Value)
+            {
+                approvalDTO.ActionTakenOn = dr.Field<DateTime>("ActionTakenOn");
+            }
             approvalDTO.Description = dr.Field<string>("Description");
             approvalDTO.ApprovalType = (ApprovalType)(dr.Field<int>("ApprovalType"));
             return approvalDTO;
