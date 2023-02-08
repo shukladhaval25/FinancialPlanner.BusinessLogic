@@ -1,4 +1,6 @@
+using FinancialPlanner.BusinessLogic.Users;
 using FinancialPlanner.Common;
+using FinancialPlanner.Common.Model;
 using FinancialPlanner.Common.Model.Approval;
 using System;
 using System.Collections.Generic;
@@ -25,32 +27,67 @@ namespace FinancialPlanner.BusinessLogic.Approval
 
         //SELECT value FROM STRING_SPLIT(@tags, ',')  where value = 'Dhaval'
         private readonly string SELECT_ALL_BY_APPROVALTYPE =
-        "SELECT * FROM APPROVALS WHERE APPROVALTYPE = {0} AND " +
-               " APPROVALSTATUS in (" + ApprovalStatus.WaitingForApproval + "," + ApprovalStatus.Reassign + ")";
+        "SELECT Approvals.*,Users.UserName as RequestedBy,U1.UserName as ActionBy, " +
+            "case " +
+                "when Approvals.ApprovalType = 1 then TaskCard.TaskId " +
+                "WHEN Approvals.ApprovalType = 2 THEN Planner.Name " +
+            "END AS ItemId" +
+            " FROM APPROVALS " +
+            " LEFT JOIN TaskCard ON TaskCard.ID = Approvals.LinkedItemId AND Approvals.ApprovalType = 1 " +
+            " LEFT JOIN Planner ON Planner.ID = Approvals.LinkedItemId AND Approvals.ApprovalType = 2 " +
+            "LEFT Join Users on Users.ID = Approvals.RequestRaisedBy " +
+            "LEFT JOIN Users U1 ON U1.ID = Approvals.ActionTakenBy " +
+            " WHERE APPROVALTYPE = {0} AND " +
+               " APPROVALSTATUS in (0,2)  AND (AuthorisedUsersToApprove LIKE '%,{1}' OR AuthorisedUsersToApprove LIKE '%,{1},%' OR AuthorisedUsersToApprove LIKE '{1},%')";
 
-        private const string UPDATE_APPROVAL_QUERY = "UPDATE APPROVALS SET APPROVALSTATUS = {0},ACTIONTAKENBY={1},ACTIONTAKENON ='{2} WHERE ID ={3} AND APPROVALTYPE ={4}";
+        private readonly string SELECT_ALL_BY_ALL_APPROVALTYPE =
+        "SELECT Approvals.*,Users.UserName as RequestedBy,U1.UserName as ActionBy, " +
+            "case " +
+                "when Approvals.ApprovalType = 1 then TaskCard.TaskId " +
+                "WHEN Approvals.ApprovalType = 2 THEN Planner.Name " +
+            "END AS ItemId" +
+            " FROM APPROVALS " +
+            " LEFT JOIN TaskCard ON TaskCard.ID = Approvals.LinkedItemId AND Approvals.ApprovalType = 1 " +
+            " LEFT JOIN Planner ON Planner.ID = Approvals.LinkedItemId AND Approvals.ApprovalType = 2 " +
+            "LEFT Join Users on Users.ID = Approvals.RequestRaisedBy " +
+            "LEFT JOIN Users U1 ON U1.ID = Approvals.ActionTakenBy " +
+            " WHERE (AuthorisedUsersToApprove LIKE '%,{0}' OR " +
+            "AuthorisedUsersToApprove LIKE '%,{0},%' OR AuthorisedUsersToApprove LIKE '{0},%') AND " +
+               " APPROVALSTATUS in (0,2)";
 
-        private readonly string UPDATE_REASSIGN_QUERY = "UPDATE APPROVALS SET APPROVALSTATUS = " + ApprovalStatus.WaitingForApproval + ", AUTHORISEDUSERSTOAPPROVE = '{0}',ACTIONTAKENBY={1},ACTIONTAKENON ='{2} WHERE ID ={3} AND APPROVALTYPE ={4}";
+        private readonly string SELECT_APPROVAL_ITEM_BY_LINKEDITEMID = "SELECT " +
+            "  Approvals.*,Users.UserName as RequestedBy,U1.UserName as ActionBy " +
+            "FROM APPROVALS " +
+            "LEFT Join Users on Users.ID = Approvals.RequestRaisedBy " +
+            "LEFT JOIN Users U1 ON U1.ID = Approvals.ActionTakenBy " +
+            " WHERE LINKEDITEMID = {0}";
+            
+
+        private const string UPDATE_APPROVAL_QUERY = "UPDATE APPROVALS SET APPROVALSTATUS = {0},ACTIONTAKENBY={1},ACTIONTAKENON ='{2}',DESCRIPTION='{5}' WHERE ID ={3} AND APPROVALTYPE ={4}";
+
+        private readonly string UPDATE_REASSIGN_QUERY = "UPDATE APPROVALS SET APPROVALSTATUS = " + (int)ApprovalStatus.WaitingForApproval + ", AUTHORISEDUSERSTOAPPROVE = '{0}',ACTIONTAKENBY={1},ACTIONTAKENON ='{2}',DESCRIPTION='{5}' WHERE ID ={3} AND APPROVALTYPE ={4}";
 
         private readonly string SELECT_ID = "SELECT N1.*,U.USERNAME AS UPDATEDBYUSERNAME FROM ULIP N1, USERS U WHERE N1.UPDATEDBY = U.ID AND N1.ID = {0}";
         public void Add(ApprovalDTO approval)
         {
             try
             {
-                string clientName = DataBase.DBService.ExecuteCommandScalar(string.Format(GET_CLIENT_NAME_QUERY, 0));
+                UserService userService = new UserService();
+                User user = userService.Get(approval.RequestRaisedBy);
+
 
                 DataBase.DBService.BeginTransaction();
                 DataBase.DBService.ExecuteCommandString(string.Format(INSERT_QUERY,
                    approval.LinkedId,
                    approval.RequestRaisedBy,
                    approval.RequestedOn,
-                   approval.AuthorisedUsersToApprove,
+                   string.Format("1,{0}", approval.AuthorisedUsersToApprove),
                    Convert.ToInt32(approval.Status),
                    approval.Description,
                    Convert.ToInt32(approval.ApprovalType)),true);
 
-                //Activity.ActivitiesService.Add(ActivityType.CreateArea, EntryStatus.Success,
-                //         Source.Server, Area.UpdatedByUserName, Area.Name, Area.MachineName);
+                //Activity.ActivitiesService.Add(ActivityType.AddApproval, EntryStatus.Success,
+                //         Source.Server, user.UserName, "Apply for approval", "");
                 DataBase.DBService.CommitTransaction();
             }
             catch (Exception ex)
@@ -71,7 +108,37 @@ namespace FinancialPlanner.BusinessLogic.Approval
                 Logger.LogInfo("Get: Approvals by approval type process start");
                 List<ApprovalDTO> approvalDTOs = new List<ApprovalDTO>();
 
-                DataTable dtApprovals = DataBase.DBService.ExecuteCommand(string.Format(SELECT_ALL_BY_APPROVALTYPE, approvalType));
+                DataTable dtApprovals;
+                if (approvalType  == ApprovalType.All)
+                    dtApprovals = DataBase.DBService.ExecuteCommand(string.Format(SELECT_ALL_BY_ALL_APPROVALTYPE , userId));
+                else
+                    dtApprovals = DataBase.DBService.ExecuteCommand(string.Format(SELECT_ALL_BY_APPROVALTYPE, approvalType,userId));
+                foreach (DataRow dr in dtApprovals.Rows)
+                {
+                    ApprovalDTO approvalDTO = convertToApprovalDTO(dr);
+                    approvalDTOs.Add(approvalDTO);
+                }
+                Logger.LogInfo("Get: Approvals by approval type process completed.");
+                return approvalDTOs;
+            }
+            catch (Exception ex)
+            {
+                StackTrace st = new StackTrace();
+                StackFrame sf = st.GetFrame(0);
+                MethodBase currentMethodName = sf.GetMethod();
+                LogDebug(currentMethodName.Name, ex);
+                return null;
+            }
+        }
+
+        public List<ApprovalDTO> GetApprovals(int itemId)
+        {
+            try
+            {
+                Logger.LogInfo("Get: Approvals by approval type process start");
+                List<ApprovalDTO> approvalDTOs = new List<ApprovalDTO>();
+
+                DataTable dtApprovals = DataBase.DBService.ExecuteCommand(string.Format(SELECT_APPROVAL_ITEM_BY_LINKEDITEMID, itemId));
                 foreach (DataRow dr in dtApprovals.Rows)
                 {
                     ApprovalDTO approvalDTO = convertToApprovalDTO(dr);
@@ -94,21 +161,26 @@ namespace FinancialPlanner.BusinessLogic.Approval
         {
             ApprovalDTO approvalDTO = new ApprovalDTO();
             approvalDTO.Id = dr.Field<int>("ID");
-            approvalDTO.LinkedId = dr.Field<int>("LinkedId");
+            approvalDTO.LinkedId = dr.Field<int>("LinkedItemId");
             approvalDTO.RequestRaisedBy = dr.Field<int>("RequestRaisedBy");
+            approvalDTO.RequestedBy = dr.Field<string>("RequestedBy"); ;
             approvalDTO.RequestedOn = dr.Field<DateTime>("RequestedOn");
             approvalDTO.AuthorisedUsersToApprove = dr.Field<string>("AuthorisedUsersToApprove");
-            approvalDTO.Status = (ApprovalStatus)dr.Field<int>("Status");
+
+            approvalDTO.Status = (ApprovalStatus)Enum.Parse(typeof(ApprovalStatus), dr["ApprovalStatus"].ToString());
+            
             if (dr["ActionTakenBy"] != DBNull.Value)
             {
                 approvalDTO.ActionTakenBy = dr.Field<int>("ActionTakenBy") ;
+                approvalDTO.ActionBy = dr.Field<string>("ActionBy");
             }
             if (dr["ActionTakenOn"] != DBNull.Value)
             {
                 approvalDTO.ActionTakenOn = dr.Field<DateTime>("ActionTakenOn");
             }
             approvalDTO.Description = dr.Field<string>("Description");
-            approvalDTO.ApprovalType = (ApprovalType)(dr.Field<int>("ApprovalType"));
+            approvalDTO.ApprovalType = (ApprovalType)Enum.Parse(typeof(ApprovalType), dr["ApprovalType"].ToString());
+            approvalDTO.ItemId = dr.Field<string>("ItemId");
             return approvalDTO;
         }
 
@@ -120,11 +192,12 @@ namespace FinancialPlanner.BusinessLogic.Approval
 
                 DataBase.DBService.BeginTransaction();
                 DataBase.DBService.ExecuteCommandString(string.Format(UPDATE_APPROVAL_QUERY,
-                       ApprovalStatus.Approve,
+                       (int) ApprovalStatus.Approve,
                        approval.ActionTakenBy,
                         approval.ActionTakenOn,
                        approval.Id,
-                       approval.ApprovalType), true);
+                       (int) approval.ApprovalType,
+                       approval.Description), true);
 
                 // Activity.ActivitiesService.Add(ActivityType.UpdateULIP, EntryStatus.Success,
                 //          Source.Server, ULIP.UpdatedByUserName, "ULIP", ULIP.MachineName);
@@ -150,11 +223,12 @@ namespace FinancialPlanner.BusinessLogic.Approval
 
                 DataBase.DBService.BeginTransaction();
                 DataBase.DBService.ExecuteCommandString(string.Format(UPDATE_APPROVAL_QUERY,
-                       ApprovalStatus.Reject,
+                      (int)  ApprovalStatus.Reject,
                        approval.ActionTakenBy,
-                        approval.ActionTakenOn,
+                       approval.ActionTakenOn,
                        approval.Id,
-                       approval.ApprovalType), true);
+                       (int) approval.ApprovalType,
+                       approval.Description), true);
 
                 //Activity.ActivitiesService.Add(ActivityType.UpdateULIP, EntryStatus.Success,
                 //          Source.Server, ULIP.UpdatedByUserName, "ULIP", ULIP.MachineName);
@@ -180,11 +254,12 @@ namespace FinancialPlanner.BusinessLogic.Approval
 
                 DataBase.DBService.BeginTransaction();
                 DataBase.DBService.ExecuteCommandString(string.Format(UPDATE_REASSIGN_QUERY,
-                       approval.AuthorisedUsersToApprove,
+                      string.Format("1,{0}",approval.AuthorisedUsersToApprove),
                        approval.ActionTakenBy,
                        approval.ActionTakenOn,
                        approval.Id,
-                       approval.ApprovalType), true);
+                       (int) approval.ApprovalType,
+                       approval.Description), true);
 
                 // Activity.ActivitiesService.Add(ActivityType.UpdateULIP, EntryStatus.Success,
                 //          Source.Server, ULIP.UpdatedByUserName, "ULIP", ULIP.MachineName);

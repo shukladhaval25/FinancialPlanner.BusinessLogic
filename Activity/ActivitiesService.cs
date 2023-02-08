@@ -237,6 +237,11 @@ namespace FinancialPlanner.BusinessLogic.Activity
         private static readonly string DELETE_INVESTMENT_RECOMMENDATION = "Investment recommendation ''{0}'' deleted sucessfully";
         private static readonly string UPDATE_QUARTERLY_REVIEW_TEMPLATE ="Update quarterly review template sucessfully";
 
+        public static readonly string ADD_APPROVAL = "Add item for approval";
+        public static readonly string APPROVED = "Item Approved";
+        public static readonly string REJECTED = "Item Rejected";
+        public static readonly string REASSIGN = "Item Reassign";
+
         public static IList<Activities> Get(string userName)
         {
             IList<Activities> lstActivities = new List<Activities>();
@@ -582,6 +587,16 @@ namespace FinancialPlanner.BusinessLogic.Activity
                 //Quarterly Review Template
                 _lstActivityDescription.Add(new KeyValuePair<ActivityType, string>
                     (ActivityType.UpdateQuarterlyReviewTemplate, UPDATE_QUARTERLY_REVIEW_TEMPLATE));
+
+                //Approval
+                _lstActivityDescription.Add(new KeyValuePair<ActivityType, string>
+                    (ActivityType.AddApproval,ADD_APPROVAL));
+                _lstActivityDescription.Add(new KeyValuePair<ActivityType, string>
+                    (ActivityType.ItemApproved, APPROVED));
+                _lstActivityDescription.Add(new KeyValuePair<ActivityType, string>
+                    (ActivityType.ItemRejected, REJECTED));
+                _lstActivityDescription.Add(new KeyValuePair<ActivityType, string>
+                    (ActivityType.ItemReassign, REASSIGN));
             }
         }
 
