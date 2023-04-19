@@ -175,7 +175,7 @@ namespace FinancialPlanner.BusinessLogic.DataBase
             return dt;
         }
 
-        public string ExecuteCommandScalar(string sqlQuery)
+        public string ExecuteCommandScalar(string sqlQuery,bool isTransaction =false)
         {
             if (_sqlConnection.State != System.Data.ConnectionState.Open)
             {
@@ -187,7 +187,8 @@ namespace FinancialPlanner.BusinessLogic.DataBase
             _sqlCommand.CommandText = sqlQuery;
             _sqlCommand.Connection = _sqlConnection;
             value = (_sqlCommand.ExecuteScalar() == null) ? string.Empty : _sqlCommand.ExecuteScalar().ToString();
-            Close();
+            if (!isTransaction)
+                Close();
             return value;
         }
     }

@@ -197,7 +197,7 @@ namespace FinancialPlanner.BusinessLogic
             double goalValue = goals.Amount;
             decimal inflationRate = goals.InflationRate;
             Goals yearWiseGoal = goals;
-            DataBase.DBService.BeginTransaction();
+           // DataBase.DBService.BeginTransaction();
             for (int year = startYear; year <= endYear;)
             {                
                 goals.StartYear = year.ToString();
@@ -216,7 +216,7 @@ namespace FinancialPlanner.BusinessLogic
                      goals.CreatedOn.ToString("yyyy-MM-dd hh:mm:ss"), goals.CreatedBy,
                      goals.UpdatedOn.ToString("yyyy-MM-dd hh:mm:ss"), goals.UpdatedBy,
                      goals.InflationRate, goals.EligibleForInsuranceCoverage,
-                     goals.OtherAmount,goals.IsDeleted), true);
+                     goals.OtherAmount,goals.IsDeleted));
 
                 if (goals.LoanForGoal != null && year == startYear)
                     addLoanForGoal(goals, goals.Name.Replace("'", "''") + " " + year);
@@ -226,12 +226,12 @@ namespace FinancialPlanner.BusinessLogic
                 year = year + (int)frequency;
                 goalPriority++;
             }
-            DataBase.DBService.CommitTransaction();
+            //DataBase.DBService.CommitTransaction();
         }
 
         private static void addSingleGoal(Goals goals, string clientName)
         {
-            DataBase.DBService.BeginTransaction();
+            //DataBase.DBService.BeginTransaction();
             DataBase.DBService.ExecuteCommandString(string.Format(INSERT_QUERY,
                      goals.Pid, goals.Category, goals.Name.Replace("'", "''"),
                      goals.Amount, goals.StartYear, goals.EndYear,
@@ -239,14 +239,14 @@ namespace FinancialPlanner.BusinessLogic
                      goals.CreatedOn.ToString("yyyy-MM-dd hh:mm:ss"), goals.CreatedBy,
                      goals.UpdatedOn.ToString("yyyy-MM-dd hh:mm:ss"), goals.UpdatedBy,
                      goals.InflationRate, goals.EligibleForInsuranceCoverage,
-                     goals.OtherAmount,goals.IsDeleted), true);
+                     goals.OtherAmount,goals.IsDeleted));
 
             if (goals.LoanForGoal != null)
                 addLoanForGoal(goals, goals.Name.Replace("'", "''"));
 
             Activity.ActivitiesService.Add(ActivityType.CreateGoals, EntryStatus.Success,
                      Source.Server, goals.UpdatedByUserName, clientName, goals.MachineName);
-            DataBase.DBService.CommitTransaction();
+            //DataBase.DBService.CommitTransaction();
         }
 
         private static void addLoanForGoal(Goals Goals,string goalName)
@@ -264,7 +264,7 @@ namespace FinancialPlanner.BusinessLogic
                                   Goals.LoanForGoal.CreatedBy,
                                   Goals.LoanForGoal.UpdatedOn.ToString("yyyy-MM-dd hh:mm:ss"),
                                   Goals.LoanForGoal.UpdatedBy,
-                                  Goals.LoanForGoal.LoanPortion), true);
+                                  Goals.LoanForGoal.LoanPortion));
         }
 
         public void Update(Goals Goals)

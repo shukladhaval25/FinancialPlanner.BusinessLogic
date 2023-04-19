@@ -20,7 +20,7 @@ namespace FinancialPlanner.BusinessLogic.Approval
                 "(LINKEDITEMID,REQUESTRAISEDBY,REQUESTEDON, AUTHORISEDUSERSTOAPPROVE,APPROVALSTATUS," +
                     " DESCRIPTION, APPROVALTYPE ) " +
                 " VALUES (" +
-                "{0},{1},'{2}','{3}',{4},'{5}',{6})";
+                "{0},{1},{2},'{3}',{4},'{5}',{6})";
 
 
         //DECLARE @tags NVARCHAR(400) = 'Admin,Dhaval,Parag,road,touring,bike'
@@ -38,7 +38,7 @@ namespace FinancialPlanner.BusinessLogic.Approval
             "LEFT Join Users on Users.ID = Approvals.RequestRaisedBy " +
             "LEFT JOIN Users U1 ON U1.ID = Approvals.ActionTakenBy " +
             " WHERE APPROVALTYPE = {0} AND " +
-               " APPROVALSTATUS in (0,2)  AND (AuthorisedUsersToApprove LIKE '%,{1}' OR AuthorisedUsersToApprove LIKE '%,{1},%' OR AuthorisedUsersToApprove LIKE '{1},%')";
+               " APPROVALSTATUS in (0,3)  AND (AuthorisedUsersToApprove LIKE '%,{1}' OR AuthorisedUsersToApprove LIKE '%,{1},%' OR AuthorisedUsersToApprove LIKE '{1},%')";
 
         private readonly string SELECT_ALL_BY_ALL_APPROVALTYPE =
         "SELECT Approvals.*,Users.UserName as RequestedBy,U1.UserName as ActionBy, " +
@@ -53,19 +53,25 @@ namespace FinancialPlanner.BusinessLogic.Approval
             "LEFT JOIN Users U1 ON U1.ID = Approvals.ActionTakenBy " +
             " WHERE (AuthorisedUsersToApprove LIKE '%,{0}' OR " +
             "AuthorisedUsersToApprove LIKE '%,{0},%' OR AuthorisedUsersToApprove LIKE '{0},%') AND " +
-               " APPROVALSTATUS in (0,2)";
+               " APPROVALSTATUS in (0,3)";
 
         private readonly string SELECT_APPROVAL_ITEM_BY_LINKEDITEMID = "SELECT " +
-            "  Approvals.*,Users.UserName as RequestedBy,U1.UserName as ActionBy " +
+            "  Approvals.*,Users.UserName as RequestedBy,U1.UserName as ActionBy, " +
+            "case " +
+                "when Approvals.ApprovalType = 1 then TaskCard.TaskId " +
+                "WHEN Approvals.ApprovalType = 2 THEN Planner.Name " +
+            "END AS ItemId " +
             "FROM APPROVALS " +
+             " LEFT JOIN TaskCard ON TaskCard.ID = Approvals.LinkedItemId AND Approvals.ApprovalType = 1 " +
+            " LEFT JOIN Planner ON Planner.ID = Approvals.LinkedItemId AND Approvals.ApprovalType = 2 " +
             "LEFT Join Users on Users.ID = Approvals.RequestRaisedBy " +
             "LEFT JOIN Users U1 ON U1.ID = Approvals.ActionTakenBy " +
             " WHERE LINKEDITEMID = {0}";
             
 
-        private const string UPDATE_APPROVAL_QUERY = "UPDATE APPROVALS SET APPROVALSTATUS = {0},ACTIONTAKENBY={1},ACTIONTAKENON ='{2}',DESCRIPTION='{5}' WHERE ID ={3} AND APPROVALTYPE ={4}";
+        private const string UPDATE_APPROVAL_QUERY = "UPDATE APPROVALS SET APPROVALSTATUS = {0},ACTIONTAKENBY={1},ACTIONTAKENON ={2},DESCRIPTION='{5}' WHERE ID ={3} AND APPROVALTYPE ={4}";
 
-        private readonly string UPDATE_REASSIGN_QUERY = "UPDATE APPROVALS SET APPROVALSTATUS = " + (int)ApprovalStatus.WaitingForApproval + ", AUTHORISEDUSERSTOAPPROVE = '{0}',ACTIONTAKENBY={1},ACTIONTAKENON ='{2}',DESCRIPTION='{5}' WHERE ID ={3} AND APPROVALTYPE ={4}";
+        private readonly string UPDATE_REASSIGN_QUERY = "UPDATE APPROVALS SET APPROVALSTATUS = " + (int)ApprovalStatus.WaitingForApproval + ", AUTHORISEDUSERSTOAPPROVE = '{0}',ACTIONTAKENBY={1},ACTIONTAKENON ={2},DESCRIPTION='{5}' WHERE ID ={3} AND APPROVALTYPE ={4}";
 
         private readonly string SELECT_ID = "SELECT N1.*,U.USERNAME AS UPDATEDBYUSERNAME FROM ULIP N1, USERS U WHERE N1.UPDATEDBY = U.ID AND N1.ID = {0}";
         public void Add(ApprovalDTO approval)
@@ -80,7 +86,8 @@ namespace FinancialPlanner.BusinessLogic.Approval
                 DataBase.DBService.ExecuteCommandString(string.Format(INSERT_QUERY,
                    approval.LinkedId,
                    approval.RequestRaisedBy,
-                   approval.RequestedOn,
+                   "GETDATE()",
+                   //approval.RequestedOn.ToString("yyyy-MM-dd"),
                    string.Format("1,{0}", approval.AuthorisedUsersToApprove),
                    Convert.ToInt32(approval.Status),
                    approval.Description,
@@ -194,7 +201,7 @@ namespace FinancialPlanner.BusinessLogic.Approval
                 DataBase.DBService.ExecuteCommandString(string.Format(UPDATE_APPROVAL_QUERY,
                        (int) ApprovalStatus.Approve,
                        approval.ActionTakenBy,
-                        approval.ActionTakenOn,
+                       "GETDATE()",
                        approval.Id,
                        (int) approval.ApprovalType,
                        approval.Description), true);
@@ -225,7 +232,7 @@ namespace FinancialPlanner.BusinessLogic.Approval
                 DataBase.DBService.ExecuteCommandString(string.Format(UPDATE_APPROVAL_QUERY,
                       (int)  ApprovalStatus.Reject,
                        approval.ActionTakenBy,
-                       approval.ActionTakenOn,
+                       "GETDATE()",
                        approval.Id,
                        (int) approval.ApprovalType,
                        approval.Description), true);
@@ -256,7 +263,7 @@ namespace FinancialPlanner.BusinessLogic.Approval
                 DataBase.DBService.ExecuteCommandString(string.Format(UPDATE_REASSIGN_QUERY,
                       string.Format("1,{0}",approval.AuthorisedUsersToApprove),
                        approval.ActionTakenBy,
-                       approval.ActionTakenOn,
+                       "GETDATE()",
                        approval.Id,
                        (int) approval.ApprovalType,
                        approval.Description), true);

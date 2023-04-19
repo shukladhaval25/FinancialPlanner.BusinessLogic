@@ -33,7 +33,7 @@ namespace FinancialPlanner.BusinessLogic.Clients
 
         private const string UPDATE_MOM = "UPDATE MOM SET MeetingDate='{0}', MeetingType ='{1}', ClientId = {2}, MarkAsImportant = {3}, Duration ='{4}', Notes ='{5}' WHERE MID = {6}";
 
-        private const string UPDATE_MOM_EMAILSENDDATE = "UPDATE MOM SET EmailSendDate='{0}' WHERE MID = {1}";
+        private const string UPDATE_MOM_EMAILSENDDATE = "UPDATE MOM SET EmailSendDate=GETDATE() WHERE MID = {0}";
 
         private const string DELETE_MOM_BY_MID = "DELETE FROM MOM WHERE MID = {0}";
 
@@ -153,8 +153,7 @@ namespace FinancialPlanner.BusinessLogic.Clients
             {
                 string clientName = DataBase.DBService.ExecuteCommandScalar(string.Format(GET_CLIENT_NAME_QUERY, mOMTransaction.CId));
 
-                DataBase.DBService.ExecuteCommandString(string.Format(UPDATE_MOM_EMAILSENDDATE,
-                    mOMTransaction.EmailSendDate.Value.ToString("yyyy-MM-dd hh:mm:ss tt"),
+                DataBase.DBService.ExecuteCommandString(string.Format(UPDATE_MOM_EMAILSENDDATE,                   
                     mOMTransaction.MId));
             }
             catch (Exception ex)
@@ -248,7 +247,7 @@ namespace FinancialPlanner.BusinessLogic.Clients
                  (mOMTransaction.MarkAsImportant == true) ? 1 : 0,
                  mOMTransaction.Duration,
                  mOMTransaction.Notes
-                 )));
+                 ),true));
         }
 
         private void LogDebug(string methodName, Exception ex)

@@ -25,9 +25,9 @@ namespace FinancialPlanner.BusinessLogic.DataBase
         {
             _dbConfiguration.ExecuteCommand(sqlQuery,isTransaction);
         }
-        public static string ExecuteCommandScalar(string sqlQuery)
+        public static string ExecuteCommandScalar(string sqlQuery,bool isTransaction = false)
         {
-           return _dbConfiguration.ExecuteCommandScalar(sqlQuery);
+           return _dbConfiguration.ExecuteCommandScalar(sqlQuery,isTransaction);
         }
 
         public static DataTable ExecuteCommand(string sqlQuery)

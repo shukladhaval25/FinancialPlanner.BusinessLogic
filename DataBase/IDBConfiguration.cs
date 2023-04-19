@@ -18,7 +18,7 @@ namespace FinancialPlanner.BusinessLogic.DataBase
         void ExecuteCommand(string sqlQuery);
         void ExecuteCommand(string sqlQuery, bool isTrancation);
         DataTable ExecuteDataAdaptor(string sqlQuery);
-        string ExecuteCommandScalar(string sqlQuery);
+        string ExecuteCommandScalar(string sqlQuery, bool isTransaction = false);
 
     }
 }

@@ -20,14 +20,24 @@ namespace FinancialPlanner.BusinessLogic.TaskManagements
     {
 
         private readonly string SELECT_ALL_TASKS =
-           "SELECT TaskCard.*,TaskProject.Name as ProjectName,Users.UserName AS OwnerName FROM TaskCard " +
-           "INNER JOIN TaskProject ON " +
-           "TaskCard.ProjectId = TaskProject.ID INNER JOIN Users ON TaskCard.Owner = Users.ID";
+        //"SELECT TaskCard.*,TaskProject.Name as ProjectName,Users.UserName AS OwnerName FROM TaskCard " +
+        //"INNER JOIN TaskProject ON " +
+        //"TaskCard.ProjectId = TaskProject.ID INNER JOIN Users ON TaskCard.Owner = Users.ID";
 
-        private readonly string SELECT_ALL_TASKS_WITH_COMMENTS = "SELECT TaskCard.*,TaskProject.Name as ProjectName,Users.UserName AS OwnerName,TaskComment.comment, u1.UserName As CommentedBy, TaskComment.CommentedOn " +
+        "SELECT TaskCard.*, TaskProject.Name as ProjectName, Users.UserName AS OwnerName, " +
+            "u.UserName  as AssignToName, Client.Name  as CustomerName" +
+            " FROM TaskCard " +
+            " INNER JOIN TaskProject ON TaskCard.ProjectId = TaskProject.ID " +
+            " INNER JOIN Users ON TaskCard.Owner = Users.ID " +
+            " INNER JOIN Users u on TaskCard.AssignTo = u.ID " +
+            " inner join Client on TaskCard.Cid = Client.ID ";
+
+        private readonly string SELECT_ALL_TASKS_WITH_COMMENTS = "SELECT TaskCard.*,TaskProject.Name as ProjectName,Users.UserName AS OwnerName,TaskComment.comment, u.UserName  as AssignToName, Client.Name  as CustomerName, u1.UserName As CommentedBy, TaskComment.CommentedOn " +
             "FROM TaskCard " +
             "INNER JOIN TaskProject ON TaskCard.ProjectId = TaskProject.ID " +
             "INNER JOIN Users ON TaskCard.Owner = Users.ID " +
+            "INNER JOIN Users u on TaskCard.AssignTo = u.ID " +
+            "inner join Client on TaskCard.Cid = Client.ID " +
             "FULL OUTER join TaskComment on TaskCard.id = TaskComment.TaskId " +
             "LEFT join Users u1 on TaskComment.CommentedBy = u1.ID " +
             "order by TaskCard.ID";
@@ -36,16 +46,23 @@ namespace FinancialPlanner.BusinessLogic.TaskManagements
             //"LEFT join Users u1 on TaskComment.CommentedBy = u1.ID order by TaskCard.ID ";
 
         private readonly string SELECT_ALL =
-            "SELECT TaskCard.*,TaskProject.Name as ProjectName,Users.UserName AS OwnerName FROM TaskCard " +
-            "INNER JOIN TaskProject ON " +
-            "TaskCard.ProjectId = TaskProject.ID INNER JOIN Users ON TaskCard.Owner = Users.ID AND " +
+            "SELECT TaskCard.*,TaskProject.Name as ProjectName,Users.UserName AS OwnerName," +
+            " u.UserName  as AssignToName, Client.Name  as CustomerName" +
+            " FROM TaskCard " +
+            " INNER JOIN TaskProject ON TaskCard.ProjectId = TaskProject.ID " +
+            " inner join Client on TaskCard.Cid = Client.ID " +
+            " INNER JOIN Users u on TaskCard.AssignTo = u.ID " +
+            " INNER JOIN Users ON TaskCard.Owner = Users.ID AND " +
             "(TaskCard.TaskStatus <> 4 and TaskCard.TaskStatus<> 5)";
 
        private readonly string SELECT_ALL_NOTIFIED_BY_USER = "SELECT  TaskCard.*, Users.UserName AS OwnerName, " +
+               " u.UserName  as AssignToName, Client.Name  as CustomerName" +
                          "TaskProject.Name AS ProjectName FROM Users INNER JOIN " +
-                         "TaskCard ON Users.ID = TaskCard.Owner INNER JOIN " +
-                         "TaskNotification ON TaskCard.ID = TaskNotification.TaskId INNER JOIN " +
-                         "TaskProject ON TaskCard.ProjectId = TaskProject.ID " +
+                         "TaskCard ON Users.ID = TaskCard.Owner " +
+                         "INNER JOIN TaskNotification ON TaskCard.ID = TaskNotification.TaskId " +
+                         "INNER JOIN TaskProject ON TaskCard.ProjectId = TaskProject.ID " +
+                         " inner join Client on TaskCard.Cid = Client.ID " +
+                         " INNER JOIN Users u on TaskCard.AssignTo = u.ID " +
                          "WHERE (TaskNotification.NotifyTo = {0})";
 
         //private readonly string SELECT_ALL_BY_TASK_STATUS = "SELECT * FROM [TaskCard] WHERE TASKSTATUS = {0}";
@@ -54,30 +71,48 @@ namespace FinancialPlanner.BusinessLogic.TaskManagements
 
         //private readonly string SELECT_BY_ID = "SELECT * FROM[TaskCard] WHERE TASKID = {0}";
 
-        private string SELECT_OVERDUE_TASKS_BY_USEID = "SELECT TaskCard.*,TaskProject.Name as ProjectName,Users.UserName AS OwnerName " +
-            "FROM TASKCARD INNER JOIN TaskProject ON " +
-            "TaskCard.ProjectId = TaskProject.ID INNER JOIN Users ON TaskCard.Owner = Users.ID WHERE DueDate < GETDATE() AND " +
+        private string SELECT_OVERDUE_TASKS_BY_USEID = "SELECT TaskCard.*,TaskProject.Name as ProjectName,Users.UserName AS OwnerName,  u.UserName  as AssignToName, Client.Name  as CustomerName " + 
+            "FROM TASKCARD " +
+            "INNER JOIN Users u on TaskCard.AssignTo = u.ID " +
+            "inner join Client on TaskCard.Cid = Client.ID " +
+            "INNER JOIN TaskProject ON TaskCard.ProjectId = TaskProject.ID " +
+            "INNER JOIN Users ON TaskCard.Owner = Users.ID WHERE DueDate < GETDATE() AND " +
             "TASKCARD.ASSIGNTO = {0} AND (" +
             "TaskCard.TaskStatus <> 3 and TaskCard.TaskStatus <> 4 and TaskCard.TaskStatus<> 5)";
 
-        private const string SELECT_TASK_BYPROJECTNAME_OPENSTATUS_ASSIGNTO = "SELECT Taskcard.* FROM TaskProject " +
+        private const string SELECT_TASK_BYPROJECTNAME_OPENSTATUS_ASSIGNTO = "SELECT Taskcard.*,  " +
+            "u.UserName  as AssignToName, Client.Name  as CustomerName " +
+            "FROM TaskProject " +
+            " INNER JOIN Users u on TaskCard.AssignTo = u.ID " +
+            " inner join Client on TaskCard.Cid = Client.ID " +
             "LEFT OUTER JOIN TaskCard ON TaskProject.ID = TaskCard.ProjectId " +
             "where (TaskCard.AssignTo = {0}) AND (TaskCard.TaskStatus <> 4 and TaskCard.TaskStatus<> 5) " + 
             "and TaskProject.Name ='{1}'";
 
-        private const string SELECT_TASK_BYPROJECTNAME = "SELECT Taskcard.* FROM TaskProject " +
+        private const string SELECT_TASK_BYPROJECTNAME = "SELECT Taskcard.*,u.UserName  as AssignToName, Client.Name  as CustomerName" +
+            " FROM TaskProject " +
+            "INNER JOIN Users u on TaskCard.AssignTo = u.ID " +
+            "inner join Client on TaskCard.Cid = Client.ID " +
             "LEFT OUTER JOIN TaskCard ON TaskProject.ID = TaskCard.ProjectId " +
             "where (TaskCard.TaskStatus <> 4 and TaskCard.TaskStatus<> 5) " +
             "and TaskProject.Name ='{1}'";
 
-        private readonly string SELECT_BY_ASSIGNTO = "SELECT TaskCard.*, Users.UserName AS OwnerName,TaskProject.Name AS ProjectName " +
-            "FROM Users INNER JOIN TaskCard ON Users.ID = TaskCard.Owner INNER JOIN " +
-            "TaskProject ON TaskCard.ProjectId = TaskProject.ID WHERE (TaskCard.AssignTo = {0}) AND "+
+        private readonly string SELECT_BY_ASSIGNTO = "SELECT TaskCard.*, Users.UserName AS OwnerName,TaskProject.Name AS ProjectName, " +
+            "u.UserName  as AssignToName, Client.Name  as CustomerName " +
+            "FROM Users " +
+            "INNER JOIN TaskCard ON Users.ID = TaskCard.Owner " +
+            "INNER JOIN Users u on TaskCard.AssignTo = u.ID " +
+            "inner join Client on TaskCard.Cid = Client.ID " + 
+            "INNER JOIN TaskProject ON TaskCard.ProjectId = TaskProject.ID WHERE (TaskCard.AssignTo = {0}) AND "+
             "(TaskCard.TaskStatus <> 4 and TaskCard.TaskStatus<> 5)";
 
         private readonly string SELECT_BY_TASKID_WHICH_NOT_CLOSE_OR_DISCARD = "SELECT TaskCard.*, Users.UserName AS OwnerName,TaskProject.Name AS ProjectName " +
-           "FROM Users INNER JOIN TaskCard ON Users.ID = TaskCard.Owner INNER JOIN " +
-           "TaskProject ON TaskCard.ProjectId = TaskProject.ID WHERE (TaskCard.TaskId = '{0}') AND " +
+           "u.UserName  as AssignToName, Client.Name  as CustomerName " +
+           "FROM Users " +
+            "INNER JOIN Users u on TaskCard.AssignTo = u.ID " +
+            "inner join Client on TaskCard.Cid = Client.ID " +
+            "INNER JOIN TaskCard ON Users.ID = TaskCard.Owner " +
+            "INNER JOIN TaskProject ON TaskCard.ProjectId = TaskProject.ID WHERE (TaskCard.TaskId = '{0}') AND " +
            "(TaskCard.TaskStatus <> 4 and TaskCard.TaskStatus<> 5)";
 
         private const string SELECT_BY_OVERDUE_TASKSTATUS = "SELECT * FROM [TaskCard] WHERE DUEDATE < {0} AND " +
@@ -421,7 +456,7 @@ namespace FinancialPlanner.BusinessLogic.TaskManagements
                 Logger.LogInfo("Get: Task Card process start");
                 IList<TaskCardWithComments> taskcards =
                     new List<TaskCardWithComments>();
-
+                Logger.LogInfo("GetAll task with comment process start");
                 DataTable dtAppConfig = DataBase.DBService.ExecuteCommand(SELECT_ALL_TASKS_WITH_COMMENTS);
                 foreach (DataRow dr in dtAppConfig.Rows)
                 {
@@ -661,7 +696,7 @@ namespace FinancialPlanner.BusinessLogic.TaskManagements
 
         private static int getTaskID(TaskCard taskcard)
         {
-            return int.Parse( DataBase.DBService.ExecuteCommandScalar(string.Format(SELECT_ID_BY_TASKDETAILS,
+            return int.Parse(DataBase.DBService.ExecuteCommandScalar(string.Format(SELECT_ID_BY_TASKDETAILS,
                  taskcard.ProjectId,
                  taskcard.Title,
                  taskcard.CustomerId,
@@ -670,7 +705,7 @@ namespace FinancialPlanner.BusinessLogic.TaskManagements
                  taskcard.Owner,
                  taskcard.TransactionType,
                  taskcard.CreatedBy
-                 )));
+                 ),true));
         }
 
         private void saveTransactionType(TaskCard taskcard, int id)
@@ -729,43 +764,54 @@ namespace FinancialPlanner.BusinessLogic.TaskManagements
             taskCard.DueDate = dr.Field<DateTime>("DueDate");
             taskCard.ProjectName = dr.Field<string>("ProjectName");
             taskCard.OwnerName = dr.Field<string>("OwnerName");
-            taskCard.AssignToName = getAssignTo(dr.Field<int?>("AssignTo"));
-            taskCard.CustomerName = getCustomerName(taskCard.CustomerId);
-            taskCard.TaskTransactionType = getTransactionType(taskCard, taskCard.Id);
+            //if (dr.Field<string>("AssignTo") <> "")
+                taskCard.AssignToName = dr.Field<string>("AssignToName");//getAssignTo(dr.Field<int?>("AssignTo"));
+            taskCard.CustomerName = dr.Field<string>("CustomerName"); //getCustomerName(taskCard.CustomerId);
+            //taskCard.TaskTransactionType = getTransactionType(taskCard, taskCard.Id);
             taskCard.OtherName = dr.Field<string>("OtherName");
             return taskCard;
         }
 
         private TaskCardWithComments convertToTaskCardWithComment(DataRow dr)
         {
-            TaskCardWithComments taskCard = new TaskCardWithComments();
-            taskCard.Id = dr.Field<int>("ID");
-            taskCard.TaskId = dr.Field<string>("TaskId");
-            taskCard.ProjectId = dr.Field<int>("ProjectId");
-            taskCard.TransactionType = dr.Field<string>("TransactionType");
-            taskCard.Type = (CardType)dr.Field<int>("CardType");
-            taskCard.CustomerId = dr.Field<int>("Cid");
-            taskCard.Title = dr.Field<string>("Title");
-            taskCard.Description = dr.Field<string>("Description");
-            taskCard.Priority = (Priority)dr.Field<int>("Priority");
-            taskCard.TaskStatus = (Common.Model.TaskManagement.TaskStatus)dr.Field<int>("TaskStatus");
-            taskCard.Owner = dr.Field<int>("Owner");
-            taskCard.AssignTo = dr.Field<int?>("AssignTo");
-            taskCard.CreatedBy = dr.Field<int>("CreatedBy");
-            taskCard.CreatedOn = dr.Field<DateTime>("CreatedOn");
-            taskCard.UpdatedOn = dr.Field<DateTime>("UpdatedOn");
-            //taskCard.ActualCompletedDate = dr.Field<DateTime>("ActualCompletedDate");
-            taskCard.DueDate = dr.Field<DateTime>("DueDate");
-            taskCard.ProjectName = dr.Field<string>("ProjectName");
-            taskCard.OwnerName = dr.Field<string>("OwnerName");
-            taskCard.AssignToName = getAssignTo(dr.Field<int?>("AssignTo"));
-            taskCard.CustomerName = getCustomerName(taskCard.CustomerId);
-            taskCard.TaskTransactionType = getTransactionType(taskCard, taskCard.Id);
-            taskCard.OtherName = dr.Field<string>("OtherName");
-            taskCard.Comment = dr.Field<string>("Comment");
-            taskCard.CommentedBy = dr.Field<string>("CommentedBy");
-            taskCard.CommentedOn = dr.Field<DateTime?>("CommentedOn");
-            return taskCard;
+            try
+            {
+                TaskCardWithComments taskCard = new TaskCardWithComments();
+                taskCard.Id = dr.Field<int>("ID");
+                taskCard.TaskId = dr.Field<string>("TaskId");
+                taskCard.ProjectId = dr.Field<int>("ProjectId");
+                taskCard.TransactionType = dr.Field<string>("TransactionType");
+                taskCard.Type = (CardType)dr.Field<int>("CardType");
+                taskCard.CustomerId = dr.Field<int>("Cid");
+                taskCard.Title = dr.Field<string>("Title");
+                taskCard.Description = dr.Field<string>("Description");
+                taskCard.Priority = (Priority)dr.Field<int>("Priority");
+                taskCard.TaskStatus = (Common.Model.TaskManagement.TaskStatus)dr.Field<int>("TaskStatus");
+                taskCard.Owner = dr.Field<int>("Owner");
+                taskCard.AssignTo = dr.Field<int?>("AssignTo");
+                taskCard.CreatedBy = dr.Field<int>("CreatedBy");
+                taskCard.CreatedOn = dr.Field<DateTime>("CreatedOn");
+                taskCard.UpdatedOn = dr.Field<DateTime>("UpdatedOn");
+                //taskCard.ActualCompletedDate = dr.Field<DateTime>("ActualCompletedDate");
+                taskCard.DueDate = dr.Field<DateTime>("DueDate");
+                taskCard.ProjectName = dr.Field<string>("ProjectName");
+                taskCard.OwnerName = dr.Field<string>("OwnerName");
+                //taskCard.AssignToName = getAssignTo(dr.Field<int?>("AssignTo"));
+                taskCard.AssignToName = dr.Field<string>("AssignToName");
+                //taskCard.CustomerName = getCustomerName(taskCard.CustomerId);
+                taskCard.CustomerName = dr.Field<string>("CustomerName");
+                taskCard.TaskTransactionType = getTransactionType(taskCard, taskCard.Id);
+                taskCard.OtherName = dr.Field<string>("OtherName");
+                taskCard.Comment = dr.Field<string>("Comment");
+                taskCard.CommentedBy = dr.Field<string>("CommentedBy");
+                taskCard.CommentedOn = dr.Field<DateTime?>("CommentedOn");
+                return taskCard;
+            }
+            catch (Exception ex)
+            {
+                Logger.LogDebug(ex);
+            }
+            return  new TaskCardWithComments();
         }
 
         private string getCustomerName(int? customerId)
