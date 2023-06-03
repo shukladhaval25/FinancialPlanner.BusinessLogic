@@ -1,6 +1,7 @@
 ﻿using FinancialPlanner.BusinessLogic.ApplictionConfiguration;
 using FinancialPlanner.Common;
 using FinancialPlanner.Common.Model;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -41,17 +42,32 @@ namespace FinancialPlanner.BusinessLogic.Clients
         private const string DELETE_ARN = "DELETE FROM CLIENTARN WHERE CID = {0}";
         #endregion
 
-        public IList<Client> Get()
-        {
-            IList<Client> lstClients = new List<Client>();
+        //public IList<Client> Get()
+        //{
+        //    IList<Client> lstClients = new List<Client>();
 
-            DataTable dtAppConfig =  DataBase.DBService.ExecuteCommand(SELECT_ALL);
-            foreach (DataRow dr in dtAppConfig.Rows)
-            {
-                Client client = convertToClientObject(dr);
-                lstClients.Add(client);
-            }
-            return lstClients;
+        //    DataTable dtAppConfig =  DataBase.DBService.ExecuteCommand(SELECT_ALL);
+        //    foreach (DataRow dr in dtAppConfig.Rows)
+        //    {
+        //        Client client = convertToClientObject(dr);
+        //        lstClients.Add(client);
+        //    }
+        //    return lstClients;
+        //}
+
+        public string Get()
+        {
+            //IList<Client> lstClients = new List<Client>();
+
+            DataTable dtAppConfig = DataBase.DBService.ExecuteCommand(SELECT_ALL);
+            string json = JsonConvert.SerializeObject(dtAppConfig, Formatting.Indented);
+            return json;
+            //foreach (DataRow dr in dtAppConfig.Rows)
+            //{
+            //    Client client = convertToClientObject(dr);
+            //    lstClients.Add(client);
+            //}
+            //return lstClients;
         }
 
         public Client Get(int id)

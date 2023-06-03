@@ -5,6 +5,7 @@ using FinancialPlanner.Common;
 using FinancialPlanner.Common.Model;
 using FinancialPlanner.Common.Model.TaskManagement;
 using FinancialPlanner.Common.Planning;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -25,19 +26,26 @@ namespace FinancialPlanner.BusinessLogic.TaskManagements
         //"TaskCard.ProjectId = TaskProject.ID INNER JOIN Users ON TaskCard.Owner = Users.ID";
 
         "SELECT TaskCard.*, TaskProject.Name as ProjectName, Users.UserName AS OwnerName, " +
-            "u.UserName  as AssignToName, Client.Name  as CustomerName" +
+            "u.UserName  as AssignToName, " +
+            "Case " +
+            "When TaskCard.Cid  > 0 THEN " +
+            "(SELECT Name FROM Client WHERE Client.ID = TaskCard.Cid) " +
+            "ELSE '' end as CustomerName " +
             " FROM TaskCard " +
             " INNER JOIN TaskProject ON TaskCard.ProjectId = TaskProject.ID " +
             " INNER JOIN Users ON TaskCard.Owner = Users.ID " +
-            " INNER JOIN Users u on TaskCard.AssignTo = u.ID " +
-            " inner join Client on TaskCard.Cid = Client.ID ";
+            " INNER JOIN Users u on TaskCard.AssignTo = u.ID ";
 
-        private readonly string SELECT_ALL_TASKS_WITH_COMMENTS = "SELECT TaskCard.*,TaskProject.Name as ProjectName,Users.UserName AS OwnerName,TaskComment.comment, u.UserName  as AssignToName, Client.Name  as CustomerName, u1.UserName As CommentedBy, TaskComment.CommentedOn " +
+        private readonly string SELECT_ALL_TASKS_WITH_COMMENTS = "SELECT TaskCard.*,TaskProject.Name as ProjectName,Users.UserName AS OwnerName,TaskComment.comment, u.UserName  as AssignToName, " +
+          "Case "  +
+            "When TaskCard.Cid  > 0 THEN " +
+            "(SELECT Name FROM Client WHERE Client.ID = TaskCard.Cid) " +
+            "ELSE '' end as CustomerName" +
+            ", u1.UserName As CommentedBy, TaskComment.CommentedOn " +
             "FROM TaskCard " +
             "INNER JOIN TaskProject ON TaskCard.ProjectId = TaskProject.ID " +
             "INNER JOIN Users ON TaskCard.Owner = Users.ID " +
             "INNER JOIN Users u on TaskCard.AssignTo = u.ID " +
-            "inner join Client on TaskCard.Cid = Client.ID " +
             "FULL OUTER join TaskComment on TaskCard.id = TaskComment.TaskId " +
             "LEFT join Users u1 on TaskComment.CommentedBy = u1.ID " +
             "order by TaskCard.ID";
@@ -47,21 +55,27 @@ namespace FinancialPlanner.BusinessLogic.TaskManagements
 
         private readonly string SELECT_ALL =
             "SELECT TaskCard.*,TaskProject.Name as ProjectName,Users.UserName AS OwnerName," +
-            " u.UserName  as AssignToName, Client.Name  as CustomerName" +
+            " u.UserName  as AssignToName, " +
+             "Case " +
+            "When TaskCard.Cid  > 0 THEN " +
+            "(SELECT Name FROM Client WHERE Client.ID = TaskCard.Cid) " +
+            "ELSE '' end as CustomerName" +
             " FROM TaskCard " +
             " INNER JOIN TaskProject ON TaskCard.ProjectId = TaskProject.ID " +
-            " inner join Client on TaskCard.Cid = Client.ID " +
             " INNER JOIN Users u on TaskCard.AssignTo = u.ID " +
             " INNER JOIN Users ON TaskCard.Owner = Users.ID AND " +
             "(TaskCard.TaskStatus <> 4 and TaskCard.TaskStatus<> 5)";
 
        private readonly string SELECT_ALL_NOTIFIED_BY_USER = "SELECT  TaskCard.*, Users.UserName AS OwnerName, " +
-               " u.UserName  as AssignToName, Client.Name  as CustomerName" +
+               " u.UserName  as AssignToName," +
+               "Case " +
+               "When TaskCard.Cid  > 0 THEN " +
+               "(SELECT Name FROM Client WHERE Client.ID = TaskCard.Cid) " +
+               "ELSE '' end as CustomerName" +
                          "TaskProject.Name AS ProjectName FROM Users INNER JOIN " +
                          "TaskCard ON Users.ID = TaskCard.Owner " +
                          "INNER JOIN TaskNotification ON TaskCard.ID = TaskNotification.TaskId " +
                          "INNER JOIN TaskProject ON TaskCard.ProjectId = TaskProject.ID " +
-                         " inner join Client on TaskCard.Cid = Client.ID " +
                          " INNER JOIN Users u on TaskCard.AssignTo = u.ID " +
                          "WHERE (TaskNotification.NotifyTo = {0})";
 
@@ -71,46 +85,61 @@ namespace FinancialPlanner.BusinessLogic.TaskManagements
 
         //private readonly string SELECT_BY_ID = "SELECT * FROM[TaskCard] WHERE TASKID = {0}";
 
-        private string SELECT_OVERDUE_TASKS_BY_USEID = "SELECT TaskCard.*,TaskProject.Name as ProjectName,Users.UserName AS OwnerName,  u.UserName  as AssignToName, Client.Name  as CustomerName " + 
+        private string SELECT_OVERDUE_TASKS_BY_USEID = "SELECT TaskCard.*,TaskProject.Name as ProjectName,Users.UserName AS OwnerName,  u.UserName  as AssignToName, " +
+              "Case " +
+               "When TaskCard.Cid  > 0 THEN " +
+               "(SELECT Name FROM Client WHERE Client.ID = TaskCard.Cid) " +
+               "ELSE '' end as CustomerName " +
             "FROM TASKCARD " +
             "INNER JOIN Users u on TaskCard.AssignTo = u.ID " +
-            "inner join Client on TaskCard.Cid = Client.ID " +
             "INNER JOIN TaskProject ON TaskCard.ProjectId = TaskProject.ID " +
             "INNER JOIN Users ON TaskCard.Owner = Users.ID WHERE DueDate < GETDATE() AND " +
             "TASKCARD.ASSIGNTO = {0} AND (" +
             "TaskCard.TaskStatus <> 3 and TaskCard.TaskStatus <> 4 and TaskCard.TaskStatus<> 5)";
 
         private const string SELECT_TASK_BYPROJECTNAME_OPENSTATUS_ASSIGNTO = "SELECT Taskcard.*,  " +
-            "u.UserName  as AssignToName, Client.Name  as CustomerName " +
+            "u.UserName  as AssignToName, " +
+            "Case " +
+               "When TaskCard.Cid  > 0 THEN " +
+               "(SELECT Name FROM Client WHERE Client.ID = TaskCard.Cid) " +
+               "ELSE '' end as CustomerName " +
             "FROM TaskProject " +
             " INNER JOIN Users u on TaskCard.AssignTo = u.ID " +
-            " inner join Client on TaskCard.Cid = Client.ID " +
             "LEFT OUTER JOIN TaskCard ON TaskProject.ID = TaskCard.ProjectId " +
             "where (TaskCard.AssignTo = {0}) AND (TaskCard.TaskStatus <> 4 and TaskCard.TaskStatus<> 5) " + 
             "and TaskProject.Name ='{1}'";
 
-        private const string SELECT_TASK_BYPROJECTNAME = "SELECT Taskcard.*,u.UserName  as AssignToName, Client.Name  as CustomerName" +
+        private const string SELECT_TASK_BYPROJECTNAME = "SELECT Taskcard.*,u.UserName  as AssignToName, " +
+            "Case " +
+               "When TaskCard.Cid  > 0 THEN " +
+               "(SELECT Name FROM Client WHERE Client.ID = TaskCard.Cid) " +
+               "ELSE '' end as CustomerName " +
             " FROM TaskProject " +
             "INNER JOIN Users u on TaskCard.AssignTo = u.ID " +
-            "inner join Client on TaskCard.Cid = Client.ID " +
             "LEFT OUTER JOIN TaskCard ON TaskProject.ID = TaskCard.ProjectId " +
             "where (TaskCard.TaskStatus <> 4 and TaskCard.TaskStatus<> 5) " +
             "and TaskProject.Name ='{1}'";
 
         private readonly string SELECT_BY_ASSIGNTO = "SELECT TaskCard.*, Users.UserName AS OwnerName,TaskProject.Name AS ProjectName, " +
-            "u.UserName  as AssignToName, Client.Name  as CustomerName " +
+            "u.UserName  as AssignToName, " +
+            "Case " +
+               "When TaskCard.Cid  > 0 THEN " +
+               "(SELECT Name FROM Client WHERE Client.ID = TaskCard.Cid) " +
+               "ELSE '' end as CustomerName " +
             "FROM Users " +
             "INNER JOIN TaskCard ON Users.ID = TaskCard.Owner " +
             "INNER JOIN Users u on TaskCard.AssignTo = u.ID " +
-            "inner join Client on TaskCard.Cid = Client.ID " + 
             "INNER JOIN TaskProject ON TaskCard.ProjectId = TaskProject.ID WHERE (TaskCard.AssignTo = {0}) AND "+
             "(TaskCard.TaskStatus <> 4 and TaskCard.TaskStatus<> 5)";
 
         private readonly string SELECT_BY_TASKID_WHICH_NOT_CLOSE_OR_DISCARD = "SELECT TaskCard.*, Users.UserName AS OwnerName,TaskProject.Name AS ProjectName " +
-           "u.UserName  as AssignToName, Client.Name  as CustomerName " +
+           "u.UserName  as AssignToName, " +
+           "Case " +
+               "When TaskCard.Cid  > 0 THEN " +
+               "(SELECT Name FROM Client WHERE Client.ID = TaskCard.Cid) " +
+               "ELSE '' end as CustomerName " +
            "FROM Users " +
             "INNER JOIN Users u on TaskCard.AssignTo = u.ID " +
-            "inner join Client on TaskCard.Cid = Client.ID " +
             "INNER JOIN TaskCard ON Users.ID = TaskCard.Owner " +
             "INNER JOIN TaskProject ON TaskCard.ProjectId = TaskProject.ID WHERE (TaskCard.TaskId = '{0}') AND " +
            "(TaskCard.TaskStatus <> 4 and TaskCard.TaskStatus<> 5)";
@@ -765,7 +794,7 @@ namespace FinancialPlanner.BusinessLogic.TaskManagements
             taskCard.ProjectName = dr.Field<string>("ProjectName");
             taskCard.OwnerName = dr.Field<string>("OwnerName");
             //if (dr.Field<string>("AssignTo") <> "")
-                taskCard.AssignToName = dr.Field<string>("AssignToName");//getAssignTo(dr.Field<int?>("AssignTo"));
+            taskCard.AssignToName = dr.Field<string>("AssignToName");//getAssignTo(dr.Field<int?>("AssignTo"));
             taskCard.CustomerName = dr.Field<string>("CustomerName"); //getCustomerName(taskCard.CustomerId);
             //taskCard.TaskTransactionType = getTransactionType(taskCard, taskCard.Id);
             taskCard.OtherName = dr.Field<string>("OtherName");
