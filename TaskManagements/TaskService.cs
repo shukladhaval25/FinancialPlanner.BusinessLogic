@@ -25,7 +25,27 @@ namespace FinancialPlanner.BusinessLogic.TaskManagements
         //"INNER JOIN TaskProject ON " +
         //"TaskCard.ProjectId = TaskProject.ID INNER JOIN Users ON TaskCard.Owner = Users.ID";
 
-        "SELECT TaskCard.*, TaskProject.Name as ProjectName, Users.UserName AS OwnerName, " +
+        "SELECT TASKCARD.[ID]" +
+            ",[TaskId]" +
+            ",[ProjectId]" +
+            ",[TransactionType]" +
+            ",[CardType] as Type" +
+            ",[Cid] as CustomerId," +
+            "[Title]" +
+            ",[Description]" +
+            ",[Priority]" +
+            ",CASE WHEN[TaskStatus] = 0 THEN 'Backlog' ELSE " +
+            "CASE WHEN[TaskStatus] = 1 THEN 'InProgress' ELSE " +
+            "CASE WHEN[TaskStatus] = 2 THEN 'Blocked' ELSE " +
+            "CASE WHEN[TaskStatus] = 3 THEN 'Complete' ELSE " +
+            "CASE WHEN[TaskStatus] = 4 THEN 'Discard' ELSE " +
+            "CASE WHEN[TaskStatus] = 5 THEN 'Close'  ELSE '' " +
+            "END END END END END END AS TaskStatus" +
+            ",[Owner]" +
+            ",[AssignTo]" +
+            ",[CompletedPercentage]" +
+            ",TaskCard.[CreatedOn]" +
+            ",TaskCard.[CreatedBy],TaskCard.[UpdatedOn],TaskCard.[UpdatedBy],[ActualCompletedOn],[DueDate],[OtherName], TaskProject.Name as ProjectName, Users.UserName AS OwnerName, " +
             "u.UserName  as AssignToName, " +
             "Case " +
             "When TaskCard.Cid  > 0 THEN " +
@@ -34,9 +54,29 @@ namespace FinancialPlanner.BusinessLogic.TaskManagements
             " FROM TaskCard " +
             " INNER JOIN TaskProject ON TaskCard.ProjectId = TaskProject.ID " +
             " INNER JOIN Users ON TaskCard.Owner = Users.ID " +
-            " INNER JOIN Users u on TaskCard.AssignTo = u.ID ";
+            " INNER JOIN Users u on TaskCard.AssignTo = u.ID  ORDER BY TASKCARD.TASKID ";
 
-        private readonly string SELECT_ALL_TASKS_WITH_COMMENTS = "SELECT TaskCard.*,TaskProject.Name as ProjectName,Users.UserName AS OwnerName,TaskComment.comment, u.UserName  as AssignToName, " +
+        private readonly string SELECT_ALL_TASKS_WITH_COMMENTS = "SELECT TASKCARD.[ID]" +
+            ",TASKCARD.[TaskId]" +
+            ",[ProjectId]" +
+            ",[TransactionType]" +
+            ",[CardType] as Type" +
+            ",[Cid] as CustomerId," +
+            "[Title]" +
+            ",[Description]" +
+            ",[Priority]" +
+            ",CASE WHEN[TaskStatus] = 0 THEN 'Backlog' ELSE " +
+            "CASE WHEN[TaskStatus] = 1 THEN 'InProgress' ELSE " +
+            "CASE WHEN[TaskStatus] = 2 THEN 'Blocked' ELSE " +
+            "CASE WHEN[TaskStatus] = 3 THEN 'Complete' ELSE " +
+            "CASE WHEN[TaskStatus] = 4 THEN 'Discard' ELSE " +
+            "CASE WHEN[TaskStatus] = 5 THEN 'Close'  ELSE '' " +
+            "END END END END END END AS TaskStatus" +
+            ",[Owner]" +
+            ",[AssignTo]" +
+            ",[CompletedPercentage]" +
+            ",TaskCard.[CreatedOn]" +
+            ",TaskCard.[CreatedBy],TaskCard.[UpdatedOn],TaskCard.[UpdatedBy],[ActualCompletedOn],[DueDate],[OtherName],TaskProject.Name as ProjectName,Users.UserName AS OwnerName,TaskComment.comment, u.UserName  as AssignToName, " +
           "Case "  +
             "When TaskCard.Cid  > 0 THEN " +
             "(SELECT Name FROM Client WHERE Client.ID = TaskCard.Cid) " +
@@ -48,13 +88,34 @@ namespace FinancialPlanner.BusinessLogic.TaskManagements
             "INNER JOIN Users u on TaskCard.AssignTo = u.ID " +
             "FULL OUTER join TaskComment on TaskCard.id = TaskComment.TaskId " +
             "LEFT join Users u1 on TaskComment.CommentedBy = u1.ID " +
+            "where TaskCard.ID IS NOT NULL " +
             "order by TaskCard.ID";
 
             //"FULL OUTER join TaskComment on TaskCard.id = TaskComment.TaskId " +
             //"LEFT join Users u1 on TaskComment.CommentedBy = u1.ID order by TaskCard.ID ";
 
         private readonly string SELECT_ALL =
-            "SELECT TaskCard.*,TaskProject.Name as ProjectName,Users.UserName AS OwnerName," +
+            "SELECT TASKCARD.[ID]" +
+            ",[TaskId]" +
+            ",[ProjectId]" +
+            ",[TransactionType]" +
+            ",[CardType] as Type" +
+            ",[Cid] as CustomerId," +
+            "[Title]" +
+            ",[Description]" +
+            ",[Priority]" +
+            ",CASE WHEN[TaskStatus] = 0 THEN 'Backlog' ELSE " +
+            "CASE WHEN[TaskStatus] = 1 THEN 'InProgress' ELSE " +
+            "CASE WHEN[TaskStatus] = 2 THEN 'Blocked' ELSE " +
+            "CASE WHEN[TaskStatus] = 3 THEN 'Complete' ELSE " +
+            "CASE WHEN[TaskStatus] = 4 THEN 'Discard' ELSE " +
+            "CASE WHEN[TaskStatus] = 5 THEN 'Close'  ELSE '' " +
+            "END END END END END END AS TaskStatus" +
+            ",[Owner]" +
+            ",[AssignTo]" +
+            ",[CompletedPercentage]" +
+            ",TaskCard.[CreatedOn]" +
+            ",TaskCard.[CreatedBy],TaskCard.[UpdatedOn],TaskCard.[UpdatedBy],[ActualCompletedOn],[DueDate],[OtherName],TaskProject.Name as ProjectName,Users.UserName AS OwnerName," +
             " u.UserName  as AssignToName, " +
              "Case " +
             "When TaskCard.Cid  > 0 THEN " +
@@ -66,7 +127,27 @@ namespace FinancialPlanner.BusinessLogic.TaskManagements
             " INNER JOIN Users ON TaskCard.Owner = Users.ID AND " +
             "(TaskCard.TaskStatus <> 4 and TaskCard.TaskStatus<> 5)";
 
-       private readonly string SELECT_ALL_NOTIFIED_BY_USER = "SELECT  TaskCard.*, Users.UserName AS OwnerName, " +
+       private readonly string SELECT_ALL_NOTIFIED_BY_USER = "SELECT TASKCARD.[ID]" +
+            ",[TaskId]" +
+            ",[ProjectId]" +
+            ",[TransactionType]" +
+            ",[CardType] as Type" +
+            ",[Cid] as CustomerId," +
+            "[Title]" +
+            ",[Description]" +
+            ",[Priority]" +
+            ",CASE WHEN[TaskStatus] = 0 THEN 'Backlog' ELSE " +
+            "CASE WHEN[TaskStatus] = 1 THEN 'InProgress' ELSE " +
+            "CASE WHEN[TaskStatus] = 2 THEN 'Blocked' ELSE " +
+            "CASE WHEN[TaskStatus] = 3 THEN 'Complete' ELSE " +
+            "CASE WHEN[TaskStatus] = 4 THEN 'Discard' ELSE " +
+            "CASE WHEN[TaskStatus] = 5 THEN 'Close'  ELSE '' " +
+            "END END END END END END AS TaskStatus" +
+            ",[Owner]" +
+            ",[AssignTo]" +
+            ",[CompletedPercentage]" +
+            ",TaskCard.[CreatedOn]" +
+            ",TaskCard.[CreatedBy],TaskCard.[UpdatedOn],TaskCard.[UpdatedBy],[ActualCompletedOn],[DueDate],[OtherName], Users.UserName AS OwnerName, " +
                " u.UserName  as AssignToName," +
                "Case " +
                "When TaskCard.Cid  > 0 THEN " +
@@ -85,7 +166,27 @@ namespace FinancialPlanner.BusinessLogic.TaskManagements
 
         //private readonly string SELECT_BY_ID = "SELECT * FROM[TaskCard] WHERE TASKID = {0}";
 
-        private string SELECT_OVERDUE_TASKS_BY_USEID = "SELECT TaskCard.*,TaskProject.Name as ProjectName,Users.UserName AS OwnerName,  u.UserName  as AssignToName, " +
+        private string SELECT_OVERDUE_TASKS_BY_USEID = "SELECT TASKCARD.[ID]" +
+            ",[TaskId]" +
+            ",[ProjectId]" +
+            ",[TransactionType]" +
+            ",[CardType] as Type" +
+            ",[Cid] as CustomerId," +
+            "[Title]" +
+            ",[Description]" +
+            ",[Priority]" +
+            ",CASE WHEN[TaskStatus] = 0 THEN 'Backlog' ELSE " +
+            "CASE WHEN[TaskStatus] = 1 THEN 'InProgress' ELSE " +
+            "CASE WHEN[TaskStatus] = 2 THEN 'Blocked' ELSE " +
+            "CASE WHEN[TaskStatus] = 3 THEN 'Complete' ELSE " +
+            "CASE WHEN[TaskStatus] = 4 THEN 'Discard' ELSE " +
+            "CASE WHEN[TaskStatus] = 5 THEN 'Close'  ELSE '' " +
+            "END END END END END END AS TaskStatus" +
+            ",[Owner]" +
+            ",[AssignTo]" +
+            ",[CompletedPercentage]" +
+            ",TaskCard.[CreatedOn]" +
+            ",TaskCard.[CreatedBy],TaskCard.[UpdatedOn],TaskCard.[UpdatedBy],[ActualCompletedOn],[DueDate],[OtherName],TaskProject.Name as ProjectName,Users.UserName AS OwnerName,  u.UserName  as AssignToName, " +
               "Case " +
                "When TaskCard.Cid  > 0 THEN " +
                "(SELECT Name FROM Client WHERE Client.ID = TaskCard.Cid) " +
@@ -97,7 +198,27 @@ namespace FinancialPlanner.BusinessLogic.TaskManagements
             "TASKCARD.ASSIGNTO = {0} AND (" +
             "TaskCard.TaskStatus <> 3 and TaskCard.TaskStatus <> 4 and TaskCard.TaskStatus<> 5)";
 
-        private const string SELECT_TASK_BYPROJECTNAME_OPENSTATUS_ASSIGNTO = "SELECT Taskcard.*,  " +
+        private const string SELECT_TASK_BYPROJECTNAME_OPENSTATUS_ASSIGNTO = "SELECT TASKCARD.[ID]" +
+            ",[TaskId]" +
+            ",[ProjectId]" +
+            ",[TransactionType]" +
+            ",[CardType] as Type" +
+            ",[Cid] as CustomerId," +
+            "[Title]" +
+            ",[Description]" +
+            ",[Priority]" +
+            ",CASE WHEN[TaskStatus] = 0 THEN 'Backlog' ELSE " +
+            "CASE WHEN[TaskStatus] = 1 THEN 'InProgress' ELSE " +
+            "CASE WHEN[TaskStatus] = 2 THEN 'Blocked' ELSE " +
+            "CASE WHEN[TaskStatus] = 3 THEN 'Complete' ELSE " +
+            "CASE WHEN[TaskStatus] = 4 THEN 'Discard' ELSE " +
+            "CASE WHEN[TaskStatus] = 5 THEN 'Close'  ELSE '' " +
+            "END END END END END END AS TaskStatus" +
+            ",[Owner]" +
+            ",[AssignTo]" +
+            ",[CompletedPercentage]" +
+            ",TaskCard.[CreatedOn]" +
+            ",TaskCard.[CreatedBy],TaskCard.[UpdatedOn],TaskCard.[UpdatedBy],[ActualCompletedOn],[DueDate],[OtherName], " +
             "u.UserName  as AssignToName, " +
             "Case " +
                "When TaskCard.Cid  > 0 THEN " +
@@ -109,7 +230,27 @@ namespace FinancialPlanner.BusinessLogic.TaskManagements
             "where (TaskCard.AssignTo = {0}) AND (TaskCard.TaskStatus <> 4 and TaskCard.TaskStatus<> 5) " + 
             "and TaskProject.Name ='{1}'";
 
-        private const string SELECT_TASK_BYPROJECTNAME = "SELECT Taskcard.*,u.UserName  as AssignToName, " +
+        private const string SELECT_TASK_BYPROJECTNAME = "SELECT TASKCARD.[ID]" +
+            ",[TaskId]" +
+            ",[ProjectId]" +
+            ",[TransactionType]" +
+            ",[CardType] as Type" +
+            ",[Cid] as CustomerId," +
+            "[Title]" +
+            ",[Description]" +
+            ",[Priority]" +
+            ",CASE WHEN[TaskStatus] = 0 THEN 'Backlog' ELSE " +
+            "CASE WHEN[TaskStatus] = 1 THEN 'InProgress' ELSE " +
+            "CASE WHEN[TaskStatus] = 2 THEN 'Blocked' ELSE " +
+            "CASE WHEN[TaskStatus] = 3 THEN 'Complete' ELSE " +
+            "CASE WHEN[TaskStatus] = 4 THEN 'Discard' ELSE " +
+            "CASE WHEN[TaskStatus] = 5 THEN 'Close'  ELSE '' " +
+            "END END END END END END AS TaskStatus" +
+            ",[Owner]" +
+            ",[AssignTo]" +
+            ",[CompletedPercentage]" +
+            ",TaskCard.[CreatedOn]" +
+            ",TaskCard.[CreatedBy],TaskCard.[UpdatedOn],TaskCard.[UpdatedBy],[ActualCompletedOn],[DueDate],[OtherName],u.UserName  as AssignToName, " +
             "Case " +
                "When TaskCard.Cid  > 0 THEN " +
                "(SELECT Name FROM Client WHERE Client.ID = TaskCard.Cid) " +
@@ -120,7 +261,27 @@ namespace FinancialPlanner.BusinessLogic.TaskManagements
             "where (TaskCard.TaskStatus <> 4 and TaskCard.TaskStatus<> 5) " +
             "and TaskProject.Name ='{1}'";
 
-        private readonly string SELECT_BY_ASSIGNTO = "SELECT TaskCard.*, Users.UserName AS OwnerName,TaskProject.Name AS ProjectName, " +
+        private readonly string SELECT_BY_ASSIGNTO = "SELECT TASKCARD.[ID]" +
+            ",[TaskId]" +
+            ",[ProjectId]" +
+            ",[TransactionType]" +
+            ",[CardType] as Type" +
+            ",[Cid] as CustomerId," +
+            "[Title]" +
+            ",[Description]" +
+            ",[Priority]" +
+            ",CASE WHEN[TaskStatus] = 0 THEN 'Backlog' ELSE " +
+            "CASE WHEN[TaskStatus] = 1 THEN 'InProgress' ELSE " +
+            "CASE WHEN[TaskStatus] = 2 THEN 'Blocked' ELSE " +
+            "CASE WHEN[TaskStatus] = 3 THEN 'Complete' ELSE " +
+            "CASE WHEN[TaskStatus] = 4 THEN 'Discard' ELSE " +
+            "CASE WHEN[TaskStatus] = 5 THEN 'Close'  ELSE '' " +
+            "END END END END END END AS TaskStatus" +
+            ",[Owner]" +
+            ",[AssignTo]" +
+            ",[CompletedPercentage]" +
+            ",TaskCard.[CreatedOn]" +
+            ",TaskCard.[CreatedBy],TaskCard.[UpdatedOn],TaskCard.[UpdatedBy],[ActualCompletedOn],[DueDate],[OtherName], Users.UserName AS OwnerName,TaskProject.Name AS ProjectName, " +
             "u.UserName  as AssignToName, " +
             "Case " +
                "When TaskCard.Cid  > 0 THEN " +
@@ -132,7 +293,27 @@ namespace FinancialPlanner.BusinessLogic.TaskManagements
             "INNER JOIN TaskProject ON TaskCard.ProjectId = TaskProject.ID WHERE (TaskCard.AssignTo = {0}) AND "+
             "(TaskCard.TaskStatus <> 4 and TaskCard.TaskStatus<> 5)";
 
-        private readonly string SELECT_BY_TASKID_WHICH_NOT_CLOSE_OR_DISCARD = "SELECT TaskCard.*, Users.UserName AS OwnerName,TaskProject.Name AS ProjectName " +
+        private readonly string SELECT_BY_TASKID_WHICH_NOT_CLOSE_OR_DISCARD = "SELECT TASKCARD.[ID]" +
+            ",[TaskId]" +
+            ",[ProjectId]" +
+            ",[TransactionType]" +
+            ",[CardType] as Type" +
+            ",[Cid] as CustomerId," +
+            "[Title]" +
+            ",[Description]" +
+            ",[Priority]" +
+            ",CASE WHEN[TaskStatus] = 0 THEN 'Backlog' ELSE " +
+            "CASE WHEN[TaskStatus] = 1 THEN 'InProgress' ELSE " +
+            "CASE WHEN[TaskStatus] = 2 THEN 'Blocked' ELSE " +
+            "CASE WHEN[TaskStatus] = 3 THEN 'Complete' ELSE " +
+            "CASE WHEN[TaskStatus] = 4 THEN 'Discard' ELSE " +
+            "CASE WHEN[TaskStatus] = 5 THEN 'Close'  ELSE '' " +
+            "END END END END END END AS TaskStatus" +
+            ",[Owner]" +
+            ",[AssignTo]" +
+            ",[CompletedPercentage]" +
+            ",TaskCard.[CreatedOn]" +
+            ",TaskCard.[CreatedBy],TaskCard.[UpdatedOn],TaskCard.[UpdatedBy],[ActualCompletedOn],[DueDate],[OtherName], Users.UserName AS OwnerName,TaskProject.Name AS ProjectName " +
            "u.UserName  as AssignToName, " +
            "Case " +
                "When TaskCard.Cid  > 0 THEN " +
@@ -144,7 +325,27 @@ namespace FinancialPlanner.BusinessLogic.TaskManagements
             "INNER JOIN TaskProject ON TaskCard.ProjectId = TaskProject.ID WHERE (TaskCard.TaskId = '{0}') AND " +
            "(TaskCard.TaskStatus <> 4 and TaskCard.TaskStatus<> 5)";
 
-        private const string SELECT_BY_OVERDUE_TASKSTATUS = "SELECT * FROM [TaskCard] WHERE DUEDATE < {0} AND " +
+        private const string SELECT_BY_OVERDUE_TASKSTATUS = "SELECT TASKCARD.[ID]" +
+            ",[TaskId]" +
+            ",[ProjectId]" +
+            ",[TransactionType]" +
+            ",[CardType] as Type" +
+            ",[Cid] as CustomerId," +
+            "[Title]" +
+            ",[Description]" +
+            ",[Priority]" +
+            ",CASE WHEN[TaskStatus] = 0 THEN 'Backlog' ELSE " +
+            "CASE WHEN[TaskStatus] = 1 THEN 'InProgress' ELSE " +
+            "CASE WHEN[TaskStatus] = 2 THEN 'Blocked' ELSE " +
+            "CASE WHEN[TaskStatus] = 3 THEN 'Complete' ELSE " +
+            "CASE WHEN[TaskStatus] = 4 THEN 'Discard' ELSE " +
+            "CASE WHEN[TaskStatus] = 5 THEN 'Close'  ELSE '' " +
+            "END END END END END END AS TaskStatus" +
+            ",[Owner]" +
+            ",[AssignTo]" +
+            ",[CompletedPercentage]" +
+            ",TaskCard.[CreatedOn]" +
+            ",TaskCard.[CreatedBy],TaskCard.[UpdatedOn],TaskCard.[UpdatedBy],[ActualCompletedOn],[DueDate],[OtherName] FROM [TaskCard] WHERE DUEDATE < {0} AND " +
             "(TaskCard.TaskStatus <> 1 or TaskCard.TaskStatus<> 2 or TaskCard.TaskStatus<> 3)";
 
         private const string SELECT_ID_BY_TASKDETAILS = "SELECT ID FROM TASKCARD WHERE PROJECTID = {0} AND TITLE ='{1}' AND  " +
@@ -397,7 +598,7 @@ namespace FinancialPlanner.BusinessLogic.TaskManagements
             transactionTypeHelper.UpdateTransaction();
         }
 
-        public IList<TaskCard> GetByAssignTo(int userId)
+        public string GetByAssignTo(int userId)
         {
             try
             {
@@ -406,13 +607,13 @@ namespace FinancialPlanner.BusinessLogic.TaskManagements
                     new List<TaskCard>();
 
                 DataTable dtAppConfig = DataBase.DBService.ExecuteCommand(string.Format(SELECT_BY_ASSIGNTO, userId));
-                foreach (DataRow dr in dtAppConfig.Rows)
-                {
-                    TaskCard task = convertToTaskCard(dr);
-                    taskcards.Add(task);
-                }
+                //foreach (DataRow dr in dtAppConfig.Rows)
+                //{
+                //    TaskCard task = convertToTaskCard(dr);
+                //    taskcards.Add(task);
+                //}
                 Logger.LogInfo("Get: Assign to task process completed.");
-                return taskcards;
+                return (dtAppConfig.Rows.Count > 0) ? JsonConvert.SerializeObject(dtAppConfig) : null;
             }
             catch (Exception ex)
             {
@@ -451,22 +652,45 @@ namespace FinancialPlanner.BusinessLogic.TaskManagements
             }
         }
 
-        public IList<TaskCard> GetAll()
+        //public IList<TaskCard> GetAll()
+        //{
+        //    try
+        //    {
+        //        Logger.LogInfo("Get: Task Card process start");
+        //        IList<TaskCard> taskcards =
+        //            new List<TaskCard>();
+
+        //        DataTable dtAppConfig = DataBase.DBService.ExecuteCommand(SELECT_ALL);
+        //        foreach (DataRow dr in dtAppConfig.Rows)
+        //        {
+        //            TaskCard task = convertToTaskCard(dr);
+        //            taskcards.Add(task);
+        //        }
+        //        Logger.LogInfo("Get: Task Card process completed.");
+        //        return taskcards;
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        StackTrace st = new StackTrace();
+        //        StackFrame sf = st.GetFrame(0);
+        //        MethodBase currentMethodName = sf.GetMethod();
+        //        LogDebug(currentMethodName.Name, ex);
+        //        return null;
+        //    }
+        //}
+
+        public string GetAll()
         {
             try
             {
                 Logger.LogInfo("Get: Task Card process start");
-                IList<TaskCard> taskcards =
-                    new List<TaskCard>();
+                //IList<TaskCard> taskcards =
+                //    new List<TaskCard>();
 
                 DataTable dtAppConfig = DataBase.DBService.ExecuteCommand(SELECT_ALL);
-                foreach (DataRow dr in dtAppConfig.Rows)
-                {
-                    TaskCard task = convertToTaskCard(dr);
-                    taskcards.Add(task);
-                }
                 Logger.LogInfo("Get: Task Card process completed.");
-                return taskcards;
+                return (dtAppConfig.Rows.Count > 0) ? JsonConvert.SerializeObject(dtAppConfig) : null;
+                //return taskcards;
             }
             catch (Exception ex)
             {
@@ -478,22 +702,50 @@ namespace FinancialPlanner.BusinessLogic.TaskManagements
             }
         }
 
-        public IList<TaskCardWithComments> GetAllTaskWithComments()
+        //public IList<TaskCardWithComments> GetAllTaskWithComments()
+        //{
+        //    try
+        //    {
+        //        Logger.LogInfo("Get: Task Card process start");
+        //        IList<TaskCardWithComments> taskcards =
+        //            new List<TaskCardWithComments>();
+        //        Logger.LogInfo("GetAll task with comment process start");
+        //        DataTable dtAppConfig = DataBase.DBService.ExecuteCommand(SELECT_ALL_TASKS_WITH_COMMENTS);
+        //        foreach (DataRow dr in dtAppConfig.Rows)
+        //        {
+        //            TaskCardWithComments task = convertToTaskCardWithComment(dr);
+        //            taskcards.Add(task);
+        //        }
+        //        Logger.LogInfo("Get: Task Card process completed.");
+        //        return taskcards;
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        StackTrace st = new StackTrace();
+        //        StackFrame sf = st.GetFrame(0);
+        //        MethodBase currentMethodName = sf.GetMethod();
+        //        LogDebug(currentMethodName.Name, ex);
+        //        return null;
+        //    }
+        //}
+
+        public string GetAllTaskWithComments()
         {
             try
             {
                 Logger.LogInfo("Get: Task Card process start");
-                IList<TaskCardWithComments> taskcards =
-                    new List<TaskCardWithComments>();
+                //IList<TaskCardWithComments> taskcards =
+                //    new List<TaskCardWithComments>();
                 Logger.LogInfo("GetAll task with comment process start");
                 DataTable dtAppConfig = DataBase.DBService.ExecuteCommand(SELECT_ALL_TASKS_WITH_COMMENTS);
-                foreach (DataRow dr in dtAppConfig.Rows)
-                {
-                    TaskCardWithComments task = convertToTaskCardWithComment(dr);
-                    taskcards.Add(task);
-                }
+                //foreach (DataRow dr in dtAppConfig.Rows)
+                //{
+                //    TaskCardWithComments task = convertToTaskCardWithComment(dr);
+                //    taskcards.Add(task);
+                //}
                 Logger.LogInfo("Get: Task Card process completed.");
-                return taskcards;
+                //return taskcards;
+                return (dtAppConfig.Rows.Count > 0) ? JsonConvert.SerializeObject(dtAppConfig) : null;
             }
             catch (Exception ex)
             {
@@ -505,22 +757,22 @@ namespace FinancialPlanner.BusinessLogic.TaskManagements
             }
         }
 
-        public IList<TaskCard> GetAllTasks()
+        public string GetAllTasks()
         {
             try
             {
                 Logger.LogInfo("Get: Task Card process start");
-                IList<TaskCard> taskcards =
-                    new List<TaskCard>();
+                //IList<TaskCard> taskcards =
+                //    new List<TaskCard>();
 
                 DataTable dtAppConfig = DataBase.DBService.ExecuteCommand(SELECT_ALL_TASKS);
-                foreach (DataRow dr in dtAppConfig.Rows)
-                {
-                    TaskCard task = convertToTaskCard(dr);
-                    taskcards.Add(task);
-                }
+                //foreach (DataRow dr in dtAppConfig.Rows)
+                //{
+                //    TaskCard task = convertToTaskCard(dr);
+                //    taskcards.Add(task);
+                //}
                 Logger.LogInfo("Get: Task Card process completed.");
-                return taskcards;
+                return (dtAppConfig.Rows.Count > 0) ? JsonConvert.SerializeObject(dtAppConfig) : null;
             }
             catch (Exception ex)
             {
@@ -560,22 +812,22 @@ namespace FinancialPlanner.BusinessLogic.TaskManagements
             }
         }
 
-        public object GetOverDueTasks(int userId)
+        public string GetOverDueTasks(int userId)
         {
             try
             {
                 Logger.LogInfo("Get: Overdue task card process start");
-                IList<TaskCard> taskcards =
-                    new List<TaskCard>();
+                //IList<TaskCard> taskcards =
+                //    new List<TaskCard>();
 
                 DataTable dtAppConfig = DataBase.DBService.ExecuteCommand(string.Format(SELECT_OVERDUE_TASKS_BY_USEID,userId));
-                foreach (DataRow dr in dtAppConfig.Rows)
-                {
-                    TaskCard task = convertToTaskCard(dr);
-                    taskcards.Add(task);
-                }
+                //foreach (DataRow dr in dtAppConfig.Rows)
+                //{
+                //    TaskCard task = convertToTaskCard(dr);
+                //    taskcards.Add(task);
+                //}
                 Logger.LogInfo("Get: Overdue task card process completed.");
-                return taskcards;
+                return (dtAppConfig.Rows.Count > 0) ? JsonConvert.SerializeObject(dtAppConfig) : null;
             }
             catch (Exception ex)
             {
