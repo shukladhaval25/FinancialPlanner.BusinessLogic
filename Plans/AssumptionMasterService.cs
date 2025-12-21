@@ -13,7 +13,7 @@ namespace FinancialPlanner.BusinessLogic.Plans
 {
     public class AssumptionMasterService
     {
-        const string SELECT_ALL = "SELECT N1.* FROM ASSUMPTIONMASTER N1";
+        const string SELECT_ALL = "SELECT N1.* FROM ASSUMPTIONMASTER N1 WITH (NOLOCK)";
         const string SELECT_COUNT = "SELECT COUNT(*) FROM ASSUMPTIONMASTER";
 
         const string INSERT_QUERY = "INSERT INTO ASSUMPTIONMASTER VALUES (" +

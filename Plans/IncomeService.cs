@@ -96,28 +96,9 @@ namespace FinancialPlanner.BusinessLogic
                 string clientName = DataBase.DBService.ExecuteCommandScalar(string.Format(GET_CLIENT_NAME_QUERY,income.Pid));
 
                 DataBase.DBService.BeginTransaction();
-                if (income.Source.Equals("salary", StringComparison.OrdinalIgnoreCase))
-                {
-                    DataBase.DBService.ExecuteCommandString(string.Format(INSERT_QUERY,
-                       income.Pid, income.Source, income.IncomeBy,
-                       income.Amount, income.ExpectGrowthInPercentage,
-                       income.StartYear, income.EndYear,
-                       income.Description,
-                       income.CreatedOn.ToString("yyyy-MM-dd hh:mm:ss"), income.CreatedBy,
-                       income.UpdatedOn.ToString("yyyy-MM-dd hh:mm:ss"), income.UpdatedBy,
-                       income.IncomeTax,
-                       income.ExpectedGrowthType,
-                       income.ExpectedGrwothInAmount), true);
-
-                    if (income.SalaryDetail != null)
-                    {
-                        income.Id = getIncomeId(income);
-                        insertSalaryDetails(income);
-                    }
-
-                }
-                else
-                {
+                
+                //else
+                //{
                     DataBase.DBService.ExecuteCommandString(string.Format(INSERT_QUERY,
                       income.Pid, income.Source, income.IncomeBy,
                       income.Amount, income.ExpectGrowthInPercentage,
@@ -128,11 +109,21 @@ namespace FinancialPlanner.BusinessLogic
                       income.IncomeTax,
                       income.ExpectedGrowthType,
                       income.ExpectedGrwothInAmount), true);
-                }
+                //}
 
                 Activity.ActivitiesService.Add(ActivityType.CreateIncome, EntryStatus.Success,
                          Source.Server, income.UpdatedByUserName, clientName, income.MachineName);
                 DataBase.DBService.CommitTransaction();
+
+                if (income.Source.Equals("salary", StringComparison.OrdinalIgnoreCase))
+                {
+                    if (income.SalaryDetail != null)
+                    {
+                        income.Id = getIncomeId(income);
+                        insertSalaryDetails(income);
+                    }
+
+                }
             }
             catch (Exception ex)
             {

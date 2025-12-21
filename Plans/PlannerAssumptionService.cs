@@ -1,4 +1,6 @@
-﻿using FinancialPlanner.Common;
+﻿using FinancialPlanner.BusinessLogic.Clients;
+using FinancialPlanner.BusinessLogic.Plans;
+using FinancialPlanner.Common;
 using FinancialPlanner.Common.Model;
 using System;
 using System.Data;
@@ -69,30 +71,33 @@ namespace FinancialPlanner.BusinessLogic
                 string clientName =
                     DataBase.DBService.ExecuteCommandScalar(string.Format(GET_CLIENT_NAME_QUERY, PlannerAssumption.Pid));
                 string recordCount = DataBase.DBService.ExecuteCommandScalar(string.Format(SELECT_COUNT, PlannerAssumption.Pid));
-                DataBase.DBService.BeginTransaction();
+
+                var currentplannerAssumption = GetAll(PlannerAssumption.Pid);
+
+               
                 if (recordCount != "0")
                 {
-                    DataBase.DBService.ExecuteCommandString(string.Format(UPDATE_QUERY,
-                       PlannerAssumption.ClientRetirementAge,
-                       PlannerAssumption.SpouseRetirementAge,
-                       PlannerAssumption.ClientLifeExpectancy,
-                       PlannerAssumption.SpouseLifeExpectancy,
-                       PlannerAssumption.PreRetirementInflactionRate,
-                       PlannerAssumption.PostRetirementInflactionRate,
-                       PlannerAssumption.EquityReturnRate,
-                       PlannerAssumption.DebtReturnRate,
-                       PlannerAssumption.OtherReturnRate,
-                       PlannerAssumption.Decription,
-                       PlannerAssumption.UpdatedOn.ToString("yyyy-MM-dd hh:mm:ss"),
-                       PlannerAssumption.UpdatedBy,
-                       PlannerAssumption.IsClientRetirmentAgeIsPrimary,
-                       PlannerAssumption.ClientIncomeRise, PlannerAssumption.SpouseIncomeRise,
-                       PlannerAssumption.OngoingExpRise,
-                       PlannerAssumption.Id,
-                       PlannerAssumption.PostRetirementInvestmentReturnRate), true);
+
+                    if (currentplannerAssumption.ClientRetirementAge != PlannerAssumption.ClientRetirementAge)
+                    {
+                        updateClientIncomeExpenseGoalsWithAssumption(PlannerAssumption, currentplannerAssumption);
+                    }
+                    else if ((currentplannerAssumption.SpouseRetirementAge != PlannerAssumption.SpouseRetirementAge))
+                    {
+                        updateClientSpouseIncomeExpenseGoalsWithRetirementAge(PlannerAssumption, currentplannerAssumption);
+
+
+                        //Check Client Age and Spouce age 
+
+                        //DataBase.DBService.ExecuteCommand(string.Format())
+                        //Update Income from salary for client and spouse based on retirement age change. 
+                        //Update Retirement goal if Retirement age assumption get updated
+
+                    }
                 }
                 else
                 {
+                    DataBase.DBService.BeginTransaction();
                     DataBase.DBService.ExecuteCommandString(string.Format(INSERT_QUERY,
                       PlannerAssumption.Pid,
                       PlannerAssumption.ClientRetirementAge,
@@ -126,6 +131,111 @@ namespace FinancialPlanner.BusinessLogic
                 MethodBase currentMethodName = sf.GetMethod();
                 LogDebug(currentMethodName.Name, ex);
                 throw ex;
+            }
+        }
+
+        private static void updateClientSpouseIncomeExpenseGoalsWithRetirementAge(PlannerAssumption PlannerAssumption, PlannerAssumption currentplannerAssumption)
+        {
+            PlannerService ps = new PlannerService();
+            var planner = ps.GetByPlannerId(PlannerAssumption.Pid);
+            if (planner != null)
+            {
+                ClientSpouseService cs = new ClientSpouseService();
+                var client = cs.Get(planner.ClientId);
+                int currentRetirementYear = (client.DOB.Year + currentplannerAssumption.SpouseRetirementAge);
+                int updatedRetirementYear = (client.DOB.Year + PlannerAssumption.SpouseRetirementAge);
+
+                DataBase.DBService.BeginTransaction();
+
+                DataBase.DBService.ExecuteCommandString(string.Format(UPDATE_QUERY,
+                       PlannerAssumption.ClientRetirementAge,
+                       PlannerAssumption.SpouseRetirementAge,
+                       PlannerAssumption.ClientLifeExpectancy,
+                       PlannerAssumption.SpouseLifeExpectancy,
+                       PlannerAssumption.PreRetirementInflactionRate,
+                       PlannerAssumption.PostRetirementInflactionRate,
+                       PlannerAssumption.EquityReturnRate,
+                       PlannerAssumption.DebtReturnRate,
+                       PlannerAssumption.OtherReturnRate,
+                       PlannerAssumption.Decription,
+                       PlannerAssumption.UpdatedOn.ToString("yyyy-MM-dd hh:mm:ss"),
+                       PlannerAssumption.UpdatedBy,
+                       PlannerAssumption.IsClientRetirmentAgeIsPrimary,
+                       PlannerAssumption.ClientIncomeRise, PlannerAssumption.SpouseIncomeRise,
+                       PlannerAssumption.OngoingExpRise,
+                       PlannerAssumption.Id,
+                       PlannerAssumption.PostRetirementInvestmentReturnRate), true);
+
+                //update income where end year = currentRetirementYear
+                const string UPDATEINCOMEWITHRETIREMENTAGE = "UPDATE INCOME SET ENDYEAR = {0} WHERE PID ={1} AND " +
+                    "ENDYEAR = {2} AND INCOMEBY ='{3}' AND (UPPER(SOURCE) = 'BUSINESS' OR UPPER(SOURCE) ='SALARY')";
+
+                DataBase.DBService.ExecuteCommandString(string.Format(UPDATEINCOMEWITHRETIREMENTAGE,
+                        updatedRetirementYear, PlannerAssumption.Pid, currentRetirementYear, client.Name), true);
+                ////update Expence where end year = currentRetirementYear
+                //const string UPDATEEXPENSEWITHRETIRETIREMENTAGE = "UPDATE EXPENSES SET ENDYEAR = {0} WHERE PID = {1} AND " +
+                //     "ENDYEAR = {2}";
+                //DataBase.DBService.ExecuteCommandString(string.Format(UPDATEEXPENSEWITHRETIRETIREMENTAGE,
+                //       updatedRetirementYear, PlannerAssumption.Pid, currentRetirementYear), true);
+
+                ////update Goal with retirement where category = retirement and start year = currentRetirementyear
+                //const string UPDATE_RETIRMENT_GOAL = "UPDATE GOALS SET STARTYEAR = {0} WHERE PID = {1} AND " +
+                //    "STARTYEAR = {2} AND CATEGORY ='Retirement'";
+                //DataBase.DBService.ExecuteCommandString(string.Format(UPDATE_RETIRMENT_GOAL,
+                //    updatedRetirementYear + 1, PlannerAssumption.Pid, currentRetirementYear + 1), true);
+            }
+        }
+
+        private static void updateClientIncomeExpenseGoalsWithAssumption(PlannerAssumption PlannerAssumption, PlannerAssumption currentplannerAssumption)
+        {
+            PlannerService ps = new PlannerService();
+            var planner = ps.GetByPlannerId(PlannerAssumption.Pid);
+            if (planner != null)
+            {
+                ClientService cs = new ClientService();
+                var client = cs.Get(planner.ClientId);
+                int currentRetirementYear = (client.DOB.Year + currentplannerAssumption.ClientRetirementAge);
+                int updatedRetirementYear = (client.DOB.Year + PlannerAssumption.ClientRetirementAge);
+
+                DataBase.DBService.BeginTransaction();
+
+                DataBase.DBService.ExecuteCommandString(string.Format(UPDATE_QUERY,
+                       PlannerAssumption.ClientRetirementAge,
+                       PlannerAssumption.SpouseRetirementAge,
+                       PlannerAssumption.ClientLifeExpectancy,
+                       PlannerAssumption.SpouseLifeExpectancy,
+                       PlannerAssumption.PreRetirementInflactionRate,
+                       PlannerAssumption.PostRetirementInflactionRate,
+                       PlannerAssumption.EquityReturnRate,
+                       PlannerAssumption.DebtReturnRate,
+                       PlannerAssumption.OtherReturnRate,
+                       PlannerAssumption.Decription,
+                       PlannerAssumption.UpdatedOn.ToString("yyyy-MM-dd hh:mm:ss"),
+                       PlannerAssumption.UpdatedBy,
+                       PlannerAssumption.IsClientRetirmentAgeIsPrimary,
+                       PlannerAssumption.ClientIncomeRise, PlannerAssumption.SpouseIncomeRise,
+                       PlannerAssumption.OngoingExpRise,
+                       PlannerAssumption.Id,
+                       PlannerAssumption.PostRetirementInvestmentReturnRate), true);
+
+                //update income where end year = currentRetirementYear
+                const string UPDATEINCOMEWITHRETIREMENTAGE = "UPDATE INCOME SET ENDYEAR = {0} WHERE PID ={1} AND " +
+                    "ENDYEAR = {2} AND INCOMEBY ='{3}' AND (UPPER(SOURCE) = 'BUSINESS' OR UPPER(SOURCE) ='SALARY')";
+
+                DataBase.DBService.ExecuteCommandString(string.Format(UPDATEINCOMEWITHRETIREMENTAGE,
+                        updatedRetirementYear, PlannerAssumption.Pid, currentRetirementYear, client.Name), true);
+                //update Expence where end year = currentRetirementYear
+                const string UPDATEEXPENSEWITHRETIRETIREMENTAGE = "UPDATE EXPENSES SET ENDYEAR = {0} WHERE PID = {1} AND " +
+                     "ENDYEAR = {2}";
+                DataBase.DBService.ExecuteCommandString(string.Format(UPDATEEXPENSEWITHRETIRETIREMENTAGE,
+                       updatedRetirementYear, PlannerAssumption.Pid, currentRetirementYear), true);
+
+                //update Goal with retirement where category = retirement and start year = currentRetirementyear
+                const string UPDATE_RETIRMENT_GOAL = "UPDATE GOALS SET STARTYEAR = {0} WHERE PID = {1} AND " +
+                    "STARTYEAR = {2} AND CATEGORY ='Retirement'";
+                DataBase.DBService.ExecuteCommandString(string.Format(UPDATE_RETIRMENT_GOAL,
+                    updatedRetirementYear + 1, PlannerAssumption.Pid, currentRetirementYear + 1), true);
+
             }
         }
 

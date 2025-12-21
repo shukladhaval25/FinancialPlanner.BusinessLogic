@@ -91,6 +91,7 @@
     <Compile Include="ApplicationMaster\CustomNotificationService.cs" />
     <Compile Include="ApplicationMaster\InsuranceCompanyService.cs" />
     <Compile Include="ApplicationMaster\OrganisationTypeService.cs" />
+    <Compile Include="ApplicationMaster\ReportPageSettingForMFD.cs" />
     <Compile Include="ApplicationMaster\ReportPageSettingService.cs" />
     <Compile Include="ApplicationMaster\SchemeCategoryService.cs" />
     <Compile Include="ApplicationMaster\SchemeService.cs" />
@@ -161,6 +162,7 @@
     <Compile Include="Plans\InvestmentSegmentService.cs" />
     <Compile Include="Plans\LoanService.cs" />
     <Compile Include="PlanOption\LumsumInvestmentRecomendationService.cs" />
+    <Compile Include="Plans\MFDInstumentMappedService.cs" />
     <Compile Include="Plans\NonFinancialAssetService.cs" />
     <Compile Include="Plans\OtherRecommedationSettingService.cs" />
     <Compile Include="Plans\PersonalAccidentInsuranceService.cs" />

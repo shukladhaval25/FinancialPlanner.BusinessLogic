@@ -398,7 +398,7 @@ namespace FinancialPlanner.BusinessLogic.ProspectClients
             }
             if (dr["OperationExecute"] != DBNull.Value)
             {
-                prospClient.OperationExecute = dr.Field<int>("OperatieonExecute");
+                prospClient.OperationExecute = dr.Field<int>("OperationExecute");
             }
             return prospClient;
         }

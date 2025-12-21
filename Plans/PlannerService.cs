@@ -83,7 +83,8 @@ namespace FinancialPlanner.BusinessLogic.Plans
                     planner.PlannerStartMonth, planner.AccountManagedBy, planner.Description,
                     planner.IsDeleted, planner.ReviewFrequency,planner.Recommendation,
                     planner.CurrencySymbol,planner.EquityRatio,planner.DebtRatio,
-                    planner.FaceType,planner.IsPlanLocked));
+                    planner.FaceType,planner.IsPlanLocked,
+                    (planner.PlannerOptionType == PlannerOptionType.MFD) ? "MFD" : "RIA"));
 
                 DataBase.DBService.ExecuteCommand(string.Format(INSERT_QUERY,
                     planner.ClientId, planner.Name, planner.StartDate.ToString("yyyy-MM-dd"),
